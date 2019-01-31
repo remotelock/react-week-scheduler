@@ -55,7 +55,8 @@ html {
     left: 0;
     top: 0;
     z-index: 2;
-    background: red;
+    border: 3px dashed hsla(209, 97%,50%, 0.5);
+    background: hsla(209, 97%, 65%, 0.5);
     width: 100px;
     height: 100px;
   }

@@ -1,4 +1,10 @@
-import React, { useRef, useState, useLayoutEffect, useEffect } from "react";
+import React, {
+  useRef,
+  useState,
+  useLayoutEffect,
+  useEffect,
+  useMemo
+} from "react";
 import ReactDOM from "react-dom";
 import { times, isEqual, floor, ceil } from "lodash";
 import {
@@ -22,68 +28,60 @@ import {
 } from "rxjs/operators";
 
 import "./styles.scss";
-
-const mapPageCoordinatesToContainer = container => {
-  return event => {
-    let { clientX, clientY, pageX, pageY } = event;
-
-    if ("changedTouches" in event) {
-      ({ clientX, clientY } = event.changedTouches[0]);
-    }
-
-    const { top, bottom, left, right } = container.getBoundingClientRect();
-    return {
-      clientX,
-      clientY,
-      pageX,
-      pageY,
-      x: clientX - left,
-      y: clientY - top
-    };
-  };
-};
+import { useClickAndDrag } from "./useClickAndDrag";
 
 const getSpan = (x1, x2) => 1 + x2 - x1;
 
-const addCellInfo = ({ container, numVerticalCells, numHorizontalCells }) => {
-  return (data): BoxInfo => {
-    const { top, left, right, bottom, ...rest } = data;
-    const { scrollWidth: width, scrollHeight: height } = container;
-    const cellHeight = height / numVerticalCells;
-    const cellWidth = width / numHorizontalCells;
-    const startCell = {
-      x: floor(left / cellWidth),
-      y: floor(top / cellHeight)
-    };
-    const endCell = {
-      x: floor(right / cellWidth),
-      y: floor(bottom / cellHeight)
-    };
-    const spanX = getSpan(startCell.x, endCell.x);
-    const spanY = getSpan(startCell.y, endCell.y);
+type Coords = { x: number; y: number };
 
-    return {
-      ...data,
-      top: startCell.y * cellHeight,
-      left: startCell.x * cellWidth,
-      bottom: endCell.y + 1,
-      right: endCell.x + 1,
-      width: spanX * cellWidth,
-      height: spanY * cellHeight,
-      spanX,
-      spanY,
-      // ...data,
-      startCell,
-      endCell
-    };
+type CellInfo = {
+  spanX: number;
+  spanY: number;
+  startX: number;
+  startY: number;
+  endX: number;
+  endY: number;
+};
+
+const createGridForContainer = ({
+  container,
+  numVerticalCells,
+  numHorizontalCells
+}) => {
+  return {
+    getCellFromRect(data: ClientRect): CellInfo {
+      const { top, left, right, bottom, ...rest } = data;
+      const { scrollWidth: width, scrollHeight: height } = container;
+      const cellHeight = height / numVerticalCells;
+      const cellWidth = width / numHorizontalCells;
+      const startX = floor(left / cellWidth);
+      const startY = floor(top / cellHeight);
+      const endX = floor(right / cellWidth);
+      const endY = floor(bottom / cellHeight);
+      const spanX = getSpan(startX, endX);
+      const spanY = getSpan(startY, endY);
+
+      return {
+        spanX,
+        spanY,
+        startX,
+        startY,
+        endX,
+        endY
+      };
+    }
   };
 };
 
-const mapSpanToDate = ({ startCell, endCell, yToMin = y => y * 30 }) => {
-  const startDay = startCell.x;
-  const endDay = endCell.x;
-  const spanX = getSpan(startCell.x, endCell.x);
-  const spanY = getSpan(startCell.y, endCell.y);
+type Grid = ReturnType<typeof createGridForContainer>;
+type DateRange = [Date, Date];
+
+const createMapCellInfoToDate = ({
+  toMin = y => y * 30,
+  toDay = x => x
+} = {}) => ({ startX, startY, endX, spanX, spanY }: CellInfo): DateRange => {
+  const startDay = startX;
+  const endDay = endX;
 
   const startDate = addMinutes(
     addDays(
@@ -92,157 +90,67 @@ const mapSpanToDate = ({ startCell, endCell, yToMin = y => y * 30 }) => {
       }),
       startDay
     ),
-    yToMin(startCell.y)
+    toMin(startY)
   );
-  const endDate = addDays(addMinutes(startDate, yToMin(spanY)), spanX - 1);
+  const endDate = addDays(addMinutes(startDate, toMin(spanY)), spanX - 1);
 
-  return {
-    start: {
-      date: startDate,
-      day: getDay(startDate),
-      hour: getTime(startDate)
-    },
-    end: { date: endDate, day: getDay(endDate), hour: getTime(endDate) }
-  };
+  return [startDate, endDate];
 };
 
-type Coords = { x: number; y: number };
+function Event({ style }) {
+  return (
+    <div className="event" style={style}>
+      Event
+    </div>
+  );
+}
 
-type BoxInfo = {
-  top: number;
-  bottom: number;
-  left: number;
-  right: number;
-  width: number;
-  height: number;
-  spanX: number;
-  spanY: number;
-  startCell: Coords;
-  endCell: Coords;
+const getTextForDateRange = ([start, end]: DateRange) => {
+  const startDateStr = format(start, "ddd h:mma");
+  const endDateStr = format(end, "ddd h:mma");
+
+  return `${startDateStr} - ${endDateStr}`;
 };
 
-function useMouseClickAndDrag(ref: React.Ref<any>) {
-  const [style, setStyle] = useState({ top: 0, left: 0, width: 0, height: 0 });
-  const [text, setText] = useState("");
-  const [boxInfo, setBoxInfo] = useState<BoxInfo>({
-    top: 0,
-    bottom: 0,
-    left: 0,
-    right: 0,
-    width: 0,
-    height: 0,
-    spanX: 0,
-    spanY: 0,
-    startCell: { x: 0, y: 0 },
-    endCell: { x: 0, y: 0 }
-  });
-  const [isDragging, setIsDragging] = useState(false);
-  const [hasFinishedDragging, setHasFinishedDragging] = useState(false);
-
-  useLayoutEffect(() => {
-    if (!ref.current) {
-      return;
-    }
-
-    const container = ref.current;
-
-    const touchStart$ = fromEvent(container, "touchstart");
-    const touchMove$ = fromEvent(container, "touchmove");
-    const touchEnd$ = fromEvent(container, "touchend");
-
-    const mouseDown$ = fromEvent(container, "mousedown");
-    const mouseMove$ = fromEvent(container, "mousemove");
-    const mouseUp$ = fromEvent(container, "mouseup");
-
-    const dragStart$ = merge(mouseDown$, touchStart$).pipe(
-      tap(e => e.stopPropagation()),
-      tap(e => e.preventDefault()),
-      map(mapPageCoordinatesToContainer(container))
-    );
-
-    const dragEnd$ = merge(mouseUp$, touchEnd$).pipe(
-      map(mapPageCoordinatesToContainer(container)),
-      tap(() => {
-        setIsDragging(false);
-        setHasFinishedDragging(true);
-      })
-    );
-    const move$ = merge(mouseMove$, touchMove$).pipe(
-      map(mapPageCoordinatesToContainer(container))
-    );
-
-    const box$ = dragStart$.pipe(
-      tap(() => {
-        setIsDragging(true);
-        setHasFinishedDragging(false);
-      }),
-      mergeMap(down => {
-        return move$.pipe(
-          map(move => {
-            return {
-              top: Math.min(down.y, move.y),
-              bottom: Math.max(down.y, move.y),
-              left: Math.min(down.x, move.x),
-              right: Math.max(down.x, move.x),
-              width: Math.abs(move.x - down.x),
-              height: Math.abs(move.y - down.y)
-            };
-          }),
-          map(
-            addCellInfo({
-              container,
-              numHorizontalCells: 7,
-              numVerticalCells: 48
-            })
-          ),
-          takeUntil(dragEnd$)
-        );
-      }),
-      tap(setBoxInfo)
-    );
-
-    const style$ = box$.pipe(
-      map(({ top, left, width, height }) => ({
-        top,
-        left,
-        width,
-        height
-      }))
-    );
-
-    const span$ = box$.pipe(distinctUntilChanged(isEqual));
-
-    const text$ = span$.pipe(
-      map(mapSpanToDate),
-      map(({ start, end }) => {
-        const startDateStr = format(start.date, "ddd h:mma");
-        const endDateStr = format(end.date, "ddd h:mma");
-
-        return `${startDateStr} - ${endDateStr}`;
-      })
-    );
-
-    const subscriber2 = text$.subscribe(setText);
-    const subscriber = style$.subscribe(setStyle);
-
-    return () => {
-      subscriber2.unsubscribe();
-      subscriber.unsubscribe();
-    };
-  }, []);
-
-  return [{ style, text, boxInfo, isDragging, hasFinishedDragging }];
-}
-
-function Event() {
-  return <div className="event">Event</div>;
-}
+const cellInfoToDate = createMapCellInfoToDate();
 
 function App() {
-  const parent = useRef(null);
-  const [
-    { style, text, isDragging, hasFinishedDragging, boxInfo }
-  ] = useMouseClickAndDrag(parent);
+  const parent = useRef<HTMLElement | null>(null);
+  const [{ style, box, isDragging, hasFinishedDragging }] = useClickAndDrag(
+    parent
+  );
+  const [text, setText] = useState("");
+
+  const grid = useMemo<Grid | null>(
+    () => {
+      if (!parent.current) {
+        return null;
+      }
+
+      return createGridForContainer({
+        container: parent.current,
+        numHorizontalCells: 7,
+        numVerticalCells: 24
+      });
+    },
+    [parent.current]
+  );
+
+  useLayoutEffect(
+    () => {
+      if (!grid) {
+        return;
+      }
+
+      const cell = grid.getCellFromRect(box);
+      const dateRange = cellInfoToDate(cell);
+
+      setText(getTextForDateRange(dateRange));
+    },
+    [box]
+  );
+
+  const event = {};
 
   return (
     <div className="root">
@@ -267,21 +175,25 @@ function App() {
               {hasFinishedDragging && <div className="popup">Popup</div>}
             </div>
           )}
+          {/* <Event {...event} /> */}
           {times(7).map(x => {
+            const cellInfo = createMapCellInfoToDate({ toMin: y => y * 60 });
+
             return (
               <div className="day-column">
                 <div className="day-hours">
                   {times(24).map(y => {
-                    const { start } = mapSpanToDate({
-                      startCell: { x, y },
-                      endCell: { x, y },
-                      yToMin: y => y * 60
+                    const [start] = cellInfo({
+                      startX: x,
+                      startY: y,
+                      endX: x,
+                      endY: y,
+                      spanX: 1,
+                      spanY: 1
                     });
 
                     return (
-                      <div className="cell">
-                        {format(start.date, "ddd h:mma")}
-                      </div>
+                      <div className="cell">{format(start, "ddd h:mma")}</div>
                     );
                   })}
                 </div>
