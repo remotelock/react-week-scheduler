@@ -4,9 +4,19 @@ html {
 }
 
 .root {
-  height:700px;
-  width: 800px;
+  height: 100vh;
+  width: 100vw;
+  position: relative;
+  // top: 50px;
+  // left: 50px;
   overflow: auto;
+  margin-bottom: 100px;
+}
+
+.debug {
+  &:not(.debug-active) {
+    display: none;
+  }
 }
 
 
@@ -52,6 +62,9 @@ html {
 
   .drag-box {
     position: absolute;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    // white-space: nowrap;
     left: 0;
     top: 0;
     z-index: 2;
@@ -70,12 +83,13 @@ html {
   position: absolute;
   font-weight: bold;
   font-size: 110%;
-  --background: hsl(125, 65%, 93%);
-  --text: hsl(125, 86%, 14%);
+  --text: hsl(207, 65%, 93%);
+  --border: hsl(207, 60%, 85%);
+  --background: hsl(202, 91%, 14%);
   box-shadow: 0 1px 5px hsla(0, 0%, 50%, 0.2),
     0 1px 10px hsla(0, 0%, 85%, 0.239);
-  border: 0.5px solid var(--text);
-  padding: 15px;
+  border: 0.5px solid var(--border);
+  // padding: 15px;
   border-radius: 5px;
   background: var(--background);
   color: var(--text);
@@ -83,6 +97,17 @@ html {
   right: 0;
   width: 100px;
   height: 100px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  &.is-pending-creation {
+    opacity: 0.75;
+  }
+  // white-space: nowrap;
+}
+
+.hours-container {
+  display: flex;
 }
 
 .day-column {
@@ -94,8 +119,6 @@ html {
     background: hsla(0, 0%, 97%, 1);
     font-size: 20px;
     // border: 1px solid lightgray;
-    box-shadow: 0 1px 5px hsla(0, 0%, 50%, 0.2),
-      0 1px 10px hsla(0, 0%, 85%, 0.239);
   }
 
   .day-hours {
@@ -106,7 +129,10 @@ html {
 
   .cell {
     border: 0.5px solid hsla(0, 0%, 83%, 0.5);
-    flex: 1 1 50px;
+    transition-duration: 0.5s;
+    transition-timing-function: ease-in-out;
+    // transition-property: height width;
+    flex: 1 1 75px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -118,4 +144,41 @@ html {
   position: sticky;
   z-index: 2;
   top: 0;
+  box-shadow: 0 1px 5px hsla(0, 0%, 50%, 0.2),
+    0 1px 10px hsla(0, 0%, 85%, 0.239);
+}
+
+.day-column.first {
+  width: 100px;
+  max-width: 100px;
+  min-width: 0;
+  flex-grow: 0;
+  flex-shrink: 0;
+}
+
+.popup {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.range-boxes {
+  .range-box {
+    display: inline-flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+
+    & > * {
+      width: 100%;
+    }
+  }
+
+  .start {
+    align-self: start;
+  }
+
+  .end {
+    align-self: end;
+  }
 }

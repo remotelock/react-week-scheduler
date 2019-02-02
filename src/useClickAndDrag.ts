@@ -18,19 +18,32 @@ import {
   combineLatest,
   withLatestFrom,
   mergeMap,
+  startWith,
+  take,
   distinctUntilChanged
 } from "rxjs/operators";
 import { createPageMapCoordsToContainer } from "./utils/createPageMapCoordsToContainer";
 
+export type Rect = ClientRect & {
+  startX: number;
+  endX: number;
+  startY: number;
+  endY: number;
+};
+
 export function useClickAndDrag(ref: React.Ref<HTMLElement>) {
   const [style, setStyle] = useState({ top: 0, left: 0, width: 0, height: 0 });
-  const [box, setBox] = useState<ClientRect>({
+  const [box, setBox] = useState<Rect>({
     top: 0,
     bottom: 0,
     left: 0,
     right: 0,
     width: 0,
-    height: 0
+    height: 0,
+    startX: 0,
+    startY: 0,
+    endX: 0,
+    endY: 0
   });
   const [isDragging, setIsDragging] = useState(false);
   const [hasFinishedDragging, setHasFinishedDragging] = useState(false);
@@ -44,12 +57,12 @@ export function useClickAndDrag(ref: React.Ref<HTMLElement>) {
     const mapCoordsToContainer = createPageMapCoordsToContainer(container);
 
     const touchStart$ = fromEvent(container, "touchstart");
-    const touchMove$ = fromEvent(container, "touchmove");
-    const touchEnd$ = fromEvent(container, "touchend");
+    const touchMove$ = fromEvent(window, "touchmove");
+    const touchEnd$ = fromEvent(window, "touchend");
 
     const mouseDown$ = fromEvent(container, "mousedown");
-    const mouseMove$ = fromEvent(container, "mousemove");
-    const mouseUp$ = fromEvent(container, "mouseup");
+    const mouseMove$ = fromEvent(window, "mousemove");
+    const mouseUp$ = fromEvent(window, "mouseup");
 
     const dragStart$ = merge(mouseDown$, touchStart$).pipe(
       tap(e => e.stopPropagation()),
@@ -66,6 +79,8 @@ export function useClickAndDrag(ref: React.Ref<HTMLElement>) {
     );
     const move$ = merge(mouseMove$, touchMove$).pipe(map(mapCoordsToContainer));
 
+    // move$.subscribe(({ x, y }) => console.log(x, y));
+
     const box$ = dragStart$.pipe(
       tap(() => {
         setIsDragging(true);
@@ -73,9 +88,14 @@ export function useClickAndDrag(ref: React.Ref<HTMLElement>) {
       }),
       mergeMap(down => {
         return move$.pipe(
+          startWith(down),
           map(
-            (move): ClientRect => {
+            (move): Rect => {
               return {
+                startX: down.x,
+                startY: down.y,
+                endX: move.x,
+                endY: move.y,
                 top: Math.min(down.y, move.y),
                 bottom: Math.max(down.y, move.y),
                 left: Math.min(down.x, move.x),
@@ -85,10 +105,12 @@ export function useClickAndDrag(ref: React.Ref<HTMLElement>) {
               };
             }
           ),
+          // tap(({ endY }) => console.log({ endY })),
           takeUntil(dragEnd$)
         );
       }),
       distinctUntilChanged(isEqual)
+      // tap(({ top, left }) => console.log(top, left))
     );
 
     const style$ = box$.pipe(

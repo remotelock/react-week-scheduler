@@ -1,5 +1,5 @@
 {
-  "name": "new",
+  "name": "calendar",
   "version": "1.0.0",
   "description": "",
   "keywords": [],
@@ -12,6 +12,7 @@
     "react": "16.8.0-alpha.1",
     "react-dom": "16.8.0-alpha.1",
     "react-scripts": "2.0.3",
+    "react-spring": "7.2.10",
     "rxjs": "latest"
   },
   "devDependencies": {
