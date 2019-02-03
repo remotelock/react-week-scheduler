@@ -106,10 +106,26 @@ const createGridForContainer = ({
     }
 
     getCellFromRect(data: Rect): CellInfo {
-      const startX = floor(data.left / this.cellWidth);
-      const startY = round(data.top / this.cellHeight);
-      const endX = floor(data.right / this.cellWidth);
-      const endY = round(data.bottom / this.cellHeight);
+      const startX = clamp(
+        floor(data.left / this.cellWidth),
+        0,
+        numHorizontalCells - 1
+      );
+      const startY = clamp(
+        round(data.top / this.cellHeight),
+        0,
+        numVerticalCells - 1
+      );
+      const endX = clamp(
+        floor(data.right / this.cellWidth),
+        0,
+        numHorizontalCells - 1
+      );
+      const endY = clamp(
+        round(data.bottom / this.cellHeight),
+        0,
+        numVerticalCells - 1
+      );
       const spanX = clamp(getSpan(startX, endX), 1, numHorizontalCells);
       const spanY = clamp(getSpan(startY, endY), 1, numVerticalCells);
 
@@ -144,11 +160,11 @@ type RecurringTimeRange = DateRange[];
 const cellToDate = ({ startX, startY, toMin, toDay, originDate }) =>
   addMinutes(addDays(originDate, startX), toMin(startY));
 
-const createMapCellInfoToRecurringTimeRange = ({
+const createMapCellInfoToRecurringTimeRange: MapCellInfoToDateRange = ({
   toMin,
   toDay,
   originDate
-}) => ({ startX, startY, endX, endY, spanX, spanY }: CellInfo): DateRange[] => {
+}) => ({ startX, startY, endX, endY, spanX, spanY }) => {
   return range(startX, endX + 1)
     .map(i => {
       const startDate = cellToDate({
@@ -167,19 +183,16 @@ const createMapCellInfoToRecurringTimeRange = ({
 
       return range;
     })
-    .sort((rangeA, rangeB) => (isBefore(rangeA[0], rangeB[0]) ? 1 : 0));
+    .sort((rangeA, rangeB) => (isBefore(rangeA[0], rangeB[0]) ? 0 : 1));
 };
 
 type DateRange = [Date, Date];
 
-const createMapCellInfoToDateRange = ({ toMin, toDay, originDate }) => ({
-  startX,
-  startY,
-  endX,
-  endY,
-  spanX,
-  spanY
-}: CellInfo): DateRange[] => {
+const createMapCellInfoToDateRange: MapCellInfoToDateRange = ({
+  toMin,
+  toDay,
+  originDate
+}) => ({ startX, startY, endX, endY, spanX, spanY }) => {
   const startDay = startX;
   const endDay = endX;
   const startDate = cellToDate({ startX, startY, toMin, toDay, originDate });
@@ -190,11 +203,25 @@ const createMapCellInfoToDateRange = ({ toMin, toDay, originDate }) => ({
     toDay,
     originDate
   });
-  // console.log(startDate, endDate);
 
   return [
     isBefore(startDate, endDate) ? [startDate, endDate] : [endDate, startDate]
   ];
+};
+
+const constraintToOneDay = ([start, end]: DateRange): DateRange => {
+  console.log(start, end);
+  if (isEqualDate(startOfDay(end), end)) {
+    return [start, startOfDay(addDays(start, 1))];
+  }
+  return [start, setDay(end, getDay(start))];
+};
+
+const createMapCellInfoToSingleDateRange: MapCellInfoToDateRange = options => {
+  const mapToRange = createMapCellInfoToDateRange(options);
+  return (info: CellInfo): DateRange[] => {
+    return [constraintToOneDay(mapToRange(info)[0])];
+  };
 };
 
 const createMapDateRangeToCells = ({
@@ -234,17 +261,12 @@ const createMapDateRangeToCells = ({
 
   if (isEqualDate(end, startOfDay(end))) {
     cells.pop();
-    return cells;
   }
 
   return cells;
 };
 
 const originDate = startOfWeek(new Date(), { weekStartsOn: 1 });
-
-const constraintToOneDay = ([start, end]: DateRange): DateRange => {
-  return [start, setDay(end, getDay(start))];
-};
 
 function Event({ style }) {
   return (
@@ -273,14 +295,17 @@ const getTextForDateRange = (
   return `${startDateStr}-${endDateStr}`;
 };
 
-const numVerticalCells = 96;
-const numHorizontalCells = 7;
-const toMin = y => y * 15;
+const MINS_IN_DAY = 24 * 60;
+const verticalPrecision = 1 / 15;
+const horiziontalPrecision = 1;
+const numVerticalCells = MINS_IN_DAY * verticalPrecision;
+const numHorizontalCells = 7 * horiziontalPrecision;
+const toMin = y => y / verticalPrecision;
 const fromY = toMin;
-const toDay = x => x;
+const toDay = x => x / horiziontalPrecision;
 const fromX = toDay;
-const toX = days => days;
-const toY = mins => mins / 15;
+const toX = days => days * horiziontalPrecision;
+const toY = mins => mins * verticalPrecision;
 
 const springConfig = {
   mass: 0.5,
@@ -291,11 +316,22 @@ const springConfig = {
   velocity: 0
 };
 
+type MapCellInfoToDateRangeOptions = {
+  toMin: (y) => number;
+  toDay: (x) => number;
+  originDate: Date;
+};
+
+type MapCellInfoToDateRange = (
+  options: MapCellInfoToDateRangeOptions
+) => (cellInfo: CellInfo) => DateRange[];
+
 const cellInfoToDate = createMapCellInfoToRecurringTimeRange({
   originDate,
   toMin,
   toDay
 });
+
 const dateRangeToCells = createMapDateRangeToCells({
   originDate,
   numVerticalCells,
@@ -344,7 +380,7 @@ function App() {
       const cell = grid.getCellFromRect(constraintedBox);
       const dateRanges = cellInfoToDate(cell);
       const event = dateRanges;
-      // console.log(event.map(getTextForDateRange));
+      console.log(event.map(d => getTextForDateRange(d)));
       setPendingCreation(event);
     },
     [box]

@@ -1,4 +1,10 @@
-import React, { useRef, useState, useLayoutEffect, useEffect } from "react";
+import React, {
+  useMemo,
+  useRef,
+  useState,
+  useLayoutEffect,
+  useEffect
+} from "react";
 import ReactDOM from "react-dom";
 import { times, isEqual, floor, ceil } from "lodash";
 import {
@@ -31,7 +37,7 @@ export type Rect = ClientRect & {
   endY: number;
 };
 
-export function useClickAndDrag(ref: React.Ref<HTMLElement>) {
+export function useClickAndDrag(ref: React.RefObject<HTMLElement>) {
   const [style, setStyle] = useState({ top: 0, left: 0, width: 0, height: 0 });
   const [box, setBox] = useState<Rect>({
     top: 0,
@@ -49,11 +55,11 @@ export function useClickAndDrag(ref: React.Ref<HTMLElement>) {
   const [hasFinishedDragging, setHasFinishedDragging] = useState(false);
 
   useLayoutEffect(() => {
-    if (!ref.current) {
+    const container = ref.current;
+    if (!container) {
       return;
     }
 
-    const container = ref.current;
     const mapCoordsToContainer = createPageMapCoordsToContainer(container);
 
     const touchStart$ = fromEvent(container, "touchstart");
@@ -91,17 +97,26 @@ export function useClickAndDrag(ref: React.Ref<HTMLElement>) {
           startWith(down),
           map(
             (move): Rect => {
+              const startX = Math.max(down.x, 0);
+              const startY = Math.max(down.y, 0);
+              const endX = Math.min(move.x, container.scrollWidth);
+              const endY = Math.min(move.y, container.scrollHeight);
+              const top = Math.min(startY, endY);
+              const bottom = Math.max(startY, endY);
+              const left = Math.min(startX, endX);
+              const right = Math.max(startX, endX);
+
               return {
-                startX: down.x,
-                startY: down.y,
-                endX: move.x,
-                endY: move.y,
-                top: Math.min(down.y, move.y),
-                bottom: Math.max(down.y, move.y),
-                left: Math.min(down.x, move.x),
-                right: Math.max(down.x, move.x),
-                width: Math.abs(move.x - down.x),
-                height: Math.abs(move.y - down.y)
+                startX,
+                startY,
+                endX,
+                endY,
+                top,
+                bottom,
+                left,
+                right,
+                width: right - left,
+                height: bottom - top
               };
             }
           ),
