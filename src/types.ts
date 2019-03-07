@@ -26,6 +26,8 @@ export type MapCellInfoToDateRangeOptions = {
 export type Grid = {
   cellHeight: number;
   cellWidth: number;
+  totalWidth: number;
+  totalHeight: number;
   getRectFromCell(cell: CellInfo): Rect;
   getCellFromRect(rect: Rect): CellInfo;
 };

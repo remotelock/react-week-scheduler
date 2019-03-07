@@ -12,12 +12,20 @@ export const createGridForContainer = ({
   numHorizontalCells: number;
 }): Grid => {
   return new class Grid {
+    get totalHeight() {
+      return container.scrollHeight;
+    }
+
+    get totalWidth() {
+      return container.scrollWidth;
+    }
+
     get cellHeight() {
-      return container.scrollHeight / numVerticalCells;
+      return this.totalHeight / numVerticalCells;
     }
 
     get cellWidth() {
-      return container.scrollWidth / numHorizontalCells;
+      return this.totalWidth / numHorizontalCells;
     }
 
     getRectFromCell(data: CellInfo) {

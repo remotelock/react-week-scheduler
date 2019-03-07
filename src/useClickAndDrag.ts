@@ -33,18 +33,7 @@ import { Rect } from './types';
 
 export function useClickAndDrag(ref: React.RefObject<HTMLElement>) {
   const [style, setStyle] = useState({ top: 0, left: 0, width: 0, height: 0 });
-  const [box, setBox] = useState<Rect>({
-    top: 0,
-    bottom: 0,
-    left: 0,
-    right: 0,
-    width: 0,
-    height: 0,
-    startX: 0,
-    startY: 0,
-    endX: 0,
-    endY: 0
-  });
+  const [box, setBox] = useState<Rect | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [hasFinishedDragging, setHasFinishedDragging] = useState(false);
 
@@ -142,5 +131,5 @@ export function useClickAndDrag(ref: React.RefObject<HTMLElement>) {
     };
   }, []);
 
-  return [{ style, box, isDragging, hasFinishedDragging }];
+  return { style, box, isDragging, hasFinishedDragging };
 }

@@ -11,6 +11,7 @@
     "lodash": "latest",
     "react": "16.8.0-alpha.1",
     "react-dom": "16.8.0-alpha.1",
+    "react-draggable": "^3.2.1",
     "react-scripts": "^2.1.5",
     "react-spring": "7.2.10",
     "rxjs": "latest"

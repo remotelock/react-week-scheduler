@@ -75,10 +75,15 @@ html {
   }
 }
 
+.draggable {
+  z-index: 2;
+}
+
 .event {
   user-select: none;
   display: block;
-  z-index: 2;
+  z-index: 5;
+  position: relative;
   margin: 0;
   position: absolute;
   font-weight: bold;
@@ -102,6 +107,10 @@ html {
 
   &.is-pending-creation {
     opacity: 0.75;
+  }
+
+  &.is-pending-edit {
+    // opacity: 0.1;
   }
   // white-space: nowrap;
 }
