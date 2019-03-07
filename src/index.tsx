@@ -23,8 +23,9 @@ import { createGridForContainer } from './utils/createGridFromContainer';
 import { getTextForDateRange } from './utils/getTextForDateRange';
 
 import './styles.scss';
-import { Grid, DateRange } from './types';
+import { Grid, Event as CalendarEvent } from './types';
 import { createMapCellInfoToContiguousDateRange } from './createMapCellInfoToContiguousDateRange';
+import { mergeEvents } from './utils/mergeEvents';
 
 const originDate = startOfWeek(new Date(), { weekStartsOn: 1 });
 
@@ -40,9 +41,7 @@ const fromX = toDay;
 const toX = (days: number) => days * horizontalPrecision;
 const toY = (mins: number) => mins * verticalPrecision;
 
-type Event = DateRange[];
-
-const schedule: Event = [
+const schedule: CalendarEvent = [
   ['2019-03-03T22:45:00.000Z', '2019-03-04T01:15:00.000Z'],
   ['2019-03-04T22:45:00.000Z', '2019-03-05T01:15:00.000Z'],
   ['2019-03-05T22:45:00.000Z', '2019-03-06T01:15:00.000Z'],
@@ -87,7 +86,7 @@ function Event({
   isResizable,
   isDeletable
 }: {
-  event: Event;
+  event: CalendarEvent;
   grid: Grid;
   className?: string;
   isResizable?: boolean;
@@ -187,16 +186,11 @@ function App() {
             <Event
               isResizable
               isDeletable
-              event={reject<any>(schedule, range => {
-                return (
-                  pendingCreation !== null &&
-                  pendingCreation.some(
-                    pendingCreationRange =>
-                      isSameOrAfter(range[0], pendingCreationRange[0]) &&
-                      isSameOrBefore(range[1], pendingCreationRange[1])
-                  )
-                );
-              })}
+              event={
+                pendingCreation
+                  ? mergeEvents(schedule, pendingCreation)
+                  : schedule
+              }
               grid={grid}
             />
           )}

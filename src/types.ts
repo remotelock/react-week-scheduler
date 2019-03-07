@@ -1,5 +1,7 @@
 export type Coords = { x: number; y: number };
 
+export type Event = DateRange[];
+
 export type CellInfo = {
   spanX: number;
   spanY: number;
