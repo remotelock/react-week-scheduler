@@ -9,6 +9,7 @@
     "classcat": "^3.2.5",
     "date-fns": "latest",
     "lodash": "latest",
+    "merge-ranges": "^1.0.2",
     "react": "16.8.0-alpha.1",
     "react-dom": "16.8.0-alpha.1",
     "react-draggable": "^3.2.1",

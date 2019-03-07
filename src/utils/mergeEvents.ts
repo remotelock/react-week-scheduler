@@ -1,4 +1,4 @@
-import { times, find, reject } from 'lodash';
+import { times, find, reject, isEmpty } from 'lodash';
 import {
   min,
   areRangesOverlapping,
@@ -8,54 +8,42 @@ import {
   isWithinRange
 } from 'date-fns';
 import { Event, DateRange } from '../types';
+// @ts-ignore
+import _mergeRanges from 'merge-ranges';
+
+export function mergeRanges(event: Event): Event {
+  return _mergeRanges([...event].map(d => d.map(c => new Date(c))));
+}
 
 export function rejectOverlappingRanges(event1: Event, event2: Event): Event {
   return reject(event1, range1 => {
-    const range2 = find(
-      event2,
-      range => isSameDay(range[0], range1[0]) && isSameDay(range[1], range1[1])
-    );
+    try {
+      const range2 = find(
+        event2,
+        range =>
+          isSameDay(range[0], range1[0]) && isSameDay(range[1], range1[1])
+      );
 
-    if (!range2) {
+      if (!range2) {
+        return false;
+      }
+
+      if (
+        isWithinRange(range1[0], range2[0], range2[1]) &&
+        isWithinRange(range1[1], range2[0], range2[1])
+      ) {
+        return true;
+      }
+    } finally {
       return false;
-    }
-
-    if (
-      isWithinRange(range1[0], range2[0], range2[1]) &&
-      isWithinRange(range1[1], range2[0], range2[1])
-    ) {
-      return true;
     }
   }) as Event;
 }
 
-export function mergeEvents(event1: Event, event2: Event): Event {
-  return times(Math.max(event1.length, event2.length), i => {
-    const range1 = event1[i];
-    const range2 = find(
-      event2,
-      range => isSameDay(range[0], range1[0]) && isSameDay(range[1], range1[1])
-    );
+export function mergeEvents(event1: Event, event2: Event | null): Event {
+  if (event2 === null) {
+    return event1;
+  }
 
-    if (!range2) {
-      return range1;
-    }
-
-    if (!range1) {
-      return range2;
-    }
-
-    if (
-      areRangesOverlapping(range1[0], range1[1], range2[0], range2[1]) ||
-      isEqual(range1[0], range2[1]) ||
-      isEqual(range1[1], range2[0])
-    ) {
-      return [
-        min(range1[0], range2[0]),
-        max(range1[1], range2[1])
-      ] as DateRange;
-    }
-
-    return range1;
-  });
+  return mergeRanges([...event1, ...event2]);
 }

@@ -32,7 +32,11 @@ import { getTextForDateRange } from './utils/getTextForDateRange';
 import './styles.scss';
 import { Grid, Event as CalendarEvent, CellInfo, DateRange } from './types';
 import { createMapCellInfoToContiguousDateRange } from './createMapCellInfoToContiguousDateRange';
-import { mergeEvents, rejectOverlappingRanges } from './utils/mergeEvents';
+import {
+  mergeEvents,
+  rejectOverlappingRanges,
+  mergeRanges
+} from './utils/mergeEvents';
 
 const originDate = startOfWeek(new Date(), { weekStartsOn: 1 });
 
@@ -123,7 +127,6 @@ function RangeBox({
     const _end = _start + height;
     const top = Math.min(_start, _end);
     const bottom = top + height;
-    console.log({ _end, _start, height });
 
     const newRect = {
       ...rect,
@@ -224,7 +227,7 @@ function App() {
       ['2019-03-05T22:00:00.000Z', '2019-03-06T01:00:00.000Z'],
       ['2019-03-06T22:00:00.000Z', '2019-03-07T01:00:00.000Z'],
       ['2019-03-07T22:00:00.000Z', '2019-03-08T01:00:00.000Z'],
-      ['2019-03-08T22:00:00.000Z', '2019-03-09T01:00:00.000Z'],
+      // ['2019-03-08T22:00:00.000Z', '2019-03-09T01:00:00.000Z'],
       ['2019-03-09T22:00:00.000Z', '2019-03-10T01:00:00.000Z']
     ].map(
       range => range.map(dateString => new Date(dateString)) as [Date, Date]
@@ -260,10 +263,17 @@ function App() {
     const cell = grid.getCellFromRect(constrainedBox);
     const dateRanges = cellInfoToDateRanges(cell);
     const event = dateRanges;
-    console.log(event);
-    console.log(event.map(d => getTextForDateRange(d)));
+    console.log(...event.map(d => getTextForDateRange(d)));
     setPendingCreation(event);
-  }, [box, size]);
+  }, [box]);
+
+  useEffect(() => {
+    if (hasFinishedDragging) {
+      console.log('finished');
+      setSchedule(schedule => mergeEvents(schedule, pendingCreation));
+      setPendingCreation(null);
+    }
+  }, [hasFinishedDragging]);
 
   const handleEventMove = useCallback<OnMoveCallback>(
     (newDateRange, rangeIndex) => {
@@ -273,7 +283,7 @@ function App() {
         }
         const newSchedule = [...schedule];
         newSchedule[rangeIndex] = newDateRange;
-        return newSchedule;
+        return mergeRanges(newSchedule);
       });
     },
     []
@@ -291,34 +301,27 @@ function App() {
         ))}
       </div>
       <div className="layer-container">
-        {grid && (
+        {grid && !pendingCreation && (
           <Event
             isResizable
             isDeletable
-            isBeingEdited={cell =>
-              pendingCreation !== null &&
-              rejectOverlappingRanges(
-                cellInfoToDateRanges(cell),
-                pendingCreation
-              ).length == 0
-            }
             onMove={handleEventMove}
             event={schedule}
             grid={grid}
           />
         )}
 
-        {(isDragging || hasFinishedDragging) && (
+        {isDragging && (
           <div className="drag-box" style={style}>
             {dragBoxText}
-            {hasFinishedDragging && <div className="popup">Popup</div>}
+            {hasFinishedDragging && <div className="popup" />}
           </div>
         )}
         {hasFinishedDragging && <div className="popup">Popup</div>}
-        {grid && pendingCreation && (isDragging || hasFinishedDragging) && (
+        {grid && pendingCreation && isDragging && (
           <Event
             className="is-pending-creation"
-            event={pendingCreation}
+            event={mergeEvents(schedule, pendingCreation)}
             grid={grid}
           />
         )}
