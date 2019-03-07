@@ -29,13 +29,7 @@ import {
   distinctUntilChanged
 } from 'rxjs/operators';
 import { createPageMapCoordsToContainer } from './utils/createPageMapCoordsToContainer';
-
-export type Rect = ClientRect & {
-  startX: number;
-  endX: number;
-  startY: number;
-  endY: number;
-};
+import { Rect } from './types';
 
 export function useClickAndDrag(ref: React.RefObject<HTMLElement>) {
   const [style, setStyle] = useState({ top: 0, left: 0, width: 0, height: 0 });

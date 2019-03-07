@@ -1,332 +1,56 @@
-import React, {
-  useRef,
-  useState,
-  useLayoutEffect,
-  useEffect,
-  useMemo
-} from 'react';
+import React, { useRef, useState, useLayoutEffect, useMemo } from 'react';
 import ReactDOM from 'react-dom';
-import {
-  times,
-  clamp,
-  range,
-  isEqual,
-  round,
-  floor,
-  ceil,
-  flatten
-} from 'lodash';
+import { times, reject } from 'lodash';
 import {
   format,
   startOfWeek,
   addDays,
-  addMinutes,
-  addSeconds,
-  differenceInMilliseconds,
-  getDay,
-  getTime,
-  isSameDay,
-  startOfDay,
-  endOfDay,
-  setDay,
-  getMinutes,
-  differenceInDays,
-  differenceInMinutes,
+  isAfter,
   isBefore,
-  isEqual as isEqualDate
+  isEqual
 } from 'date-fns';
-import { fromEvent, merge } from 'rxjs';
+import useComponentSize from '@rehooks/component-size';
+import cc from 'classcat';
+
+import { useClickAndDrag } from './useClickAndDrag';
+
 import {
-  tap,
-  map,
-  skipUntil,
-  takeUntil,
-  combineLatest,
-  withLatestFrom,
-  mergeMap,
-  distinctUntilChanged
-} from 'rxjs/operators';
-import { usePrevious } from './utils/usePrevious';
-import { useSpring } from 'react-spring/hooks';
-import { Spring, animated } from 'react-spring';
+  RecurringTimeRange,
+  createMapCellInfoToRecurringTimeRange
+} from './createMapCellInfoToRecurringTimeRange';
+import { createMapDateRangeToCells } from './createMapDateRangeToCells';
+import { createGridForContainer } from './utils/createGridFromContainer';
+import { getTextForDateRange } from './utils/getTextForDateRange';
 
 import './styles.scss';
-import { useClickAndDrag, Rect } from './useClickAndDrag';
-
-const getSpan = (x1: number, x2: number) => 1 + Math.abs(x2 - x1);
-
-type Coords = { x: number; y: number };
-
-type CellInfo = {
-  spanX: number;
-  spanY: number;
-  startX: number;
-  startY: number;
-  endX: number;
-  endY: number;
-};
-
-const createGridForContainer = ({
-  container,
-  numVerticalCells,
-  numHorizontalCells
-}: {
-  container: HTMLElement;
-  numVerticalCells: number;
-  numHorizontalCells: number;
-}) => {
-  return new class Grid {
-    get cellHeight() {
-      return container.scrollHeight / numVerticalCells;
-    }
-
-    get cellWidth() {
-      return container.scrollWidth / numHorizontalCells;
-    }
-
-    getRectFromCell(data: CellInfo): Rect {
-      const { endX, startX, endY, startY, spanX, spanY } = data;
-      const bottom = endY * this.cellHeight;
-      const top = startY * this.cellHeight;
-      const left = startX * this.cellWidth;
-      const right = endX * this.cellWidth;
-      const height = spanY * this.cellHeight;
-      const width = spanX * this.cellWidth;
-
-      return {
-        bottom,
-        top,
-        left,
-        right,
-        height,
-        width,
-
-        // @TODO: check the math
-        startX: startX * this.cellWidth,
-        endX: endX * this.cellWidth,
-        startY: startY * this.cellHeight,
-        endY: endY * this.cellHeight
-      };
-    }
-
-    getCellFromRect(data: Rect): CellInfo {
-      const startX = clamp(
-        floor(data.left / this.cellWidth),
-        0,
-        numHorizontalCells - 1
-      );
-      const startY = clamp(
-        round(data.top / this.cellHeight),
-        0,
-        numVerticalCells - 1
-      );
-      const endX = clamp(
-        floor(data.right / this.cellWidth),
-        0,
-        numHorizontalCells - 1
-      );
-      const endY = clamp(
-        round(data.bottom / this.cellHeight),
-        0,
-        numVerticalCells - 1
-      );
-      const spanX = clamp(getSpan(startX, endX), 1, numHorizontalCells);
-      const spanY = clamp(getSpan(startY, endY), 1, numVerticalCells);
-
-      return {
-        spanX,
-        spanY,
-        startX,
-        startY,
-        endX,
-        endY
-      };
-    }
-
-    constrainBoxToOneColumn(box: Rect) {
-      return this.getRectFromCell(
-        this.getCellFromRect({
-          ...box,
-          endX: box.startX,
-          left: box.startX,
-          right: box.startX,
-          width: 0
-        })
-      );
-    }
-  }();
-};
-
-type Grid = ReturnType<typeof createGridForContainer>;
-
-type RecurringTimeRange = DateRange[];
-
-const cellToDate = ({
-  startX,
-  startY,
-  toMin,
-  toDay,
-  originDate
-}: {
-  startX: number;
-  startY: number;
-  toMin: any;
-  toDay: any;
-  originDate: Date;
-}) => addMinutes(addDays(originDate, startX), toMin(startY));
-
-const createMapCellInfoToRecurringTimeRange: MapCellInfoToDateRange = ({
-  toMin,
-  toDay,
-  originDate
-}) => ({ startX, startY, endX, endY, spanX, spanY }) => {
-  return range(startX, endX + 1)
-    .map(i => {
-      const startDate = cellToDate({
-        startX: i,
-        startY,
-        toMin,
-        toDay,
-        originDate
-      });
-
-      const endDate = addMinutes(startDate, toMin(spanY));
-
-      const range: DateRange = isBefore(startDate, endDate)
-        ? [startDate, endDate]
-        : [endDate, startDate];
-
-      return range;
-    })
-    .sort((rangeA, rangeB) => (isBefore(rangeA[0], rangeB[0]) ? 0 : 1));
-};
-
-type DateRange = [Date, Date];
-
-const createMapCellInfoToDateRange: MapCellInfoToDateRange = ({
-  toMin,
-  toDay,
-  originDate
-}) => ({ startX, startY, endX, endY, spanX, spanY }) => {
-  const startDay = startX;
-  const endDay = endX;
-  const startDate = cellToDate({ startX, startY, toMin, toDay, originDate });
-  const endDate = cellToDate({
-    startX: endX,
-    startY: endY,
-    toMin,
-    toDay,
-    originDate
-  });
-
-  return [
-    isBefore(startDate, endDate) ? [startDate, endDate] : [endDate, startDate]
-  ];
-};
-
-const constraintToOneDay = ([start, end]: DateRange): DateRange => {
-  console.log(start, end);
-  if (isEqualDate(startOfDay(end), end)) {
-    return [start, startOfDay(addDays(start, 1))];
-  }
-  return [start, setDay(end, getDay(start))];
-};
-
-const createMapCellInfoToSingleDateRange: MapCellInfoToDateRange = options => {
-  const mapToRange = createMapCellInfoToDateRange(options);
-  return (info: CellInfo): DateRange[] => {
-    return [constraintToOneDay(mapToRange(info)[0])];
-  };
-};
-
-const createMapDateRangeToCells = ({
-  toX = (x: number) => x,
-  toY,
-  numVerticalCells,
-  numHorizontalCells,
-  originDate
-}: {
-  toX: any;
-  toY: any;
-  numHorizontalCells: number;
-  numVerticalCells: number;
-  originDate: Date;
-}) => ([start, end]: DateRange): CellInfo[] => {
-  const originOfThisDay = startOfDay(start);
-  const _startX = toX(differenceInDays(start, originDate));
-  const _startY = toY(differenceInMinutes(start, originOfThisDay));
-  const _endX = toX(differenceInDays(end, originDate));
-  const _endY = toY(differenceInMinutes(end, startOfDay(end))) - 1;
-
-  const cells = range(_startX, _endX + 1).map(i => {
-    const startX = i;
-    const endX = i;
-    const atStart = i === _startX;
-    const atEnd = i === _endX;
-    const atEdge = atStart || atEnd;
-    const inside = !atEdge;
-    const startY = !atStart ? 0 : _startY;
-    const endY = !atEnd ? numVerticalCells - 1 : _endY;
-    const spanX = getSpan(startX, endX);
-    const spanY = getSpan(startY, endY);
-
-    return {
-      startX,
-      startY,
-      endX,
-      endY,
-      spanX,
-      spanY
-    };
-  });
-
-  if (isEqualDate(end, startOfDay(end))) {
-    cells.pop();
-  }
-
-  return cells;
-};
+import { Grid, DateRange } from './types';
+import { createMapCellInfoToContiguousDateRange } from './createMapCellInfoToContiguousDateRange';
 
 const originDate = startOfWeek(new Date(), { weekStartsOn: 1 });
 
-function Event({ style }: { style: any }) {
-  return (
-    <div className="event" style={style}>
-      Event
-    </div>
-  );
-}
-
-const getTextForDateRange = (
-  dates: Date[],
-  template?: string,
-  template2?: string
-) => {
-  const start = dates[0];
-  const end = dates[dates.length - 1];
-
-  if (isSameDay(start, end) && !template) {
-    return `${format(start, 'ddd h:mma')} - ${format(end, 'h:mma')}`;
-  }
-
-  const formatTemplate = 'ddd h:mma';
-  const startDateStr = format(start, template || formatTemplate);
-  const endDateStr = format(end, template2 || formatTemplate);
-
-  return `${startDateStr}-${endDateStr}`;
-};
-
 const MINS_IN_DAY = 24 * 60;
 const verticalPrecision = 1 / 15;
-const horiziontalPrecision = 1;
+const horizontalPrecision = 1;
 const numVerticalCells = MINS_IN_DAY * verticalPrecision;
-const numHorizontalCells = 7 * horiziontalPrecision;
+const numHorizontalCells = 7 * horizontalPrecision;
 const toMin = (y: number) => y / verticalPrecision;
 const fromY = toMin;
-const toDay = (x: number) => x / horiziontalPrecision;
+const toDay = (x: number) => x / horizontalPrecision;
 const fromX = toDay;
-const toX = (days: number) => days * horiziontalPrecision;
+const toX = (days: number) => days * horizontalPrecision;
 const toY = (mins: number) => mins * verticalPrecision;
+
+type Event = DateRange[];
+
+const schedule: Event = [
+  ['2019-03-03T22:45:00.000Z', '2019-03-04T01:15:00.000Z'],
+  ['2019-03-04T22:45:00.000Z', '2019-03-05T01:15:00.000Z'],
+  ['2019-03-05T22:45:00.000Z', '2019-03-06T01:15:00.000Z'],
+  ['2019-03-06T22:45:00.000Z', '2019-03-07T01:15:00.000Z'],
+  ['2019-03-07T22:45:00.000Z', '2019-03-08T01:15:00.000Z'],
+  ['2019-03-08T22:45:00.000Z', '2019-03-09T01:15:00.000Z'],
+  ['2019-03-09T22:45:00.000Z', '2019-03-10T01:15:00.000Z']
+].map(range => range.map(dateString => new Date(dateString)) as [Date, Date]);
 
 const springConfig = {
   mass: 0.5,
@@ -337,17 +61,12 @@ const springConfig = {
   velocity: 0
 };
 
-type MapCellInfoToDateRangeOptions = {
-  toMin: (y: number) => number;
-  toDay: (x: number) => number;
-  originDate: Date;
-};
+const isSameOrAfter = (date1: Date, date2: Date) =>
+  isEqual(date1, date2) || isAfter(date1, date2);
+const isSameOrBefore = (date1: Date, date2: Date) =>
+  isEqual(date1, date2) || isBefore(date1, date2);
 
-type MapCellInfoToDateRange = (
-  options: MapCellInfoToDateRangeOptions
-) => (cellInfo: CellInfo) => DateRange[];
-
-const cellInfoToDate = createMapCellInfoToRecurringTimeRange({
+const cellInfoToDateRange = createMapCellInfoToRecurringTimeRange({
   originDate,
   toMin,
   toDay
@@ -361,8 +80,47 @@ const dateRangeToCells = createMapDateRangeToCells({
   toY
 });
 
+function Event({
+  event,
+  grid,
+  className,
+  isResizable,
+  isDeletable
+}: {
+  event: Event;
+  grid: Grid;
+  className?: string;
+  isResizable?: boolean;
+  isDeletable?: boolean;
+}) {
+  return (
+    <div className="range-boxes">
+      {event.map(dateRange => {
+        return dateRangeToCells(dateRange).map((cell, i, array) => {
+          const { top, left, width, height } = grid.getRectFromCell(cell);
+          const style = { top, left, width, height };
+          return (
+            <div
+              className={cc(['event', 'range-box', className])}
+              style={style}
+            >
+              <span className="start">
+                {i === 0 && format(dateRange[0], 'h:mma')}
+              </span>
+              <span className="end">
+                {i === array.length - 1 && format(dateRange[1], 'h:mma')}
+              </span>
+            </div>
+          );
+        });
+      })}
+    </div>
+  );
+}
+
 function App() {
   const parent = useRef<HTMLDivElement | null>(null);
+  const size = useComponentSize(parent);
   const [{ style, box, isDragging, hasFinishedDragging }] = useClickAndDrag(
     parent
   );
@@ -371,10 +129,6 @@ function App() {
     pendingCreation,
     setPendingCreation
   ] = useState<RecurringTimeRange | null>(null);
-  const [eventPendingCreationStyle, setEventPendingCreationStyle] = useState<
-    React.CSSProperties
-  >({});
-  const prevStyle = usePrevious(eventPendingCreationStyle);
 
   const grid = useMemo<Grid | null>(() => {
     if (!parent.current) {
@@ -386,7 +140,7 @@ function App() {
       numHorizontalCells,
       numVerticalCells
     });
-  }, [parent.current]);
+  }, [parent.current, size]);
 
   useLayoutEffect(() => {
     if (grid === null) {
@@ -395,11 +149,12 @@ function App() {
 
     const constrainedBox = box; //grid.constrainBoxToOneColumn(box);
     const cell = grid.getCellFromRect(constrainedBox);
-    const dateRanges = cellInfoToDate(cell);
+    const dateRanges = cellInfoToDateRange(cell);
     const event = dateRanges;
+    console.log(event);
     console.log(event.map(d => getTextForDateRange(d)));
     setPendingCreation(event);
-  }, [box]);
+  }, [box, size]);
 
   return (
     <div className="root">
@@ -413,7 +168,6 @@ function App() {
         ))}
       </div>
       <div className="layer-container">
-        {/* <Event /> */}
         <div ref={parent} className="calendar">
           {(isDragging || hasFinishedDragging) && (
             <div className="drag-box" style={style}>
@@ -422,39 +176,32 @@ function App() {
             </div>
           )}
           {hasFinishedDragging && <div className="popup">Popup</div>}
-          <div className="range-boxes">
-            {pendingCreation &&
-              (isDragging || hasFinishedDragging) &&
-              pendingCreation.map(dateRange => {
-                return dateRangeToCells(dateRange).map((cell, i, array) => {
-                  if (!grid) {
-                    return;
-                  }
-
-                  const { top, left, width, height } = grid.getRectFromCell(
-                    cell
-                  );
-                  const style = { top, left, width, height };
-                  return (
-                    <div
-                      className="event range-box is-pending-creation"
-                      style={style}
-                    >
-                      <span className="start">
-                        {i === 0 && format(dateRange[0], 'h:mma')}
-                      </span>
-                      <span className="end">
-                        {i === array.length - 1 &&
-                          format(dateRange[1], 'h:mma')}
-                      </span>
-                    </div>
-                  );
-                });
+          {grid && pendingCreation && (isDragging || hasFinishedDragging) && (
+            <Event
+              className="is-pending-creation"
+              event={pendingCreation}
+              grid={grid}
+            />
+          )}
+          {grid && (
+            <Event
+              isResizable
+              isDeletable
+              event={reject<any>(schedule, range => {
+                return (
+                  pendingCreation !== null &&
+                  pendingCreation.some(
+                    pendingCreationRange =>
+                      isSameOrAfter(range[0], pendingCreationRange[0]) &&
+                      isSameOrBefore(range[1], pendingCreationRange[1])
+                  )
+                );
               })}
-          </div>
-          {/* <Event {...event} /> */}
+              grid={grid}
+            />
+          )}
           {times(7).map(x => {
-            const cellInfo = createMapCellInfoToDateRange({
+            const cellInfo = createMapCellInfoToContiguousDateRange({
               originDate,
               toDay: toDay,
               toMin: y => y * 60

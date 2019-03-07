@@ -1,11 +1,16 @@
 body,
 html {
   margin: 0;
+  padding: 0;
+}
+
+* {
+  box-sizing: border-box;
 }
 
 .root {
-  height: 100vh;
-  width: 100vw;
+  height: 600px;
+  max-width: 100vw;
   position: relative;
   // top: 50px;
   // left: 50px;
@@ -19,20 +24,13 @@ html {
   }
 }
 
-
 .calendar {
-  // position: relative;
-  // top: 50px;
-  // left: 100px;
-  // width: 800px;
-  // height: 100px;
   user-select: none;
   -moz-user-select: none;
   font-family: sans-serif;
   text-align: center;
   display: flex;
   position: relative;
-  // height: 800px;
   &,
   * {
     box-sizing: border-box;
@@ -43,6 +41,8 @@ html {
 
 .layer-container {
   position: relative;
+  height: 100%;
+  width: 100%;
   z-index: 1;
   & > * {
     position: absolute;
@@ -68,7 +68,7 @@ html {
     left: 0;
     top: 0;
     z-index: 2;
-    border: 3px dashed hsla(209, 97%,50%, 0.5);
+    border: 3px dashed hsla(209, 97%, 50%, 0.5);
     background: hsla(209, 97%, 65%, 0.5);
     width: 100px;
     height: 100px;
@@ -111,8 +111,7 @@ html {
 }
 
 .day-column {
-  flex: 0 1 250px;
-  min-width: 200px;
+  flex: 1 1 250px;
   // border: 1px solid lightgray;
   .title {
     padding: 20px 10px;
@@ -137,7 +136,6 @@ html {
     justify-content: center;
     align-items: center;
   }
-
 }
 
 .header {

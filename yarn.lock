@@ -872,6 +872,11 @@
   resolved "https://registry.yarnpkg.com/@nodelib/fs.stat/-/fs.stat-1.1.3.tgz#2b5a3ab3f918cca48a8c754c08168e3f03eba61b"
   integrity sha512-shAmDyaQC4H92APFoIaVDHCx5bStIocgvbwQyxPRrbUY20V1EYTbSDchWbuwlMG3V17cprZhA6+78JfB+3DTPw==
 
+"@rehooks/component-size@^1.0.2":
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/@rehooks/component-size/-/component-size-1.0.2.tgz#b93d5f39bc9f47a6c0feb39690ae07156bc65863"
+  integrity sha512-bjuKCFEIr1eDNvK/ET2SWl/xCKloywupJyfKQqZ6GaEKhnlCI2YV10rv9wTNrbSnzoHraktig9YYC0e69RowLA==
+
 "@svgr/babel-plugin-add-jsx-attribute@^4.0.0":
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/@svgr/babel-plugin-add-jsx-attribute/-/babel-plugin-add-jsx-attribute-4.0.0.tgz#5acf239cd2747b1a36ec7e708de05d914cb9b948"
@@ -2339,6 +2344,11 @@ class-utils@^0.3.5:
     define-property "^0.2.5"
     isobject "^3.0.0"
     static-extend "^0.1.1"
+
+classcat@^3.2.5:
+  version "3.2.5"
+  resolved "https://registry.yarnpkg.com/classcat/-/classcat-3.2.5.tgz#bf4271dee0c93fdf132bc127f5d0432d35245888"
+  integrity sha512-exme+Vc60aBW3KbPcVg+t7P2qsA5EXxYjD4ivpB2i+bAclFqtbchE4z7/Wj5A2eoKKi4jO+T+Da5zwS/Jw55Kw==
 
 clean-css@4.2.x:
   version "4.2.1"

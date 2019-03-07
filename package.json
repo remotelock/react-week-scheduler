@@ -5,6 +5,8 @@
   "keywords": [],
   "main": "src/index.tsx",
   "dependencies": {
+    "@rehooks/component-size": "^1.0.2",
+    "classcat": "^3.2.5",
     "date-fns": "latest",
     "lodash": "latest",
     "react": "16.8.0-alpha.1",
