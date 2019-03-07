@@ -70,7 +70,7 @@ export const createGridForContainer = ({
         numHorizontalCells - 1
       );
       const endY = clamp(
-        round(data.bottom / this.cellHeight),
+        round(data.bottom / this.cellHeight) - 1,
         0,
         numVerticalCells - 1
       );

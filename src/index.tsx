@@ -3,7 +3,8 @@ import React, {
   useState,
   useLayoutEffect,
   useMemo,
-  useCallback
+  useCallback,
+  useEffect
 } from 'react';
 import ReactDOM from 'react-dom';
 import { times, reject } from 'lodash';
@@ -29,7 +30,7 @@ import { createGridForContainer } from './utils/createGridFromContainer';
 import { getTextForDateRange } from './utils/getTextForDateRange';
 
 import './styles.scss';
-import { Grid, Event as CalendarEvent, CellInfo } from './types';
+import { Grid, Event as CalendarEvent, CellInfo, DateRange } from './types';
 import { createMapCellInfoToContiguousDateRange } from './createMapCellInfoToContiguousDateRange';
 import { mergeEvents, rejectOverlappingRanges } from './utils/mergeEvents';
 
@@ -61,7 +62,7 @@ const isSameOrAfter = (date1: Date, date2: Date) =>
 const isSameOrBefore = (date1: Date, date2: Date) =>
   isEqual(date1, date2) || isBefore(date1, date2);
 
-const cellInfoToDateRange = createMapCellInfoToRecurringTimeRange({
+const cellInfoToDateRanges = createMapCellInfoToRecurringTimeRange({
   originDate,
   toMin,
   toDay
@@ -77,11 +78,101 @@ const dateRangeToCells = createMapDateRangeToCells({
 
 import Draggable, { DraggableEventHandler } from 'react-draggable';
 
-type OnMoveCallback = (
-  rangeIndex: number,
-  cellIndex: number,
-  newCell: CellInfo
-) => void;
+type OnMoveCallback = (newDateRange: DateRange, rangeIndex: number) => void;
+
+function RangeBox({
+  grid,
+  isBeingEdited,
+  rangeIndex,
+  cellIndex,
+  cellArray,
+  cell,
+  dateRange,
+  className,
+  onMove
+}: {
+  grid: Grid;
+  cell: CellInfo;
+  cellIndex: number;
+  cellArray: CellInfo[];
+  dateRange: DateRange;
+  className?: string;
+  onMove?: OnMoveCallback;
+  rangeIndex: number;
+  isBeingEdited?(cell: CellInfo): boolean;
+}) {
+  const [modifiedDateRange, setModifiedDateRange] = useState(dateRange);
+
+  // Copy prop to state, like getDerivedStateFromProps
+  useEffect(() => {
+    setModifiedDateRange(dateRange);
+  }, [dateRange]);
+
+  const rect = useMemo(() => grid.getRectFromCell(cell), [cell]);
+
+  const { top, left, width, height } = rect;
+
+  const style = { width, height, position: 'absolute', transform: '' };
+  // style.transform = `translate(${left}px, ${top}px)`;
+
+  const isStart = cellIndex === 0;
+  const isEnd = cellIndex === cellArray.length - 1;
+
+  const handleDrag: DraggableEventHandler = (e, { y, ...rest }) => {
+    const _start = y;
+    const _end = _start + height;
+    const top = Math.min(_start, _end);
+    const bottom = top + height;
+    console.log({ _end, _start, height });
+
+    const newRect = {
+      ...rect,
+      top,
+      bottom
+    };
+    const newCell = grid.getCellFromRect(newRect);
+    return setModifiedDateRange(cellInfoToDateRanges(newCell)[0]);
+  };
+
+  const handleDragStop: DraggableEventHandler = () => {
+    onMove && onMove(modifiedDateRange, rangeIndex);
+  };
+
+  return (
+    <Draggable
+      axis="y"
+      bounds={{
+        top: 0,
+        bottom: grid.totalHeight - height,
+        left: 0,
+        right: grid.totalWidth
+      }}
+      position={{ x: left, y: top }}
+      onDrag={handleDrag}
+      onStop={handleDragStop}
+    >
+      <div
+        className={cc([
+          'event',
+          'range-box',
+          className,
+          {
+            'is-draggable': true,
+            'is-pending-edit': isBeingEdited && isBeingEdited(cell)
+          }
+        ])}
+        style={style as any}
+      >
+        <span className="start">
+          {isStart && format(modifiedDateRange[0], 'h:mma')}
+        </span>
+        <span className="end">
+          {isEnd && format(modifiedDateRange[1], 'h:mma')}
+        </span>
+      </div>
+    </Draggable>
+  );
+}
 
 function Event({
   event,
@@ -104,67 +195,18 @@ function Event({
     <div className="range-boxes">
       {event.map((dateRange, rangeIndex) => {
         return dateRangeToCells(dateRange).map((cell, cellIndex, array) => {
-          const rect = grid.getRectFromCell(cell);
-          const { top, left, width, height } = rect;
-          const style = { width, height };
-
-          const handleDrag: DraggableEventHandler = (e, { y, ...rest }) => {
-            const _start = y;
-            const _end = y + rect.height;
-            const top = Math.min(_start, _end);
-            const bottom = Math.max(_start, _end);
-
-            const newRect = {
-              ...rect,
-              top,
-              bottom,
-              startY: top,
-              endY: bottom
-            };
-
-            console.log(rect.height, newRect.bottom, { y });
-            console.log(grid.totalHeight);
-
-            onMove &&
-              onMove(rangeIndex, cellIndex, grid.getCellFromRect(newRect));
-          };
-
           return (
-            <Draggable
-              key={`(${cell.startX},${cell.startY})-(${cell.endX},${
-                cell.endY
-              })`}
-              axis="y"
-              bounds={{
-                top: 0,
-                bottom: grid.totalHeight - height,
-                left: 0,
-                right: grid.totalWidth
-              }}
-              defaultPosition={{ x: left, y: top }}
-              onDrag={handleDrag}
-            >
-              <div
-                className={cc([
-                  'event',
-                  'range-box',
-                  className,
-                  {
-                    'is-draggable': true,
-                    'is-pending-edit': isBeingEdited && isBeingEdited(cell)
-                  }
-                ])}
-                style={style}
-              >
-                <span className="start">
-                  {cellIndex === 0 && format(dateRange[0], 'h:mma')}
-                </span>
-                <span className="end">
-                  {cellIndex === array.length - 1 &&
-                    format(dateRange[1], 'h:mma')}
-                </span>
-              </div>
-            </Draggable>
+            <RangeBox
+              cellArray={array}
+              cellIndex={cellIndex}
+              dateRange={dateRange}
+              rangeIndex={rangeIndex}
+              className={className}
+              isBeingEdited={isBeingEdited}
+              onMove={onMove}
+              grid={grid}
+              cell={cell}
+            />
           );
         });
       })}
@@ -177,13 +219,13 @@ function App() {
   const size = useComponentSize(parent);
   const [schedule, setSchedule] = useState<CalendarEvent>(
     [
-      ['2019-03-03T22:45:00.000Z', '2019-03-04T01:15:00.000Z'],
-      ['2019-03-04T22:45:00.000Z', '2019-03-05T01:15:00.000Z'],
-      ['2019-03-05T22:45:00.000Z', '2019-03-06T01:15:00.000Z'],
-      ['2019-03-06T22:45:00.000Z', '2019-03-07T01:15:00.000Z'],
-      ['2019-03-07T22:45:00.000Z', '2019-03-08T01:15:00.000Z'],
-      ['2019-03-08T22:45:00.000Z', '2019-03-09T01:15:00.000Z'],
-      ['2019-03-09T22:45:00.000Z', '2019-03-10T01:15:00.000Z']
+      // ['2019-03-03T22:45:00.000Z', '2019-03-04T01:15:00.000Z'],
+      ['2019-03-04T22:00:00.000Z', '2019-03-05T01:00:00.000Z'],
+      ['2019-03-05T22:00:00.000Z', '2019-03-06T01:00:00.000Z'],
+      ['2019-03-06T22:00:00.000Z', '2019-03-07T01:00:00.000Z'],
+      ['2019-03-07T22:00:00.000Z', '2019-03-08T01:00:00.000Z'],
+      ['2019-03-08T22:00:00.000Z', '2019-03-09T01:00:00.000Z'],
+      ['2019-03-09T22:00:00.000Z', '2019-03-10T01:00:00.000Z']
     ].map(
       range => range.map(dateString => new Date(dateString)) as [Date, Date]
     )
@@ -209,14 +251,14 @@ function App() {
     });
   }, [parent.current, size]);
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     if (grid === null || box === null) {
       return;
     }
 
     const constrainedBox = box;
     const cell = grid.getCellFromRect(constrainedBox);
-    const dateRanges = cellInfoToDateRange(cell);
+    const dateRanges = cellInfoToDateRanges(cell);
     const event = dateRanges;
     console.log(event);
     console.log(event.map(d => getTextForDateRange(d)));
@@ -224,10 +266,15 @@ function App() {
   }, [box, size]);
 
   const handleEventMove = useCallback<OnMoveCallback>(
-    (rangeIndex, cellIndex, newCell) => {
-      console.log(
-        cellInfoToDateRange(newCell).map(range => getTextForDateRange(range))
-      );
+    (newDateRange, rangeIndex) => {
+      setSchedule(schedule => {
+        if (!schedule) {
+          return [newDateRange];
+        }
+        const newSchedule = [...schedule];
+        newSchedule[rangeIndex] = newDateRange;
+        return newSchedule;
+      });
     },
     []
   );
@@ -251,34 +298,31 @@ function App() {
             isBeingEdited={cell =>
               pendingCreation !== null &&
               rejectOverlappingRanges(
-                cellInfoToDateRange(cell),
+                cellInfoToDateRanges(cell),
                 pendingCreation
               ).length == 0
             }
             onMove={handleEventMove}
-            event={
-              pendingCreation
-                ? mergeEvents(schedule, pendingCreation)
-                : schedule
-            }
+            event={schedule}
+            grid={grid}
+          />
+        )}
+
+        {(isDragging || hasFinishedDragging) && (
+          <div className="drag-box" style={style}>
+            {dragBoxText}
+            {hasFinishedDragging && <div className="popup">Popup</div>}
+          </div>
+        )}
+        {hasFinishedDragging && <div className="popup">Popup</div>}
+        {grid && pendingCreation && (isDragging || hasFinishedDragging) && (
+          <Event
+            className="is-pending-creation"
+            event={pendingCreation}
             grid={grid}
           />
         )}
         <div ref={parent} className="calendar">
-          {(isDragging || hasFinishedDragging) && (
-            <div className="drag-box" style={style}>
-              {dragBoxText}
-              {hasFinishedDragging && <div className="popup">Popup</div>}
-            </div>
-          )}
-          {hasFinishedDragging && <div className="popup">Popup</div>}
-          {grid && pendingCreation && (isDragging || hasFinishedDragging) && (
-            <Event
-              className="is-pending-creation"
-              event={pendingCreation}
-              grid={grid}
-            />
-          )}
           {times(7).map(x => {
             const cellInfo = createMapCellInfoToContiguousDateRange({
               originDate,
