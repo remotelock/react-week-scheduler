@@ -1,13 +1,6 @@
-import { times, find, reject, isEmpty } from 'lodash';
-import {
-  min,
-  areRangesOverlapping,
-  max,
-  isSameDay,
-  isEqual,
-  isWithinRange
-} from 'date-fns';
-import { Event, DateRange } from '../types';
+import { find, reject } from 'lodash';
+import { isSameDay, isWithinRange } from 'date-fns';
+import { Event } from '../types';
 // @ts-ignore
 import _mergeRanges from 'merge-ranges';
 

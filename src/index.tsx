@@ -17,6 +17,8 @@ import {
   isEqual
 } from 'date-fns';
 import useComponentSize from '@rehooks/component-size';
+// @ts-ignore
+import useKey from 'use-key-hook';
 import cc from 'classcat';
 
 import { useClickAndDrag } from './useClickAndDrag';
@@ -82,7 +84,10 @@ const dateRangeToCells = createMapDateRangeToCells({
 
 import Draggable, { DraggableEventHandler } from 'react-draggable';
 
-type OnMoveCallback = (newDateRange: DateRange, rangeIndex: number) => void;
+type OnMoveCallback = (
+  newDateRange: DateRange | undefined,
+  rangeIndex: number
+) => void;
 
 function RangeBox({
   grid,
@@ -106,23 +111,34 @@ function RangeBox({
   isBeingEdited?(cell: CellInfo): boolean;
 }) {
   const [modifiedDateRange, setModifiedDateRange] = useState(dateRange);
+  const ref = useRef(null);
 
   // Copy prop to state, like getDerivedStateFromProps
   useEffect(() => {
     setModifiedDateRange(dateRange);
   }, [dateRange]);
 
+  useKey(
+    () => {
+      if (ref.current === document.activeElement) {
+        onMove && onMove(undefined, rangeIndex);
+      }
+    },
+    {
+      detectKeys: [46]
+    }
+  );
+
   const rect = useMemo(() => grid.getRectFromCell(cell), [cell]);
 
   const { top, left, width, height } = rect;
 
-  const style = { width, height, position: 'absolute', transform: '' };
-  // style.transform = `translate(${left}px, ${top}px)`;
+  const style = { width, height, position: 'absolute' };
 
   const isStart = cellIndex === 0;
   const isEnd = cellIndex === cellArray.length - 1;
 
-  const handleDrag: DraggableEventHandler = (e, { y, ...rest }) => {
+  const handleDrag: DraggableEventHandler = (_event, { y }) => {
     const _start = y;
     const _end = _start + height;
     const top = Math.min(_start, _end);
@@ -154,7 +170,8 @@ function RangeBox({
       onDrag={handleDrag}
       onStop={handleDragStop}
     >
-      <div
+      <button
+        ref={ref}
         className={cc([
           'event',
           'range-box',
@@ -172,7 +189,7 @@ function RangeBox({
         <span className="end">
           {isEnd && format(modifiedDateRange[1], 'h:mma')}
         </span>
-      </div>
+      </button>
     </Draggable>
   );
 }
@@ -223,10 +240,10 @@ function App() {
   const [schedule, setSchedule] = useState<CalendarEvent>(
     [
       // ['2019-03-03T22:45:00.000Z', '2019-03-04T01:15:00.000Z'],
-      ['2019-03-04T22:00:00.000Z', '2019-03-05T01:00:00.000Z'],
+      ['2019-03-04T22:15:00.000Z', '2019-03-05T01:00:00.000Z'],
       ['2019-03-05T22:00:00.000Z', '2019-03-06T01:00:00.000Z'],
       ['2019-03-06T22:00:00.000Z', '2019-03-07T01:00:00.000Z'],
-      ['2019-03-07T22:00:00.000Z', '2019-03-08T01:00:00.000Z'],
+      ['2019-03-07T05:30:00.000Z', '2019-03-07T10:00:00.000Z'],
       // ['2019-03-08T22:00:00.000Z', '2019-03-09T01:00:00.000Z'],
       ['2019-03-09T22:00:00.000Z', '2019-03-10T01:00:00.000Z']
     ].map(
@@ -278,11 +295,18 @@ function App() {
   const handleEventMove = useCallback<OnMoveCallback>(
     (newDateRange, rangeIndex) => {
       setSchedule(schedule => {
-        if (!schedule) {
+        if (!schedule && newDateRange) {
           return [newDateRange];
         }
+
         const newSchedule = [...schedule];
-        newSchedule[rangeIndex] = newDateRange;
+
+        if (!newDateRange) {
+          newSchedule.splice(rangeIndex, 1);
+        } else {
+          newSchedule[rangeIndex] = newDateRange;
+        }
+
         return mergeRanges(newSchedule);
       });
     },
