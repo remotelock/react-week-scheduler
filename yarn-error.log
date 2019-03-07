@@ -1,0 +1,70 @@
+Arguments: 
+  /home/f/.nvm/versions/node/v10.11.0/bin/node /usr/share/yarn/bin/yarn.js
+
+PATH: 
+  /home/f/.rvm/gems/ruby-2.5.3/bin:/home/f/.rvm/gems/ruby-2.5.3@global/bin:/home/f/.rvm/rubies/ruby-2.5.3/bin:/home/linuxbrew/.linuxbrew/bin:/home/f/.deno/bin:/home/f/.nvm/versions/node/v10.11.0/bin:/home/linuxbrew/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/sbin:/home/f/bin:/home/f/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/opt/puppetlabs/bin:/home/f/.rvm/bin:/home/f/.yarn/bin:/home/f/.bin:/home/f/Android/Sdk/tools:/home/f/Android/Sdk/tools/bin:/home/f/Android/Sdk/platform-tools:/home/f/Android/Sdk/emulator:/home/f/Projects/buck/bin:/home/f/.rvm/bin:/home/f/.flutter-sdk/flutter/bin:/usr/lib/dart/bin
+
+Yarn version: 
+  1.13.0
+
+Node version: 
+  10.11.0
+
+Platform: 
+  linux x64
+
+Trace: 
+  Error: https://registry.yarnpkg.com/@types%2frxjs: Not found
+      at Request.params.callback [as _callback] (/usr/share/yarn/lib/cli.js:66255:18)
+      at Request.self.callback (/usr/share/yarn/lib/cli.js:129397:22)
+      at Request.emit (events.js:182:13)
+      at Request.<anonymous> (/usr/share/yarn/lib/cli.js:130369:10)
+      at Request.emit (events.js:182:13)
+      at IncomingMessage.<anonymous> (/usr/share/yarn/lib/cli.js:130291:12)
+      at Object.onceWrapper (events.js:273:13)
+      at IncomingMessage.emit (events.js:187:15)
+      at endReadableNT (_stream_readable.js:1092:12)
+      at process._tickCallback (internal/process/next_tick.js:63:19)
+
+npm manifest: 
+  {
+    "name": "calendar",
+    "version": "1.0.0",
+    "description": "",
+    "keywords": [],
+    "main": "src/index.tsx",
+    "dependencies": {
+      "@types/lodash": "latest",
+      "@types/rxjs": "latest",
+      "date-fns": "latest",
+      "lodash": "latest",
+      "react": "16.8.0-alpha.1",
+      "react-dom": "16.8.0-alpha.1",
+      "react-scripts": "2.0.3",
+      "react-spring": "7.2.10",
+      "rxjs": "latest"
+    },
+    "devDependencies": {
+      "@types/lodash": "4.14.120",
+      "@types/react": "16.7.22",
+      "@types/react-dom": "16.0.11"
+    },
+    "scripts": {
+      "start": "react-scripts start",
+      "build": "react-scripts build",
+      "test": "react-scripts test --env=jsdom",
+      "eject": "react-scripts eject"
+    },
+    "browserslist": [
+      ">0.2%",
+      "not dead",
+      "not ie <= 11",
+      "not op_mini all"
+    ]
+  }
+
+yarn manifest: 
+  No manifest
+
+Lockfile: 
+  No lockfile

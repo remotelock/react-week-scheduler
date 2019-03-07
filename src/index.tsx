@@ -4,8 +4,8 @@ import React, {
   useLayoutEffect,
   useEffect,
   useMemo
-} from "react";
-import ReactDOM from "react-dom";
+} from 'react';
+import ReactDOM from 'react-dom';
 import {
   times,
   clamp,
@@ -15,7 +15,7 @@ import {
   floor,
   ceil,
   flatten
-} from "lodash";
+} from 'lodash';
 import {
   format,
   startOfWeek,
@@ -34,8 +34,8 @@ import {
   differenceInMinutes,
   isBefore,
   isEqual as isEqualDate
-} from "date-fns";
-import { fromEvent, merge } from "rxjs";
+} from 'date-fns';
+import { fromEvent, merge } from 'rxjs';
 import {
   tap,
   map,
@@ -45,15 +45,15 @@ import {
   withLatestFrom,
   mergeMap,
   distinctUntilChanged
-} from "rxjs/operators";
-import { usePrevious } from "./utils/usePrevious";
-import { useSpring } from "react-spring/hooks";
-import { Spring, animated } from "react-spring";
+} from 'rxjs/operators';
+import { usePrevious } from './utils/usePrevious';
+import { useSpring } from 'react-spring/hooks';
+import { Spring, animated } from 'react-spring';
 
-import "./styles.scss";
-import { useClickAndDrag, Rect } from "./useClickAndDrag";
+import './styles.scss';
+import { useClickAndDrag, Rect } from './useClickAndDrag';
 
-const getSpan = (x1, x2) => 1 + Math.abs(x2 - x1);
+const getSpan = (x1: number, x2: number) => 1 + Math.abs(x2 - x1);
 
 type Coords = { x: number; y: number };
 
@@ -70,6 +70,10 @@ const createGridForContainer = ({
   container,
   numVerticalCells,
   numHorizontalCells
+}: {
+  container: HTMLElement;
+  numVerticalCells: number;
+  numHorizontalCells: number;
 }) => {
   return new class Grid {
     get cellHeight() {
@@ -157,8 +161,19 @@ type Grid = ReturnType<typeof createGridForContainer>;
 
 type RecurringTimeRange = DateRange[];
 
-const cellToDate = ({ startX, startY, toMin, toDay, originDate }) =>
-  addMinutes(addDays(originDate, startX), toMin(startY));
+const cellToDate = ({
+  startX,
+  startY,
+  toMin,
+  toDay,
+  originDate
+}: {
+  startX: number;
+  startY: number;
+  toMin: any;
+  toDay: any;
+  originDate: Date;
+}) => addMinutes(addDays(originDate, startX), toMin(startY));
 
 const createMapCellInfoToRecurringTimeRange: MapCellInfoToDateRange = ({
   toMin,
@@ -225,11 +240,17 @@ const createMapCellInfoToSingleDateRange: MapCellInfoToDateRange = options => {
 };
 
 const createMapDateRangeToCells = ({
-  toX = x => x,
+  toX = (x: number) => x,
   toY,
   numVerticalCells,
   numHorizontalCells,
   originDate
+}: {
+  toX: any;
+  toY: any;
+  numHorizontalCells: number;
+  numVerticalCells: number;
+  originDate: Date;
 }) => ([start, end]: DateRange): CellInfo[] => {
   const originOfThisDay = startOfDay(start);
   const _startX = toX(differenceInDays(start, originDate));
@@ -268,7 +289,7 @@ const createMapDateRangeToCells = ({
 
 const originDate = startOfWeek(new Date(), { weekStartsOn: 1 });
 
-function Event({ style }) {
+function Event({ style }: { style: any }) {
   return (
     <div className="event" style={style}>
       Event
@@ -285,10 +306,10 @@ const getTextForDateRange = (
   const end = dates[dates.length - 1];
 
   if (isSameDay(start, end) && !template) {
-    return `${format(start, "ddd h:mma")} - ${format(end, "h:mma")}`;
+    return `${format(start, 'ddd h:mma')} - ${format(end, 'h:mma')}`;
   }
 
-  const formatTemplate = "ddd h:mma";
+  const formatTemplate = 'ddd h:mma';
   const startDateStr = format(start, template || formatTemplate);
   const endDateStr = format(end, template2 || formatTemplate);
 
@@ -300,12 +321,12 @@ const verticalPrecision = 1 / 15;
 const horiziontalPrecision = 1;
 const numVerticalCells = MINS_IN_DAY * verticalPrecision;
 const numHorizontalCells = 7 * horiziontalPrecision;
-const toMin = y => y / verticalPrecision;
+const toMin = (y: number) => y / verticalPrecision;
 const fromY = toMin;
-const toDay = x => x / horiziontalPrecision;
+const toDay = (x: number) => x / horiziontalPrecision;
 const fromX = toDay;
-const toX = days => days * horiziontalPrecision;
-const toY = mins => mins * verticalPrecision;
+const toX = (days: number) => days * horiziontalPrecision;
+const toY = (mins: number) => mins * verticalPrecision;
 
 const springConfig = {
   mass: 0.5,
@@ -317,8 +338,8 @@ const springConfig = {
 };
 
 type MapCellInfoToDateRangeOptions = {
-  toMin: (y) => number;
-  toDay: (x) => number;
+  toMin: (y: number) => number;
+  toDay: (x: number) => number;
   originDate: Date;
 };
 
@@ -345,7 +366,7 @@ function App() {
   const [{ style, box, isDragging, hasFinishedDragging }] = useClickAndDrag(
     parent
   );
-  const [dragBoxText, setDragBoxText] = useState("");
+  const [dragBoxText, setDragBoxText] = useState('');
   const [
     pendingCreation,
     setPendingCreation
@@ -355,36 +376,30 @@ function App() {
   >({});
   const prevStyle = usePrevious(eventPendingCreationStyle);
 
-  const grid = useMemo<Grid | null>(
-    () => {
-      if (!parent.current) {
-        return null;
-      }
+  const grid = useMemo<Grid | null>(() => {
+    if (!parent.current) {
+      return null;
+    }
 
-      return createGridForContainer({
-        container: parent.current,
-        numHorizontalCells,
-        numVerticalCells
-      });
-    },
-    [parent.current]
-  );
+    return createGridForContainer({
+      container: parent.current,
+      numHorizontalCells,
+      numVerticalCells
+    });
+  }, [parent.current]);
 
-  useLayoutEffect(
-    () => {
-      if (!grid) {
-        return;
-      }
+  useLayoutEffect(() => {
+    if (grid === null) {
+      return;
+    }
 
-      const constraintedBox = box; //grid.constrainBoxToOneColumn(box);
-      const cell = grid.getCellFromRect(constraintedBox);
-      const dateRanges = cellInfoToDate(cell);
-      const event = dateRanges;
-      console.log(event.map(d => getTextForDateRange(d)));
-      setPendingCreation(event);
-    },
-    [box]
-  );
+    const constrainedBox = box; //grid.constrainBoxToOneColumn(box);
+    const cell = grid.getCellFromRect(constrainedBox);
+    const dateRanges = cellInfoToDate(cell);
+    const event = dateRanges;
+    console.log(event.map(d => getTextForDateRange(d)));
+    setPendingCreation(event);
+  }, [box]);
 
   return (
     <div className="root">
@@ -392,7 +407,7 @@ function App() {
         {times(7).map(i => (
           <div className="day-column">
             <div className="cell title">
-              {format(addDays(originDate, i), "ddd")}
+              {format(addDays(originDate, i), 'ddd')}
             </div>
           </div>
         ))}
@@ -412,32 +427,27 @@ function App() {
               (isDragging || hasFinishedDragging) &&
               pendingCreation.map(dateRange => {
                 return dateRangeToCells(dateRange).map((cell, i, array) => {
+                  if (!grid) {
+                    return;
+                  }
+
                   const { top, left, width, height } = grid.getRectFromCell(
                     cell
                   );
                   const style = { top, left, width, height };
                   return (
-                    <Spring
-                      key={cell.startX}
-                      config={springConfig}
-                      to={style}
-                      native
+                    <div
+                      className="event range-box is-pending-creation"
+                      style={style}
                     >
-                      {style => (
-                        <animated.div
-                          className="event range-box is-pending-creation"
-                          style={style}
-                        >
-                          <span className="start">
-                            {i === 0 && format(dateRange[0], "h:mma")}
-                          </span>
-                          <span className="end">
-                            {i === array.length - 1 &&
-                              format(dateRange[1], "h:mma")}
-                          </span>
-                        </animated.div>
-                      )}
-                    </Spring>
+                      <span className="start">
+                        {i === 0 && format(dateRange[0], 'h:mma')}
+                      </span>
+                      <span className="end">
+                        {i === array.length - 1 &&
+                          format(dateRange[1], 'h:mma')}
+                      </span>
+                    </div>
                   );
                 });
               })}
@@ -464,11 +474,11 @@ function App() {
                       spanY: 1
                     });
 
-                    const d = range.map(d => getTextForDateRange(d, "h", "ha"));
+                    const d = range.map(d => getTextForDateRange(d, 'h', 'ha'));
 
                     return (
                       <div className="cell">
-                        <div className="debug">{d.join(", ")}</div>
+                        <div className="debug">{d.join(', ')}</div>
                         <div className="debug">
                           ({x}, {y})
                         </div>
@@ -485,5 +495,5 @@ function App() {
   );
 }
 
-const rootElement = document.getElementById("root");
+const rootElement = document.getElementById('root');
 ReactDOM.render(<App />, rootElement);

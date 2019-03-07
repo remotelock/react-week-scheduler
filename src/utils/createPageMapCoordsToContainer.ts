@@ -1,5 +1,5 @@
 export const createPageMapCoordsToContainer = (container: HTMLElement) => {
-  return (event: MouseEvent | TouchEvent) => {
+  return (event: any | React.MouseEvent | MouseEvent | TouchEvent) => {
     let clientX: number;
     let clientY: number;
     let pageX: number;
@@ -7,7 +7,7 @@ export const createPageMapCoordsToContainer = (container: HTMLElement) => {
     let offsetX: number;
     let offsetY: number;
 
-    if ("changedTouches" in event) {
+    if ('changedTouches' in event) {
       ({ clientX, clientY, pageX, pageY } = event.changedTouches[0]);
     } else {
       ({ clientX, clientY, pageX, pageY } = event);

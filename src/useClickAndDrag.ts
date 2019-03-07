@@ -4,9 +4,9 @@ import React, {
   useState,
   useLayoutEffect,
   useEffect
-} from "react";
-import ReactDOM from "react-dom";
-import { times, isEqual, floor, ceil } from "lodash";
+} from 'react';
+import ReactDOM from 'react-dom';
+import { times, isEqual, floor, ceil } from 'lodash';
 import {
   format,
   startOfWeek,
@@ -14,8 +14,8 @@ import {
   addMinutes,
   getDay,
   getTime
-} from "date-fns";
-import { fromEvent, merge } from "rxjs";
+} from 'date-fns';
+import { fromEvent, merge } from 'rxjs';
 import {
   tap,
   map,
@@ -27,8 +27,8 @@ import {
   startWith,
   take,
   distinctUntilChanged
-} from "rxjs/operators";
-import { createPageMapCoordsToContainer } from "./utils/createPageMapCoordsToContainer";
+} from 'rxjs/operators';
+import { createPageMapCoordsToContainer } from './utils/createPageMapCoordsToContainer';
 
 export type Rect = ClientRect & {
   startX: number;
@@ -62,17 +62,19 @@ export function useClickAndDrag(ref: React.RefObject<HTMLElement>) {
 
     const mapCoordsToContainer = createPageMapCoordsToContainer(container);
 
-    const touchStart$ = fromEvent(container, "touchstart");
-    const touchMove$ = fromEvent(window, "touchmove");
-    const touchEnd$ = fromEvent(window, "touchend");
+    const touchStart$ = fromEvent(container, 'touchstart');
+    const touchMove$ = fromEvent(window, 'touchmove');
+    const touchEnd$ = fromEvent(window, 'touchend');
 
-    const mouseDown$ = fromEvent(container, "mousedown");
-    const mouseMove$ = fromEvent(window, "mousemove");
-    const mouseUp$ = fromEvent(window, "mouseup");
+    const mouseDown$ = fromEvent(container, 'mousedown');
+    const mouseMove$ = fromEvent(window, 'mousemove');
+    const mouseUp$ = fromEvent(window, 'mouseup');
 
     const dragStart$ = merge(mouseDown$, touchStart$).pipe(
-      tap(e => e.stopPropagation()),
-      tap(e => e.preventDefault()),
+      tap((e: any) => {
+        e.stopPropagation();
+        e.preventDefault();
+      }),
       map(mapCoordsToContainer)
     );
 
