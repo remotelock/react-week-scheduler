@@ -39,13 +39,20 @@ html {
   border-collapse: collapse;
 }
 
+.react-draggable {
+  position: absolute;
+}
+
+.react-resizable-handle {
+  z-index: 3;
+}
+
 .layer-container {
   position: relative;
   height: 100%;
   width: 100%;
   z-index: 1;
-  & > * {
-    position: absolute;
+  .calendar {
     top: 0;
     left: 0;
     right: 0;
@@ -57,7 +64,8 @@ html {
   }
 
   .calendar {
-    z-index: 1;
+    position: absolute;
+    z-index: -1;
   }
 
   .drag-box {

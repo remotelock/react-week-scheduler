@@ -1,4 +1,4 @@
-import React, { useState, useLayoutEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { isEqual } from 'lodash';
 import { fromEvent, merge } from 'rxjs';
 import {
@@ -18,7 +18,7 @@ export function useClickAndDrag(ref: React.RefObject<HTMLElement>) {
   const [isDragging, setIsDragging] = useState(false);
   const [hasFinishedDragging, setHasFinishedDragging] = useState(false);
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     const container = ref.current;
     if (!container) {
       return;

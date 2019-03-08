@@ -24,7 +24,8 @@ import {
 import { createMapDateRangeToCells } from './createMapDateRangeToCells';
 import { createGridForContainer } from './utils/createGridFromContainer';
 import { getTextForDateRange } from './utils/getTextForDateRange';
-import { usePrevious } from './utils/usePrevious';
+import { ResizableBox } from 'react-resizable';
+import 'react-resizable/css/styles.css';
 
 import Draggable, { DraggableEventHandler } from 'react-draggable';
 
@@ -97,6 +98,7 @@ function RangeBox({
   isBeingEdited?(cell: CellInfo): boolean;
 }) {
   const [modifiedDateRange, setModifiedDateRange] = useState(dateRange);
+  const [modifiedCell, setModifiedCell] = useState(cell);
   const ref = useRef(null);
 
   // Copy prop to state, like getDerivedStateFromProps
@@ -104,20 +106,34 @@ function RangeBox({
     setModifiedDateRange(dateRange);
   }, [dateRange]);
 
+  useEffect(() => {
+    setModifiedCell(cell);
+  }, [cell]);
+
   const handleDelete = useCallback(() => {
     onMove && onMove(undefined, rangeIndex);
   }, [ref.current, onMove, rangeIndex]);
 
   useMousetrap('del', handleDelete, ref.current);
 
-  const rect = useMemo(() => grid.getRectFromCell(cell), [cell]);
+  const rect = useMemo(() => grid.getRectFromCell(modifiedCell), [
+    modifiedCell
+  ]);
 
   const { top, left, width, height } = rect;
 
-  const style = { width, height, position: 'absolute' };
+  const style = { width, height };
 
   const isStart = cellIndex === 0;
   const isEnd = cellIndex === cellArray.length - 1;
+
+  useEffect(() => {
+    setModifiedDateRange(cellInfoToDateRanges(modifiedCell)[0]);
+  }, [modifiedCell]);
+
+  const handleStop = useCallback(() => {
+    onMove && onMove(cellInfoToDateRanges(modifiedCell)[0], rangeIndex);
+  }, [modifiedCell, rangeIndex, onMove]);
 
   const handleDrag: DraggableEventHandler = (_event, { y }) => {
     const _start = y;
@@ -134,12 +150,26 @@ function RangeBox({
       top: newTop,
       bottom: newBottom
     };
+
     const newCell = grid.getCellFromRect(newRect);
-    return setModifiedDateRange(cellInfoToDateRanges(newCell)[0]);
+
+    setModifiedCell(newCell);
   };
 
-  const handleDragStop: DraggableEventHandler = () => {
-    onMove && onMove(modifiedDateRange, rangeIndex);
+  const handleResize = (_event: any, { size: { height: newHeight } }: any) => {
+    if (newHeight === height) {
+      return;
+    }
+
+    const newRect = {
+      ...rect,
+      bottom: rect.top + newHeight,
+      height: newHeight
+    };
+
+    const newCell = grid.getCellFromRect(newRect);
+
+    setModifiedCell(newCell);
   };
 
   return (
@@ -154,28 +184,39 @@ function RangeBox({
       }}
       position={{ x: left, y: top }}
       onDrag={handleDrag}
-      onStop={handleDragStop}
+      onStop={handleStop}
+      cancel=".react-resizable-handle"
     >
-      <button
-        ref={ref}
-        className={cc([
-          'event',
-          'range-box',
-          className,
-          {
-            'is-draggable': true,
-            'is-pending-edit': isBeingEdited && isBeingEdited(cell)
-          }
-        ])}
-        style={style as any}
-      >
-        <span className="start">
-          {isStart && format(modifiedDateRange[0], 'h:mma')}
-        </span>
-        <span className="end">
-          {isEnd && format(modifiedDateRange[1], 'h:mma')}
-        </span>
-      </button>
+      <div style={style}>
+        <ResizableBox
+          onResize={handleResize}
+          axis="y"
+          width={width}
+          height={height}
+          onResizeStop={handleStop}
+        >
+          <button
+            ref={ref}
+            className={cc([
+              'event',
+              'range-box',
+              className,
+              {
+                'is-draggable': true,
+                'is-pending-edit': isBeingEdited && isBeingEdited(cell)
+              }
+            ])}
+            style={style}
+          >
+            <span className="start">
+              {isStart && format(modifiedDateRange[0], 'h:mma')}
+            </span>
+            <span className="end">
+              {isEnd && format(modifiedDateRange[1], 'h:mma')}
+            </span>
+          </button>
+        </ResizableBox>
+      </div>
     </Draggable>
   );
 }
@@ -279,7 +320,7 @@ function App() {
     const event = dateRanges;
     console.log(...event.map(d => getTextForDateRange(d)));
     setPendingCreation(event);
-  }, [box]);
+  }, [box, grid]);
 
   useEffect(() => {
     if (hasFinishedDragging) {
@@ -343,27 +384,26 @@ function App() {
           </div>
         ))}
       </div>
+
       <div className="layer-container">
+        {isDragging && (
+          <div className="drag-box" style={style}>
+            {hasFinishedDragging && <div className="popup" />}
+          </div>
+        )}
+        {grid && pendingCreation && isDragging && (
+          <Event
+            className="is-pending-creation"
+            event={mergeEvents(scheduleState.present, pendingCreation)}
+            grid={grid}
+          />
+        )}
         {grid && !pendingCreation && (
           <Event
             isResizable
             isDeletable
             onMove={handleEventMove}
             event={scheduleState.present}
-            grid={grid}
-          />
-        )}
-
-        {isDragging && (
-          <div className="drag-box" style={style}>
-            {hasFinishedDragging && <div className="popup" />}
-          </div>
-        )}
-        {hasFinishedDragging && <div className="popup">Popup</div>}
-        {grid && pendingCreation && isDragging && (
-          <Event
-            className="is-pending-creation"
-            event={mergeEvents(scheduleState.present, pendingCreation)}
             grid={grid}
           />
         )}
