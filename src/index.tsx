@@ -1,7 +1,6 @@
 import React, {
   useRef,
   useState,
-  useLayoutEffect,
   useMemo,
   useCallback,
   useEffect
@@ -37,7 +36,7 @@ import { mergeEvents, mergeRanges } from './utils/mergeEvents';
 const originDate = startOfWeek(new Date(), { weekStartsOn: 1 });
 
 const MINS_IN_DAY = 24 * 60;
-const verticalPrecision = 1 / 15;
+const verticalPrecision = 1 / 5;
 const horizontalPrecision = 1;
 const numVerticalCells = MINS_IN_DAY * verticalPrecision;
 const numHorizontalCells = 7 * horizontalPrecision;
@@ -107,7 +106,7 @@ function RangeBox({
 
   const handleDelete = useCallback(() => {
     onMove && onMove(undefined, rangeIndex);
-  }, [ref, onMove, rangeIndex]);
+  }, [ref.current, onMove, rangeIndex]);
 
   useMousetrap('del', handleDelete, ref.current);
 
@@ -198,7 +197,6 @@ function Event({
   isBeingEdited?: (cell: CellInfo) => boolean;
   onMove?: OnMoveCallback;
 }) {
-  console.log(event);
   return (
     <div className="range-boxes">
       {event.map((dateRange, rangeIndex) => {
@@ -230,7 +228,6 @@ function App() {
   const { style, box, isDragging, hasFinishedDragging } = useClickAndDrag(
     parent
   );
-  const [dragBoxText, setDragBoxText] = useState('');
   const [
     pendingCreation,
     setPendingCreation
@@ -259,8 +256,6 @@ function App() {
     )
   );
 
-  console.log({ scheduleState });
-
   const grid = useMemo<Grid | null>(() => {
     if (!parent.current) {
       return null;
@@ -288,7 +283,6 @@ function App() {
 
   useEffect(() => {
     if (hasFinishedDragging) {
-      console.log('finished');
       setSchedule(mergeEvents(scheduleState.present, pendingCreation));
       setPendingCreation(null);
     }
@@ -327,6 +321,7 @@ function App() {
       const newSchedule = [...scheduleState.present];
 
       if (!newDateRange) {
+        console.log(rangeIndex, 'will be deleted from', newSchedule);
         newSchedule.splice(rangeIndex, 1);
       } else {
         newSchedule[rangeIndex] = newDateRange;
@@ -361,7 +356,6 @@ function App() {
 
         {isDragging && (
           <div className="drag-box" style={style}>
-            {dragBoxText}
             {hasFinishedDragging && <div className="popup" />}
           </div>
         )}

@@ -112,6 +112,14 @@ html {
     // opacity: 0.1;
   }
   // white-space: nowrap;
+
+  &.is-draggable {
+    cursor: grab;
+  }
+
+  &.is-draggable.react-draggable-dragging {
+    cursor: grabbing;
+  }
 }
 
 .hours-container {

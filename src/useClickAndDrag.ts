@@ -1,31 +1,12 @@
-import React, {
-  useMemo,
-  useRef,
-  useState,
-  useLayoutEffect,
-  useEffect
-} from 'react';
-import ReactDOM from 'react-dom';
-import { times, isEqual, floor, ceil } from 'lodash';
-import {
-  format,
-  startOfWeek,
-  addDays,
-  addMinutes,
-  getDay,
-  getTime
-} from 'date-fns';
+import React, { useState, useLayoutEffect } from 'react';
+import { isEqual } from 'lodash';
 import { fromEvent, merge } from 'rxjs';
 import {
   tap,
   map,
-  skipUntil,
   takeUntil,
-  combineLatest,
-  withLatestFrom,
   mergeMap,
   startWith,
-  take,
   distinctUntilChanged
 } from 'rxjs/operators';
 import { createPageMapCoordsToContainer } from './utils/createPageMapCoordsToContainer';
