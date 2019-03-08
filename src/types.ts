@@ -18,8 +18,8 @@ export type MapCellInfoToDateRange = (
 ) => (cellInfo: CellInfo) => DateRange[];
 
 export type MapCellInfoToDateRangeOptions = {
-  toMin: (y: number) => number;
-  toDay: (x: number) => number;
+  fromY: (y: number) => number;
+  fromX: (x: number) => number;
   originDate: Date;
 };
 

@@ -13,10 +13,10 @@ import { cellToDate } from './cellToDate';
 export type RecurringTimeRange = DateRange[];
 
 export const createMapCellInfoToRecurringTimeRange: MapCellInfoToDateRange = ({
-  toMin,
-  toDay,
+  fromY: toMin,
+  fromX: toDay,
   originDate
-}) => ({ startX, startY, endX, endY, spanX, spanY }) => {
+}) => ({ startX, startY, endX, spanY }) => {
   const result = range(startX, endX + 1)
     .map(i => {
       const startDate = cellToDate({

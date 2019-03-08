@@ -8,18 +8,13 @@ import React, {
 } from 'react';
 import ReactDOM from 'react-dom';
 import { times, reject } from 'lodash';
-import {
-  format,
-  startOfWeek,
-  addDays,
-  isAfter,
-  isBefore,
-  isEqual
-} from 'date-fns';
+import { format, startOfWeek, addDays } from 'date-fns';
 import useComponentSize from '@rehooks/component-size';
-// @ts-ignore
-import useKey from 'use-key-hook';
+import useUndo from 'use-undo';
+import useMousetrap from './useMousetrap';
 import cc from 'classcat';
+// @ts-ignore
+import 'resize-observer-polyfill/dist/ResizeObserver.global';
 
 import { useClickAndDrag } from './useClickAndDrag';
 
@@ -30,15 +25,14 @@ import {
 import { createMapDateRangeToCells } from './createMapDateRangeToCells';
 import { createGridForContainer } from './utils/createGridFromContainer';
 import { getTextForDateRange } from './utils/getTextForDateRange';
+import { usePrevious } from './utils/usePrevious';
+
+import Draggable, { DraggableEventHandler } from 'react-draggable';
 
 import './styles.scss';
 import { Grid, Event as CalendarEvent, CellInfo, DateRange } from './types';
 import { createMapCellInfoToContiguousDateRange } from './createMapCellInfoToContiguousDateRange';
-import {
-  mergeEvents,
-  rejectOverlappingRanges,
-  mergeRanges
-} from './utils/mergeEvents';
+import { mergeEvents, mergeRanges } from './utils/mergeEvents';
 
 const originDate = startOfWeek(new Date(), { weekStartsOn: 1 });
 
@@ -63,15 +57,10 @@ const springConfig = {
   velocity: 0
 };
 
-const isSameOrAfter = (date1: Date, date2: Date) =>
-  isEqual(date1, date2) || isAfter(date1, date2);
-const isSameOrBefore = (date1: Date, date2: Date) =>
-  isEqual(date1, date2) || isBefore(date1, date2);
-
 const cellInfoToDateRanges = createMapCellInfoToRecurringTimeRange({
   originDate,
-  toMin,
-  toDay
+  fromY: toMin,
+  fromX: toDay
 });
 
 const dateRangeToCells = createMapDateRangeToCells({
@@ -81,8 +70,6 @@ const dateRangeToCells = createMapDateRangeToCells({
   toX,
   toY
 });
-
-import Draggable, { DraggableEventHandler } from 'react-draggable';
 
 type OnMoveCallback = (
   newDateRange: DateRange | undefined,
@@ -118,16 +105,11 @@ function RangeBox({
     setModifiedDateRange(dateRange);
   }, [dateRange]);
 
-  useKey(
-    () => {
-      if (ref.current === document.activeElement) {
-        onMove && onMove(undefined, rangeIndex);
-      }
-    },
-    {
-      detectKeys: [46]
-    }
-  );
+  const handleDelete = useCallback(() => {
+    onMove && onMove(undefined, rangeIndex);
+  }, [ref, onMove, rangeIndex]);
+
+  useMousetrap('del', handleDelete, ref.current);
 
   const rect = useMemo(() => grid.getRectFromCell(cell), [cell]);
 
@@ -141,13 +123,17 @@ function RangeBox({
   const handleDrag: DraggableEventHandler = (_event, { y }) => {
     const _start = y;
     const _end = _start + height;
-    const top = Math.min(_start, _end);
-    const bottom = top + height;
+    const newTop = Math.min(_start, _end);
+    const newBottom = newTop + height;
+
+    if (newTop === top) {
+      return;
+    }
 
     const newRect = {
       ...rect,
-      top,
-      bottom
+      top: newTop,
+      bottom: newBottom
     };
     const newCell = grid.getCellFromRect(newRect);
     return setModifiedDateRange(cellInfoToDateRanges(newCell)[0]);
@@ -159,6 +145,7 @@ function RangeBox({
 
   return (
     <Draggable
+      key={rangeIndex}
       axis="y"
       bounds={{
         top: 0,
@@ -211,12 +198,14 @@ function Event({
   isBeingEdited?: (cell: CellInfo) => boolean;
   onMove?: OnMoveCallback;
 }) {
+  console.log(event);
   return (
     <div className="range-boxes">
       {event.map((dateRange, rangeIndex) => {
         return dateRangeToCells(dateRange).map((cell, cellIndex, array) => {
           return (
             <RangeBox
+              key={cellIndex}
               cellArray={array}
               cellIndex={cellIndex}
               dateRange={dateRange}
@@ -235,9 +224,28 @@ function Event({
 }
 
 function App() {
+  const root = useRef<HTMLDivElement | null>(null);
   const parent = useRef<HTMLDivElement | null>(null);
   const size = useComponentSize(parent);
-  const [schedule, setSchedule] = useState<CalendarEvent>(
+  const { style, box, isDragging, hasFinishedDragging } = useClickAndDrag(
+    parent
+  );
+  const [dragBoxText, setDragBoxText] = useState('');
+  const [
+    pendingCreation,
+    setPendingCreation
+  ] = useState<RecurringTimeRange | null>(null);
+  const [
+    scheduleState,
+    {
+      set: setSchedule,
+      reset: resetSchedule,
+      undo: undoSchedule,
+      redo: redoSchedule,
+      canUndo: canUndoSchedule,
+      canRedo: canRedoSchedule
+    }
+  ] = useUndo<CalendarEvent>(
     [
       // ['2019-03-03T22:45:00.000Z', '2019-03-04T01:15:00.000Z'],
       ['2019-03-04T22:15:00.000Z', '2019-03-05T01:00:00.000Z'],
@@ -250,14 +258,8 @@ function App() {
       range => range.map(dateString => new Date(dateString)) as [Date, Date]
     )
   );
-  const { style, box, isDragging, hasFinishedDragging } = useClickAndDrag(
-    parent
-  );
-  const [dragBoxText, setDragBoxText] = useState('');
-  const [
-    pendingCreation,
-    setPendingCreation
-  ] = useState<RecurringTimeRange | null>(null);
+
+  console.log({ scheduleState });
 
   const grid = useMemo<Grid | null>(() => {
     if (!parent.current) {
@@ -287,34 +289,56 @@ function App() {
   useEffect(() => {
     if (hasFinishedDragging) {
       console.log('finished');
-      setSchedule(schedule => mergeEvents(schedule, pendingCreation));
+      setSchedule(mergeEvents(scheduleState.present, pendingCreation));
       setPendingCreation(null);
     }
   }, [hasFinishedDragging]);
 
+  useMousetrap(
+    'ctrl+z',
+    () => {
+      if (!canUndoSchedule) {
+        return;
+      }
+
+      undoSchedule();
+    },
+    document
+  );
+
+  useMousetrap(
+    'ctrl+shift+z',
+    () => {
+      if (!canRedoSchedule) {
+        return;
+      }
+
+      redoSchedule();
+    },
+    document
+  );
+
   const handleEventMove = useCallback<OnMoveCallback>(
     (newDateRange, rangeIndex) => {
-      setSchedule(schedule => {
-        if (!schedule && newDateRange) {
-          return [newDateRange];
-        }
+      if (!scheduleState.present && newDateRange) {
+        return [newDateRange];
+      }
 
-        const newSchedule = [...schedule];
+      const newSchedule = [...scheduleState.present];
 
-        if (!newDateRange) {
-          newSchedule.splice(rangeIndex, 1);
-        } else {
-          newSchedule[rangeIndex] = newDateRange;
-        }
+      if (!newDateRange) {
+        newSchedule.splice(rangeIndex, 1);
+      } else {
+        newSchedule[rangeIndex] = newDateRange;
+      }
 
-        return mergeRanges(newSchedule);
-      });
+      setSchedule(mergeRanges(newSchedule));
     },
-    []
+    [scheduleState.present]
   );
 
   return (
-    <div className="root">
+    <div ref={root} className="root">
       <div className="calendar header">
         {times(7).map(i => (
           <div className="day-column">
@@ -330,7 +354,7 @@ function App() {
             isResizable
             isDeletable
             onMove={handleEventMove}
-            event={schedule}
+            event={scheduleState.present}
             grid={grid}
           />
         )}
@@ -345,7 +369,7 @@ function App() {
         {grid && pendingCreation && isDragging && (
           <Event
             className="is-pending-creation"
-            event={mergeEvents(schedule, pendingCreation)}
+            event={mergeEvents(scheduleState.present, pendingCreation)}
             grid={grid}
           />
         )}
@@ -353,8 +377,8 @@ function App() {
           {times(7).map(x => {
             const cellInfo = createMapCellInfoToContiguousDateRange({
               originDate,
-              toDay: toDay,
-              toMin: y => y * 60
+              fromX: toDay,
+              fromY: y => y * 60
             });
 
             return (

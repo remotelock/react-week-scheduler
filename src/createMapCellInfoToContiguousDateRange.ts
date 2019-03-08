@@ -3,12 +3,10 @@ import { isBefore } from 'date-fns';
 import { cellToDate } from './cellToDate';
 
 export const createMapCellInfoToContiguousDateRange: MapCellInfoToDateRange = ({
-  toMin,
-  toDay,
+  fromY: toMin,
+  fromX: toDay,
   originDate
-}) => ({ startX, startY, endX, endY, spanX, spanY }) => {
-  const startDay = startX;
-  const endDay = endX;
+}) => ({ startX, startY, endX, endY }) => {
   const startDate = cellToDate({ startX, startY, toMin, toDay, originDate });
   const endDate = cellToDate({
     startX: endX,
