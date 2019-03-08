@@ -45,6 +45,19 @@ html {
 
 .react-resizable-handle {
   z-index: 3;
+  position: absolute;
+  height: 10px;
+  width: 100%;
+  cursor: s-resize;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  background-position: center;
+  padding: 0 3px 3px 0;
+  background-repeat: no-repeat;
+  background-size: auto 100%;
+  box-sizing: border-box;
+  background-image: url('./baseline_menu_white_18dp.png');
 }
 
 .layer-container {
@@ -186,6 +199,7 @@ html {
 
 .range-boxes {
   .range-box {
+    padding-bottom: 10px;
     display: inline-flex;
     flex-direction: column;
     justify-content: space-between;
