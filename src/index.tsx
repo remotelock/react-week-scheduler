@@ -174,7 +174,6 @@ function RangeBox({
 
   return (
     <Draggable
-      key={rangeIndex}
       axis="y"
       bounds={{
         top: 0,
@@ -244,7 +243,7 @@ function Event({
         return dateRangeToCells(dateRange).map((cell, cellIndex, array) => {
           return (
             <RangeBox
-              key={cellIndex}
+              key={`${getTextForDateRange(dateRange)}`}
               cellArray={array}
               cellIndex={cellIndex}
               dateRange={dateRange}
