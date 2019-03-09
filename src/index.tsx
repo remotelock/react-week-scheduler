@@ -368,25 +368,29 @@ function Schedule({
   return (
     <div className="range-boxes">
       {ranges.map((dateRange, rangeIndex) => {
-        return dateRangeToCells(dateRange).map((cell, cellIndex, array) => {
-          return (
-            <RangeBox
-              key={cellIndex}
-              isResizable={isResizable}
-              isMovable={isMovable}
-              isDeletable={isDeletable}
-              cellInfoToDateRange={cellInfoToDateRange}
-              cellArray={array}
-              cellIndex={cellIndex}
-              rangeIndex={rangeIndex}
-              className={className}
-              isBeingEdited={isBeingEdited}
-              onMove={onMove}
-              grid={grid}
-              cell={cell}
-            />
-          );
-        });
+        return (
+          <span key={rangeIndex}>
+            {dateRangeToCells(dateRange).map((cell, cellIndex, array) => {
+              return (
+                <RangeBox
+                  key={cellIndex}
+                  isResizable={isResizable}
+                  isMovable={isMovable}
+                  isDeletable={isDeletable}
+                  cellInfoToDateRange={cellInfoToDateRange}
+                  cellArray={array}
+                  cellIndex={cellIndex}
+                  rangeIndex={rangeIndex}
+                  className={className}
+                  isBeingEdited={isBeingEdited}
+                  onMove={onMove}
+                  grid={grid}
+                  cell={cell}
+                />
+              );
+            })}
+          </span>
+        );
       })}
     </div>
   );
