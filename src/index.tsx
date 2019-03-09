@@ -6,7 +6,7 @@ import React, {
   useEffect
 } from 'react';
 import ReactDOM from 'react-dom';
-import { times, reject } from 'lodash';
+import { times } from 'lodash';
 import { format, startOfWeek, addDays, compareAsc } from 'date-fns';
 import useComponentSize from '@rehooks/component-size';
 import useUndo from 'use-undo';
@@ -25,7 +25,6 @@ import { createMapDateRangeToCells } from './createMapDateRangeToCells';
 import { createGridForContainer } from './utils/createGridFromContainer';
 import { getTextForDateRange } from './utils/getTextForDateRange';
 import Resizable, { ResizeCallback } from 're-resizable';
-// import 'react-resizable/css/styles.css';
 
 import Draggable, { DraggableEventHandler } from 'react-draggable';
 
@@ -65,6 +64,19 @@ const cellInfoToDateRanges = createMapCellInfoToRecurringTimeRange({
   fromX: toDay
 });
 
+const cellInfoToSingleDateRange = (cell: CellInfo): DateRange => {
+  const [first, ...rest] = cellInfoToDateRanges(cell);
+
+  invariant(
+    rest.length === 0,
+    `Expected "cellInfoToSingleDateRange" to return a single date range, found ${
+      rest.length
+    } additional ranges instead. This is a bug in @remotelock/weekly-scheduler`
+  );
+
+  return first;
+};
+
 const dateRangeToCells = createMapDateRangeToCells({
   originDate,
   numVerticalCells,
@@ -86,7 +98,11 @@ function RangeBox({
   cellArray,
   cell,
   className,
-  onMove
+  onMove,
+  cellInfoToDateRange,
+  isResizable,
+  isDeletable,
+  isMovable
 }: {
   grid: Grid;
   cell: CellInfo;
@@ -94,8 +110,12 @@ function RangeBox({
   cellArray: CellInfo[];
   className?: string;
   onMove?: OnMoveCallback;
+  isResizable?: boolean;
+  isDeletable?: boolean;
+  isMovable?: boolean;
   rangeIndex: number;
   isBeingEdited?(cell: CellInfo): boolean;
+  cellInfoToDateRange(cell: CellInfo): DateRange;
 }) {
   const [modifiedCell, setModifiedCell] = useState(cell);
   const originalRect = useMemo(() => grid.getRectFromCell(cell), [cell, grid]);
@@ -110,14 +130,17 @@ function RangeBox({
     setModifiedCell(cell);
   }, [cell]);
 
-  const modifiedDateRange = useMemo(
-    () => cellInfoToDateRanges(modifiedCell)[0],
-    [modifiedCell]
-  );
+  const modifiedDateRange = useMemo(() => cellInfoToDateRange(modifiedCell), [
+    modifiedCell
+  ]);
 
   const handleDelete = useCallback(() => {
+    if (!isDeletable) {
+      return;
+    }
+
     onMove && onMove(undefined, rangeIndex);
-  }, [ref.current, onMove, rangeIndex]);
+  }, [ref.current, onMove, isDeletable, rangeIndex]);
 
   useMousetrap('del', handleDelete, ref.current);
 
@@ -129,12 +152,16 @@ function RangeBox({
   const isEnd = cellIndex === cellArray.length - 1;
 
   const handleStop = useCallback(() => {
-    onMove && onMove(cellInfoToDateRanges(modifiedCell)[0], rangeIndex);
+    onMove && onMove(cellInfoToDateRange(modifiedCell), rangeIndex);
   }, [modifiedCell, rangeIndex, onMove]);
 
   useMousetrap(
     'up',
     () => {
+      if (!isMovable) {
+        return;
+      }
+
       if (modifiedCell.startY === 0) {
         return;
       }
@@ -145,7 +172,7 @@ function RangeBox({
         endY: modifiedCell.endY - 1
       };
 
-      onMove && onMove(cellInfoToDateRanges(newCell)[0], rangeIndex);
+      onMove && onMove(cellInfoToDateRange(newCell), rangeIndex);
     },
     ref.current
   );
@@ -153,6 +180,10 @@ function RangeBox({
   useMousetrap(
     'down',
     () => {
+      if (!isMovable) {
+        return;
+      }
+
       if (modifiedCell.endY === grid.numVerticalCells - 1) {
         return;
       }
@@ -163,13 +194,17 @@ function RangeBox({
         endY: modifiedCell.endY + 1
       };
 
-      onMove && onMove(cellInfoToDateRanges(newCell)[0], rangeIndex);
+      onMove && onMove(cellInfoToDateRange(newCell), rangeIndex);
     },
     ref.current
   );
 
   const handleDrag: DraggableEventHandler = useCallback(
     (_event, { y }) => {
+      if (!isMovable) {
+        return;
+      }
+
       const _start = y;
       const _end = _start + rect.height;
       const newTop = Math.min(_start, _end);
@@ -200,6 +235,10 @@ function RangeBox({
 
   const handleResize: ResizeCallback = useCallback(
     (event, direction, ref, delta) => {
+      if (!isResizable) {
+        return;
+      }
+
       if (delta.height === 0) {
         return;
       }
@@ -229,7 +268,7 @@ function RangeBox({
 
   return (
     <Draggable
-      axis="y"
+      axis={isMovable ? 'y' : 'none'}
       bounds={{
         top: 0,
         bottom: grid.totalHeight - height,
@@ -248,7 +287,7 @@ function RangeBox({
           'range-box',
           className,
           {
-            'is-draggable': true,
+            'is-draggable': isMovable,
             'is-pending-edit': isBeingEdited && isBeingEdited(cell)
           }
         ])}
@@ -261,10 +300,14 @@ function RangeBox({
           onResize={handleResize}
           onResizeStop={handleStop}
           handleWrapperClass="handle-wrapper"
-          enable={{
-            top: true,
-            bottom: true
-          }}
+          enable={
+            isResizable
+              ? {
+                  top: true,
+                  bottom: true
+                }
+              : {}
+          }
           handleClasses={{
             bottom: 'handle bottom',
             bottomLeft: 'handle bottom-left',
@@ -290,29 +333,37 @@ function RangeBox({
   );
 }
 
-function CalendarEventComponent({
-  event,
+function Schedule({
+  ranges,
   grid,
   className,
   onMove,
   isResizable,
   isDeletable,
+  isMovable,
+  cellInfoToDateRange,
   isBeingEdited
 }: {
-  event: CalendarEvent;
+  ranges: CalendarEvent;
   grid: Grid;
   className?: string;
   isResizable?: boolean;
   isDeletable?: boolean;
-  isBeingEdited?: (cell: CellInfo) => boolean;
+  isMovable?: boolean;
   onMove?: OnMoveCallback;
+  isBeingEdited?(cell: CellInfo): boolean;
+  cellInfoToDateRange(cell: CellInfo): DateRange;
 }) {
   return (
     <div className="range-boxes">
-      {event.map((dateRange, rangeIndex) => {
+      {ranges.map((dateRange, rangeIndex) => {
         return dateRangeToCells(dateRange).map((cell, cellIndex, array) => {
           return (
             <RangeBox
+              isResizable={isResizable}
+              isMovable={isMovable}
+              isDeletable={isDeletable}
+              cellInfoToDateRange={cellInfoToDateRange}
               cellArray={array}
               cellIndex={cellIndex}
               rangeIndex={rangeIndex}
@@ -523,18 +574,21 @@ function App() {
           </div>
         )}
         {grid && pendingCreation && isDragging && (
-          <CalendarEventComponent
+          <Schedule
+            cellInfoToDateRange={cellInfoToSingleDateRange}
             className="is-pending-creation"
-            event={mergeEvents(scheduleState.present, pendingCreation)}
+            ranges={mergeEvents(scheduleState.present, pendingCreation)}
             grid={grid}
           />
         )}
         {grid && !pendingCreation && (
-          <CalendarEventComponent
+          <Schedule
+            cellInfoToDateRange={cellInfoToSingleDateRange}
             isResizable
+            isMovable
             isDeletable
             onMove={handleEventMove}
-            event={scheduleState.present}
+            ranges={scheduleState.present}
             grid={grid}
           />
         )}
