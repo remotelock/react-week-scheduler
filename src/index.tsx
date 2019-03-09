@@ -24,8 +24,8 @@ import {
 import { createMapDateRangeToCells } from './createMapDateRangeToCells';
 import { createGridForContainer } from './utils/createGridFromContainer';
 import { getTextForDateRange } from './utils/getTextForDateRange';
-import { ResizableBox } from 'react-resizable';
-import 'react-resizable/css/styles.css';
+import Resizable, { ResizeCallback } from 're-resizable';
+// import 'react-resizable/css/styles.css';
 
 import Draggable, { DraggableEventHandler } from 'react-draggable';
 
@@ -33,11 +33,12 @@ import './styles.scss';
 import { Grid, Event as CalendarEvent, CellInfo, DateRange } from './types';
 import { createMapCellInfoToContiguousDateRange } from './createMapCellInfoToContiguousDateRange';
 import { mergeEvents, mergeRanges } from './utils/mergeEvents';
+import invariant from 'invariant';
 
 const originDate = startOfWeek(new Date(), { weekStartsOn: 1 });
 
 const MINS_IN_DAY = 24 * 60;
-const verticalPrecision = 1 / 5;
+const verticalPrecision = 1 / 15;
 const horizontalPrecision = 1;
 const numVerticalCells = MINS_IN_DAY * verticalPrecision;
 const numHorizontalCells = 7 * horizontalPrecision;
@@ -83,7 +84,6 @@ function RangeBox({
   cellIndex,
   cellArray,
   cell,
-  dateRange,
   className,
   onMove
 }: {
@@ -91,34 +91,34 @@ function RangeBox({
   cell: CellInfo;
   cellIndex: number;
   cellArray: CellInfo[];
-  dateRange: DateRange;
   className?: string;
   onMove?: OnMoveCallback;
   rangeIndex: number;
   isBeingEdited?(cell: CellInfo): boolean;
 }) {
-  const [modifiedDateRange, setModifiedDateRange] = useState(dateRange);
   const [modifiedCell, setModifiedCell] = useState(cell);
-  const ref = useRef(null);
+  const originalRect = useMemo(() => grid.getRectFromCell(cell), [cell, grid]);
+  const rect = useMemo(() => grid.getRectFromCell(modifiedCell), [
+    modifiedCell,
+    grid
+  ]);
 
-  // Copy prop to state, like getDerivedStateFromProps
-  useEffect(() => {
-    setModifiedDateRange(dateRange);
-  }, [dateRange]);
+  const ref = useRef(null);
 
   useEffect(() => {
     setModifiedCell(cell);
   }, [cell]);
+
+  const modifiedDateRange = useMemo(
+    () => cellInfoToDateRanges(modifiedCell)[0],
+    [modifiedCell]
+  );
 
   const handleDelete = useCallback(() => {
     onMove && onMove(undefined, rangeIndex);
   }, [ref.current, onMove, rangeIndex]);
 
   useMousetrap('del', handleDelete, ref.current);
-
-  const rect = useMemo(() => grid.getRectFromCell(modifiedCell), [
-    modifiedCell
-  ]);
 
   const { top, left, width, height } = rect;
 
@@ -127,50 +127,104 @@ function RangeBox({
   const isStart = cellIndex === 0;
   const isEnd = cellIndex === cellArray.length - 1;
 
-  useEffect(() => {
-    setModifiedDateRange(cellInfoToDateRanges(modifiedCell)[0]);
-  }, [modifiedCell]);
-
   const handleStop = useCallback(() => {
     onMove && onMove(cellInfoToDateRanges(modifiedCell)[0], rangeIndex);
   }, [modifiedCell, rangeIndex, onMove]);
 
-  const handleDrag: DraggableEventHandler = (_event, { y }) => {
-    const _start = y;
-    const _end = _start + height;
-    const newTop = Math.min(_start, _end);
-    const newBottom = newTop + height;
+  useMousetrap(
+    'up',
+    () => {
+      if (modifiedCell.startY === 0) {
+        return;
+      }
 
-    if (newTop === top) {
-      return;
-    }
+      const newCell = {
+        ...modifiedCell,
+        startY: modifiedCell.startY - 1,
+        endY: modifiedCell.endY - 1
+      };
 
-    const newRect = {
-      ...rect,
-      top: newTop,
-      bottom: newBottom
-    };
+      onMove && onMove(cellInfoToDateRanges(newCell)[0], rangeIndex);
+    },
+    ref.current
+  );
 
-    const newCell = grid.getCellFromRect(newRect);
+  useMousetrap(
+    'down',
+    () => {
+      if (modifiedCell.endY === grid.numVerticalCells - 1) {
+        return;
+      }
 
-    setModifiedCell(newCell);
-  };
+      const newCell = {
+        ...modifiedCell,
+        startY: modifiedCell.startY + 1,
+        endY: modifiedCell.endY + 1
+      };
 
-  const handleResize = (_event: any, { size: { height: newHeight } }: any) => {
-    if (newHeight === height) {
-      return;
-    }
+      onMove && onMove(cellInfoToDateRanges(newCell)[0], rangeIndex);
+    },
+    ref.current
+  );
 
-    const newRect = {
-      ...rect,
-      bottom: rect.top + newHeight,
-      height: newHeight
-    };
+  const handleDrag: DraggableEventHandler = useCallback(
+    (_event, { y }) => {
+      const _start = y;
+      const _end = _start + rect.height;
+      const newTop = Math.min(_start, _end);
+      const newBottom = newTop + rect.height;
 
-    const newCell = grid.getCellFromRect(newRect);
+      if (newTop === top) {
+        return;
+      }
 
-    setModifiedCell(newCell);
-  };
+      const newRect = {
+        ...rect,
+        top: newTop,
+        bottom: newBottom
+      };
+
+      const newCell = grid.getCellFromRect(newRect);
+      newCell.spanY = cell.spanY;
+      invariant(
+        newCell.spanY === cell.spanY,
+        `Expected the dragged time cell to have the same height (${
+          newCell.spanY
+        }, ${cell.spanY})`
+      );
+      setModifiedCell(newCell);
+    },
+    [grid, rect]
+  );
+
+  const handleResize: ResizeCallback = useCallback(
+    (event, direction, ref, delta) => {
+      if (delta.height === 0) {
+        return;
+      }
+
+      const newSize = {
+        height: delta.height + rect.height,
+        width: delta.width + rect.width
+      };
+
+      const newRect = {
+        ...originalRect,
+        ...newSize
+      };
+
+      if (direction.includes('top')) {
+        newRect.top -= delta.height;
+      } else if (direction.includes('bottom')) {
+        newRect.bottom += delta.height;
+      }
+
+      const newCell = grid.getCellFromRect(newRect);
+
+      setModifiedCell(newCell);
+    },
+    [grid, rect, originalRect]
+  );
 
   return (
     <Draggable
@@ -184,18 +238,31 @@ function RangeBox({
       position={{ x: left, y: top }}
       onDrag={handleDrag}
       onStop={handleStop}
-      cancel=".react-resizable-handle"
+      cancel=".handle"
     >
-      <div style={style}>
-        <ResizableBox
+      <div className="button-reset" ref={ref} tabIndex={0} style={style}>
+        <Resizable
+          size={originalRect}
           onResize={handleResize}
-          axis="y"
-          width={width}
-          height={height}
           onResizeStop={handleStop}
+          handleWrapperClass="handle-wrapper"
+          enable={{
+            top: true,
+            bottom: true
+          }}
+          handleClasses={{
+            bottom: 'handle bottom',
+            bottomLeft: 'handle bottom-left',
+            bottomRight: 'handle bottom-right',
+            left: 'handle left',
+            right: 'handle right',
+            top: 'handle top',
+            topLeft: 'handle top-left',
+            topRight: 'handle top-right'
+          }}
         >
           <button
-            ref={ref}
+            style={style}
             className={cc([
               'event',
               'range-box',
@@ -205,7 +272,6 @@ function RangeBox({
                 'is-pending-edit': isBeingEdited && isBeingEdited(cell)
               }
             ])}
-            style={style}
           >
             <span className="start">
               {isStart && format(modifiedDateRange[0], 'h:mma')}
@@ -214,13 +280,13 @@ function RangeBox({
               {isEnd && format(modifiedDateRange[1], 'h:mma')}
             </span>
           </button>
-        </ResizableBox>
+        </Resizable>
       </div>
     </Draggable>
   );
 }
 
-function Event({
+function CalendarEventComponent({
   event,
   grid,
   className,
@@ -243,10 +309,8 @@ function Event({
         return dateRangeToCells(dateRange).map((cell, cellIndex, array) => {
           return (
             <RangeBox
-              key={`${getTextForDateRange(dateRange)}`}
               cellArray={array}
               cellIndex={cellIndex}
-              dateRange={dateRange}
               rangeIndex={rangeIndex}
               className={className}
               isBeingEdited={isBeingEdited}
@@ -261,9 +325,20 @@ function Event({
   );
 }
 
+const defaultSchedule: [string, string][] = [
+  // ['2019-03-03T22:45:00.000Z', '2019-03-04T01:15:00.000Z'],
+  ['2019-03-05T22:00:00.000Z', '2019-03-06T01:00:00.000Z'],
+  ['2019-03-04T22:15:00.000Z', '2019-03-05T01:00:00.000Z'],
+  ['2019-03-07T05:30:00.000Z', '2019-03-07T10:00:00.000Z'],
+  // ['2019-03-08T22:00:00.000Z', '2019-03-09T01:00:00.000Z'],
+  ['2019-03-09T22:00:00.000Z', '2019-03-10T01:00:00.000Z'],
+  ['2019-03-06T22:00:00.000Z', '2019-03-07T01:00:00.000Z']
+];
+
 function App() {
   const root = useRef<HTMLDivElement | null>(null);
   const parent = useRef<HTMLDivElement | null>(null);
+
   const size = useComponentSize(parent);
   const { style, box, isDragging, hasFinishedDragging } = useClickAndDrag(
     parent
@@ -283,15 +358,7 @@ function App() {
       canRedo: canRedoSchedule
     }
   ] = useUndo<CalendarEvent>(
-    [
-      // ['2019-03-03T22:45:00.000Z', '2019-03-04T01:15:00.000Z'],
-      ['2019-03-04T22:15:00.000Z', '2019-03-05T01:00:00.000Z'],
-      ['2019-03-05T22:00:00.000Z', '2019-03-06T01:00:00.000Z'],
-      ['2019-03-06T22:00:00.000Z', '2019-03-07T01:00:00.000Z'],
-      ['2019-03-07T05:30:00.000Z', '2019-03-07T10:00:00.000Z'],
-      // ['2019-03-08T22:00:00.000Z', '2019-03-09T01:00:00.000Z'],
-      ['2019-03-09T22:00:00.000Z', '2019-03-10T01:00:00.000Z']
-    ].map(
+    defaultSchedule.map(
       range => range.map(dateString => new Date(dateString)) as [Date, Date]
     )
   );
@@ -319,7 +386,7 @@ function App() {
     const event = dateRanges;
     console.log(...event.map(d => getTextForDateRange(d)));
     setPendingCreation(event);
-  }, [box, grid]);
+  }, [box]);
 
   useEffect(() => {
     if (hasFinishedDragging) {
@@ -391,14 +458,14 @@ function App() {
           </div>
         )}
         {grid && pendingCreation && isDragging && (
-          <Event
+          <CalendarEventComponent
             className="is-pending-creation"
             event={mergeEvents(scheduleState.present, pendingCreation)}
             grid={grid}
           />
         )}
         {grid && !pendingCreation && (
-          <Event
+          <CalendarEventComponent
             isResizable
             isDeletable
             onMove={handleEventMove}

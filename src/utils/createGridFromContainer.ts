@@ -11,13 +11,19 @@ export const createGridForContainer = ({
   numVerticalCells: number;
   numHorizontalCells: number;
 }): Grid => {
+  const totalHeight = container.scrollHeight;
+  const totalWidth = container.scrollWidth;
+
   return new class Grid {
+    numVerticalCells = numVerticalCells;
+    numHorizontalCells = numHorizontalCells;
+
     get totalHeight() {
-      return container.scrollHeight;
+      return totalHeight;
     }
 
     get totalWidth() {
-      return container.scrollWidth;
+      return totalWidth;
     }
 
     get cellHeight() {
@@ -60,7 +66,7 @@ export const createGridForContainer = ({
         numHorizontalCells - 1
       );
       const startY = clamp(
-        round(data.top / this.cellHeight),
+        floor(data.top / this.cellHeight),
         0,
         numVerticalCells - 1
       );
@@ -70,7 +76,7 @@ export const createGridForContainer = ({
         numHorizontalCells - 1
       );
       const endY = clamp(
-        round(data.bottom / this.cellHeight) - 1,
+        floor(data.bottom / this.cellHeight),
         0,
         numVerticalCells - 1
       );

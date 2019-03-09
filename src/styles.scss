@@ -43,21 +43,21 @@ html {
   position: absolute;
 }
 
-.react-resizable-handle {
+.handle-wrapper {
   z-index: 3;
   position: absolute;
-  height: 10px;
-  width: 100%;
-  cursor: s-resize;
   left: 0;
   bottom: 0;
   right: 0;
+  top: 0;
   background-position: center;
   padding: 0 3px 3px 0;
   background-repeat: no-repeat;
   background-size: auto 100%;
   box-sizing: border-box;
-  background-image: url('./baseline_menu_white_18dp.png');
+
+  &.handle {
+  }
 }
 
 .layer-container {
@@ -98,6 +98,10 @@ html {
 
 .draggable {
   z-index: 2;
+}
+
+.button-reset {
+  outline: none;
 }
 
 .event {

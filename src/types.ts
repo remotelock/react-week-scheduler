@@ -28,6 +28,8 @@ export type Grid = {
   cellWidth: number;
   totalWidth: number;
   totalHeight: number;
+  numVerticalCells: number;
+  numHorizontalCells: number;
   getRectFromCell(cell: CellInfo): Rect;
   getCellFromRect(rect: Rect): CellInfo;
 };
