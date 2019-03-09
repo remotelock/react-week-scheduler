@@ -7,7 +7,7 @@ import React, {
 } from 'react';
 import ReactDOM from 'react-dom';
 import { times, reject } from 'lodash';
-import { format, startOfWeek, addDays } from 'date-fns';
+import { format, startOfWeek, addDays, compareAsc } from 'date-fns';
 import useComponentSize from '@rehooks/component-size';
 import useUndo from 'use-undo';
 import useMousetrap from './useMousetrap';
@@ -345,9 +345,13 @@ function App() {
   const [left, setLeft] = useState(0);
 
   const size = useComponentSize(parent);
-  const { style, box, isDragging, hasFinishedDragging } = useClickAndDrag(
-    parent
-  );
+  const {
+    style,
+    box,
+    isDragging,
+    hasFinishedDragging,
+    cancel
+  } = useClickAndDrag(parent);
   const [
     pendingCreation,
     setPendingCreation
@@ -363,9 +367,11 @@ function App() {
       canRedo: canRedoSchedule
     }
   ] = useUndo<CalendarEvent>(
-    defaultSchedule.map(
-      range => range.map(dateString => new Date(dateString)) as [Date, Date]
-    )
+    defaultSchedule
+      .map(
+        range => range.map(dateString => new Date(dateString)) as [Date, Date]
+      )
+      .sort((range1, range2) => compareAsc(range1[0], range2[0]))
   );
 
   const { totalHeight, totalWidth } = useMemo(() => {
@@ -389,10 +395,11 @@ function App() {
       numHorizontalCells,
       numVerticalCells
     });
-  }, [totalHeight, totalWidth]);
+  }, [totalHeight, totalWidth, numHorizontalCells, numVerticalCells]);
 
   useEffect(() => {
     if (grid === null || box === null) {
+      setPendingCreation(null);
       return;
     }
 
@@ -402,14 +409,20 @@ function App() {
     const event = dateRanges;
     console.log(...event.map(d => getTextForDateRange(d)));
     setPendingCreation(event);
-  }, [box]);
+  }, [box, grid, setPendingCreation]);
 
   useEffect(() => {
     if (hasFinishedDragging) {
       setSchedule(mergeEvents(scheduleState.present, pendingCreation));
       setPendingCreation(null);
     }
-  }, [hasFinishedDragging]);
+  }, [
+    hasFinishedDragging,
+    setSchedule,
+    setPendingCreation,
+    pendingCreation,
+    scheduleState.present
+  ]);
 
   useMousetrap(
     'ctrl+z',
@@ -431,6 +444,16 @@ function App() {
       }
 
       redoSchedule();
+    },
+    document
+  );
+
+  useMousetrap(
+    'esc',
+    () => {
+      if (pendingCreation) {
+        cancel();
+      }
     },
     document
   );
@@ -475,6 +498,11 @@ function App() {
     },
     { passive: true }
   );
+
+  useEffect(() => {
+    // @ts-ignore
+    document.activeElement && document.activeElement.scrollIntoViewIfNeeded();
+  }, [document.activeElement, scheduleState.present]);
 
   return (
     <div ref={root} className="root">

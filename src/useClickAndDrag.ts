@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { isEqual } from 'lodash';
 import { fromEvent, merge } from 'rxjs';
 import {
@@ -112,5 +112,11 @@ export function useClickAndDrag(ref: React.RefObject<HTMLElement>) {
     };
   }, []);
 
-  return { style, box, isDragging, hasFinishedDragging };
+  const cancel = useCallback(() => {
+    setIsDragging(false);
+    setHasFinishedDragging(false);
+    setBox(null);
+  }, [setBox]);
+
+  return { style, box, isDragging, cancel, hasFinishedDragging };
 }
