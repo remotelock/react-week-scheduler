@@ -7,7 +7,8 @@ import {
   takeUntil,
   mergeMap,
   startWith,
-  distinctUntilChanged
+  distinctUntilChanged,
+  filter
 } from 'rxjs/operators';
 import { createPageMapCoordsToContainer } from './utils/createPageMapCoordsToContainer';
 import { Rect } from './types';
@@ -30,7 +31,9 @@ export function useClickAndDrag(ref: React.RefObject<HTMLElement>) {
     const touchMove$ = fromEvent(window, 'touchmove', { passive: true });
     const touchEnd$ = fromEvent(window, 'touchend', { passive: true });
 
-    const mouseDown$ = fromEvent(container, 'mousedown', { passive: true });
+    const mouseDown$ = fromEvent<MouseEvent>(container, 'mousedown', {
+      passive: true
+    }).pipe(filter(event => event.which === 1));
     const mouseMove$ = fromEvent(window, 'mousemove', { passive: true });
     const mouseUp$ = fromEvent(window, 'mouseup', { passive: true });
 
