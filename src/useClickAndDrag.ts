@@ -26,13 +26,13 @@ export function useClickAndDrag(ref: React.RefObject<HTMLElement>) {
 
     const mapCoordsToContainer = createPageMapCoordsToContainer(container);
 
-    const touchStart$ = fromEvent(container, 'touchstart');
-    const touchMove$ = fromEvent(window, 'touchmove');
-    const touchEnd$ = fromEvent(window, 'touchend');
+    const touchStart$ = fromEvent(container, 'touchstart', { passive: true });
+    const touchMove$ = fromEvent(window, 'touchmove', { passive: true });
+    const touchEnd$ = fromEvent(window, 'touchend', { passive: true });
 
-    const mouseDown$ = fromEvent(container, 'mousedown');
-    const mouseMove$ = fromEvent(window, 'mousemove');
-    const mouseUp$ = fromEvent(window, 'mouseup');
+    const mouseDown$ = fromEvent(container, 'mousedown', { passive: true });
+    const mouseMove$ = fromEvent(window, 'mousemove', { passive: true });
+    const mouseUp$ = fromEvent(window, 'mouseup', { passive: true });
 
     const dragStart$ = merge(mouseDown$, touchStart$).pipe(
       tap((e: any) => {

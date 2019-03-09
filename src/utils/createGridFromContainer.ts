@@ -3,36 +3,26 @@ import { clamp, floor, round } from 'lodash';
 import { getSpan } from './getSpan';
 
 export const createGridForContainer = ({
-  container,
+  totalHeight,
+  totalWidth,
   numVerticalCells,
   numHorizontalCells
 }: {
-  container: HTMLElement;
+  totalHeight: number;
+  totalWidth: number;
   numVerticalCells: number;
   numHorizontalCells: number;
 }): Grid => {
-  const totalHeight = container.scrollHeight;
-  const totalWidth = container.scrollWidth;
+  const cellHeight = totalHeight / numVerticalCells;
+  const cellWidth = totalWidth / numHorizontalCells;
 
-  return new class Grid {
-    numVerticalCells = numVerticalCells;
-    numHorizontalCells = numHorizontalCells;
-
-    get totalHeight() {
-      return totalHeight;
-    }
-
-    get totalWidth() {
-      return totalWidth;
-    }
-
-    get cellHeight() {
-      return this.totalHeight / numVerticalCells;
-    }
-
-    get cellWidth() {
-      return this.totalWidth / numHorizontalCells;
-    }
+  return {
+    totalHeight,
+    totalWidth,
+    numVerticalCells,
+    numHorizontalCells,
+    cellWidth,
+    cellHeight,
 
     getRectFromCell(data: CellInfo) {
       const { endX, startX, endY, startY, spanX, spanY } = data;
@@ -57,7 +47,7 @@ export const createGridForContainer = ({
         startY: startY * this.cellHeight,
         endY: endY * this.cellHeight
       };
-    }
+    },
 
     getCellFromRect(data: Rect) {
       const startX = clamp(
@@ -92,17 +82,5 @@ export const createGridForContainer = ({
         endY
       };
     }
-
-    constrainBoxToOneColumn(box: Rect) {
-      return this.getRectFromCell(
-        this.getCellFromRect({
-          ...box,
-          endX: box.startX,
-          left: box.startX,
-          right: box.startX,
-          width: 0
-        })
-      );
-    }
-  }();
+  };
 };

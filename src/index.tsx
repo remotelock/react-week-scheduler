@@ -34,6 +34,7 @@ import { Grid, Event as CalendarEvent, CellInfo, DateRange } from './types';
 import { createMapCellInfoToContiguousDateRange } from './createMapCellInfoToContiguousDateRange';
 import { mergeEvents, mergeRanges } from './utils/mergeEvents';
 import invariant from 'invariant';
+import { useEventListener } from './utils/useEventListener';
 
 const originDate = startOfWeek(new Date(), { weekStartsOn: 1 });
 
@@ -240,7 +241,21 @@ function RangeBox({
       onStop={handleStop}
       cancel=".handle"
     >
-      <div className="button-reset" ref={ref} tabIndex={0} style={style}>
+      <button
+        className={cc([
+          'event',
+          'button-reset',
+          'range-box',
+          className,
+          {
+            'is-draggable': true,
+            'is-pending-edit': isBeingEdited && isBeingEdited(cell)
+          }
+        ])}
+        ref={ref}
+        tabIndex={0}
+        style={style}
+      >
         <Resizable
           size={originalRect}
           onResize={handleResize}
@@ -261,27 +276,16 @@ function RangeBox({
             topRight: 'handle top-right'
           }}
         >
-          <button
-            style={style}
-            className={cc([
-              'event',
-              'range-box',
-              className,
-              {
-                'is-draggable': true,
-                'is-pending-edit': isBeingEdited && isBeingEdited(cell)
-              }
-            ])}
-          >
+          <div className="event-content" style={style}>
             <span className="start">
               {isStart && format(modifiedDateRange[0], 'h:mma')}
             </span>
             <span className="end">
               {isEnd && format(modifiedDateRange[1], 'h:mma')}
             </span>
-          </button>
+          </div>
         </Resizable>
-      </div>
+      </button>
     </Draggable>
   );
 }
@@ -338,6 +342,7 @@ const defaultSchedule: [string, string][] = [
 function App() {
   const root = useRef<HTMLDivElement | null>(null);
   const parent = useRef<HTMLDivElement | null>(null);
+  const [left, setLeft] = useState(0);
 
   const size = useComponentSize(parent);
   const { style, box, isDragging, hasFinishedDragging } = useClickAndDrag(
@@ -363,17 +368,28 @@ function App() {
     )
   );
 
+  const { totalHeight, totalWidth } = useMemo(() => {
+    let totalHeight: number | null = null;
+    let totalWidth: number | null = null;
+    if (parent.current !== null) {
+      ({ scrollHeight: totalHeight, scrollWidth: totalWidth } = parent.current);
+    }
+
+    return { totalHeight, totalWidth };
+  }, [size]);
+
   const grid = useMemo<Grid | null>(() => {
-    if (!parent.current) {
+    if (totalHeight === null || totalWidth === null) {
       return null;
     }
 
     return createGridForContainer({
-      container: parent.current,
+      totalHeight,
+      totalWidth,
       numHorizontalCells,
       numVerticalCells
     });
-  }, [parent.current, size]);
+  }, [totalHeight, totalWidth]);
 
   useEffect(() => {
     if (grid === null || box === null) {
@@ -439,6 +455,27 @@ function App() {
     [scheduleState.present]
   );
 
+  const getDateRangeForVisualGrid = useMemo(
+    () =>
+      createMapCellInfoToContiguousDateRange({
+        originDate,
+        fromX: toDay,
+        fromY: y => y * 30
+      }),
+    [toDay, originDate]
+  );
+
+  useEventListener(
+    root,
+    'scroll',
+    event => {
+      // @ts-ignore
+      const left = event && event.target ? event.target.scrollLeft : 0;
+      setLeft(left);
+    },
+    { passive: true }
+  );
+
   return (
     <div ref={root} className="root">
       <div className="calendar header">
@@ -473,35 +510,17 @@ function App() {
             grid={grid}
           />
         )}
-        <div ref={parent} className="calendar">
-          {times(7).map(x => {
-            const cellInfo = createMapCellInfoToContiguousDateRange({
-              originDate,
-              fromX: toDay,
-              fromY: y => y * 60
-            });
 
+        <div ref={parent} className="calendar">
+          {times(7).map(dayIndex => {
             return (
               <div className="day-column">
                 <div className="day-hours">
-                  {times(24).map(y => {
-                    const startY = y;
-                    const range = cellInfo({
-                      startX: x,
-                      startY,
-                      endX: x,
-                      endY: startY + 1,
-                      spanX: 1,
-                      spanY: 1
-                    });
-
-                    const d = range.map(d => getTextForDateRange(d, 'h', 'ha'));
-
+                  {times(48).map(timeIndex => {
                     return (
                       <div className="cell">
-                        <div className="debug">{d.join(', ')}</div>
                         <div className="debug">
-                          ({x}, {y})
+                          ({dayIndex}, {timeIndex})
                         </div>
                       </div>
                     );
@@ -510,6 +529,32 @@ function App() {
               </div>
             );
           })}
+        </div>
+        <div style={{ left }} className="timeline">
+          <div className="day-column">
+            <div className="day-hours">
+              {times(48).map(timeIndex => {
+                let startText = '';
+                if (timeIndex % 2 === 0) {
+                  const [[start]] = getDateRangeForVisualGrid({
+                    startX: 0,
+                    startY: timeIndex,
+                    endX: 0,
+                    endY: timeIndex + 1,
+                    spanX: 1,
+                    spanY: 1
+                  });
+                  startText = format(start, 'h a');
+                }
+
+                return (
+                  <div className="cell">
+                    <div className="time">{startText}</div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
         </div>
       </div>
     </div>
