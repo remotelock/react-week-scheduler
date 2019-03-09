@@ -9,6 +9,19 @@ html {
 }
 
 .root {
+  contain: size paint layout style;
+  margin: 50px;
+  position: relative;
+  display: flex;
+
+  & > * {
+    flex: 1 0 auto;
+  }
+
+  & > .timeline {
+    flex-grow: 0;
+  }
+
   font-family: sans-serif;
   --cell-height: calc(100vh / 24);
   --border: hsl(207, 60%, 85%);
@@ -18,7 +31,6 @@ html {
   overflow: auto;
   background: white;
   border: 1px solid hsla(0, 0%, 83%, 1);
-  border-top: 0;
 
   &,
   * {
@@ -62,10 +74,12 @@ html {
 
   .handle.top {
     top: -5px !important;
+    cursor: n-resize !important;
   }
 
   .handle.bottom {
     bottom: 8px !important;
+    cursor: s-resize !important;
   }
 
   .handle.top,
@@ -76,12 +90,6 @@ html {
       content: '═';
     }
   }
-}
-
-.timeline {
-  position: absolute;
-  pointer-events: none;
-  z-index: -1;
 }
 
 .layer-container {
@@ -143,6 +151,7 @@ html {
 }
 
 .event {
+  contain: layout paint size style;
   user-select: none;
   display: block;
   z-index: 5;
@@ -152,16 +161,14 @@ html {
   font-size: 110%;
   --text: hsl(207, 65%, 93%);
   --background: hsl(202, 100%, 20%);
-  box-shadow: 0 1px 5px hsla(0, 0%, 50%, 0.2),
-    0 1px 10px hsla(0, 0%, 85%, 0.239);
 
   &:not(.is-pending-creation) {
     &:focus,
     &:focus-within,
     &:hover {
       --background: hsl(202, 100%, 30%);
-      box-shadow: 0 1px 5px 1px hsl(202, 100%, 81%),
-        0 5px 5px rgba(217, 217, 217, 0.5);
+      box-shadow: 0 1px 5px 1px hsla(202, 100%, 16%, 0.5),
+        0 5px 10px 1px rgba(217, 217, 217, 0.5);
       z-index: 4;
     }
 
@@ -199,8 +206,9 @@ html {
 }
 
 .day-column {
-  flex: 1 1 250px;
   // border: 1px solid lightgray;
+
+  flex: 1 1 250px;
 
   .day-hours {
     display: flex;
@@ -211,7 +219,7 @@ html {
   .cell {
     .time {
       color: hsl(0, 0%, 48%);
-      font-size: calc(10px + var(--cell-height) / 3);
+      font-size: 15px;
       text-transform: uppercase;
     }
 
@@ -226,7 +234,6 @@ html {
 
   .title {
     padding: 10px 10px;
-    background: hsla(0, 0%, 97%, 1);
     font-size: 20px;
 
     justify-content: center;
@@ -247,10 +254,14 @@ html {
   border-top-style: dashed;
 }
 
+.header .cell {
+  border-top-width: 0;
+}
+
 .header {
-  position: sticky;
+  will-change: transform;
   z-index: 2;
-  top: 0;
+  background: hsla(0, 0%, 97%, 1);
   box-shadow: 0 1px 5px hsla(0, 0%, 50%, 0.2),
     0 1px 10px hsla(0, 0%, 85%, 0.239);
 }
@@ -292,7 +303,38 @@ html {
   }
 }
 
-.timeline .cell {
+.timeline {
+  text-align: end;
+  pointer-events: none;
+
+  .day-column {
+    flex: 0 0 auto;
+  }
+}
+
+.timeline .header {
+  z-index: 1;
+  box-shadow: none;
+  background: white;
+  .cell {
+    visibility: hidden;
+  }
+}
+
+.timeline > *:not(.header) .cell {
+  position: relative;
+  top: -8px;
+  &:first-child {
+    visibility: hidden;
+  }
+
+  .time {
+    background: white;
+    padding: 0 10px;
+  }
+
   border: none;
   border-color: transparent;
+  text-align: end;
+  justify-content: flex-end;
 }

@@ -1,3 +1,5 @@
+import 'resize-observer-polyfill/dist/ResizeObserver.global';
+
 import React, {
   useRef,
   useState,
@@ -6,14 +8,17 @@ import React, {
   useEffect
 } from 'react';
 import ReactDOM from 'react-dom';
+import invariant from 'invariant';
 import { times } from 'lodash';
 import { format, startOfWeek, addDays, compareAsc } from 'date-fns';
 import useComponentSize from '@rehooks/component-size';
 import useUndo from 'use-undo';
+import scrollIntoView from 'scroll-into-view-if-needed';
 import useMousetrap from './useMousetrap';
 import cc from 'classcat';
 // @ts-ignore
-import 'resize-observer-polyfill/dist/ResizeObserver.global';
+import Resizable, { ResizeCallback } from 're-resizable';
+import Draggable, { DraggableEventHandler } from 'react-draggable';
 
 import { useClickAndDrag } from './useClickAndDrag';
 
@@ -24,15 +29,11 @@ import {
 import { createMapDateRangeToCells } from './createMapDateRangeToCells';
 import { createGridForContainer } from './utils/createGridFromContainer';
 import { getTextForDateRange } from './utils/getTextForDateRange';
-import Resizable, { ResizeCallback } from 're-resizable';
-
-import Draggable, { DraggableEventHandler } from 'react-draggable';
-
-import './styles.scss';
 import { Grid, Event as CalendarEvent, CellInfo, DateRange } from './types';
 import { createMapCellInfoToContiguousDateRange } from './createMapCellInfoToContiguousDateRange';
 import { mergeEvents, mergeRanges } from './utils/mergeEvents';
-import invariant from 'invariant';
+
+import './styles.scss';
 import { useEventListener } from './utils/useEventListener';
 
 const originDate = startOfWeek(new Date(), { weekStartsOn: 1 });
@@ -43,9 +44,7 @@ const horizontalPrecision = 1;
 const numVerticalCells = MINS_IN_DAY * verticalPrecision;
 const numHorizontalCells = 7 * horizontalPrecision;
 const toMin = (y: number) => y / verticalPrecision;
-const fromY = toMin;
 const toDay = (x: number) => x / horizontalPrecision;
-const fromX = toDay;
 const toX = (days: number) => days * horizontalPrecision;
 const toY = (mins: number) => mins * verticalPrecision;
 
@@ -220,8 +219,14 @@ function RangeBox({
         bottom: newBottom
       };
 
-      const newCell = grid.getCellFromRect(newRect);
-      newCell.spanY = cell.spanY;
+      const { startY, endY } = grid.getCellFromRect(newRect);
+
+      const newCell = {
+        ...cell,
+        startY,
+        endY
+      };
+
       invariant(
         newCell.spanY === cell.spanY,
         `Expected the dragged time cell to have the same height (${
@@ -259,7 +264,13 @@ function RangeBox({
         newRect.bottom += delta.height;
       }
 
-      const newCell = grid.getCellFromRect(newRect);
+      const { spanY, startY, endY } = grid.getCellFromRect(newRect);
+      const newCell = {
+        ...cell,
+        spanY,
+        startY,
+        endY
+      };
 
       setModifiedCell(newCell);
     },
@@ -360,6 +371,7 @@ function Schedule({
         return dateRangeToCells(dateRange).map((cell, cellIndex, array) => {
           return (
             <RangeBox
+              key={cellIndex}
               isResizable={isResizable}
               isMovable={isMovable}
               isDeletable={isDeletable}
@@ -393,7 +405,12 @@ const defaultSchedule: [string, string][] = [
 function App() {
   const root = useRef<HTMLDivElement | null>(null);
   const parent = useRef<HTMLDivElement | null>(null);
-  const [left, setLeft] = useState(0);
+  const [top, setTop] = useState(0);
+
+  const stickyStyle = useMemo<React.CSSProperties>(
+    () => ({ transform: `translateY(${top}px)` }),
+    [top]
+  );
 
   const size = useComponentSize(parent);
   const {
@@ -544,75 +561,31 @@ function App() {
     'scroll',
     event => {
       // @ts-ignore
-      const left = event && event.target ? event.target.scrollLeft : 0;
-      setLeft(left);
+      const top = event && event.target ? event.target.scrollTop : 0;
+      setTop(top);
     },
     { passive: true }
   );
 
   useEffect(() => {
     // @ts-ignore
-    document.activeElement && document.activeElement.scrollIntoViewIfNeeded();
+    document.activeElement &&
+      scrollIntoView(document.activeElement, {
+        scrollMode: 'if-needed',
+        block: 'nearest',
+        inline: 'nearest'
+      });
   }, [document.activeElement, scheduleState.present]);
 
   return (
     <div ref={root} className="root">
-      <div className="calendar header">
-        {times(7).map(i => (
+      <div className="timeline">
+        <div className="header">
           <div className="day-column">
-            <div className="cell title">
-              {format(addDays(originDate, i), 'ddd')}
-            </div>
+            <div className="cell title">Timeline</div>
           </div>
-        ))}
-      </div>
-
-      <div className="layer-container">
-        {isDragging && (
-          <div className="drag-box" style={style}>
-            {hasFinishedDragging && <div className="popup" />}
-          </div>
-        )}
-        {grid && pendingCreation && isDragging && (
-          <Schedule
-            cellInfoToDateRange={cellInfoToSingleDateRange}
-            className="is-pending-creation"
-            ranges={mergeEvents(scheduleState.present, pendingCreation)}
-            grid={grid}
-          />
-        )}
-        {grid && !pendingCreation && (
-          <Schedule
-            cellInfoToDateRange={cellInfoToSingleDateRange}
-            isResizable
-            isMovable
-            isDeletable
-            onMove={handleEventMove}
-            ranges={scheduleState.present}
-            grid={grid}
-          />
-        )}
-
-        <div ref={parent} className="calendar">
-          {times(7).map(dayIndex => {
-            return (
-              <div className="day-column">
-                <div className="day-hours">
-                  {times(48).map(timeIndex => {
-                    return (
-                      <div className="cell">
-                        <div className="debug">
-                          ({dayIndex}, {timeIndex})
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            );
-          })}
         </div>
-        <div style={{ left }} className="timeline">
+        <div className="calendar">
           <div className="day-column">
             <div className="day-hours">
               {times(48).map(timeIndex => {
@@ -630,12 +603,70 @@ function App() {
                 }
 
                 return (
-                  <div className="cell">
+                  <div key={timeIndex} className="cell">
                     <div className="time">{startText}</div>
                   </div>
                 );
               })}
             </div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div className="calendar header">
+          {times(7).map(i => (
+            <div key={i} className="day-column">
+              <div className="cell title">
+                {format(addDays(originDate, i), 'ddd')}
+              </div>
+            </div>
+          ))}
+        </div>
+        <div className="layer-container">
+          {isDragging && (
+            <div className="drag-box" style={style}>
+              {hasFinishedDragging && <div className="popup" />}
+            </div>
+          )}
+          {grid && pendingCreation && isDragging && (
+            <Schedule
+              cellInfoToDateRange={cellInfoToSingleDateRange}
+              className="is-pending-creation"
+              ranges={mergeEvents(scheduleState.present, pendingCreation)}
+              grid={grid}
+            />
+          )}
+          {grid && !pendingCreation && (
+            <Schedule
+              cellInfoToDateRange={cellInfoToSingleDateRange}
+              isResizable
+              isMovable
+              isDeletable
+              onMove={handleEventMove}
+              ranges={scheduleState.present}
+              grid={grid}
+            />
+          )}
+
+          <div ref={parent} className="calendar">
+            {times(7).map(dayIndex => {
+              return (
+                <div key={dayIndex} className="day-column">
+                  <div className="day-hours">
+                    {times(48).map(timeIndex => {
+                      return (
+                        <div key={timeIndex} className="cell">
+                          <div className="debug">
+                            ({dayIndex}, {timeIndex})
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
       </div>

@@ -30,7 +30,8 @@
   "peerDependencies": {
     "react": "^16.8.4",
     "react-dom": "^16.8.4",
-    "resize-observer-polyfill": "^1.5.1"
+    "resize-observer-polyfill": "^1.5.1",
+    "scroll-into-view-if-needed": "^2.2.20"
   },
   "devDependencies": {
     "@types/invariant": "^2.2.29",
@@ -40,8 +41,12 @@
     "@types/node": "^11.10.4",
     "@types/react": "^16.8.6",
     "@types/react-dom": "^16.8.2",
-    "react-scripts": "^2.1.5",
     "node-sass": "^4.11.0",
+    "react": "^16.8.4",
+    "react-dom": "^16.8.4",
+    "react-scripts": "^2.1.5",
+    "resize-observer-polyfill": "^1.5.1",
+    "scroll-into-view-if-needed": "^2.2.20",
     "typescript": "^3.3.3333"
   },
   "scripts": {
