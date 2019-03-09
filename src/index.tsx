@@ -84,7 +84,7 @@ const dateRangeToCells = createMapDateRangeToCells({
   toY
 });
 
-type OnMoveCallback = (
+type OnChangeCallback = (
   newDateRange: DateRange | undefined,
   rangeIndex: number
 ) => void;
@@ -108,7 +108,7 @@ function RangeBox({
   cellIndex: number;
   cellArray: CellInfo[];
   className?: string;
-  onMove?: OnMoveCallback;
+  onMove?: OnChangeCallback;
   isResizable?: boolean;
   isDeletable?: boolean;
   isMovable?: boolean;
@@ -239,7 +239,7 @@ function RangeBox({
   );
 
   const handleResize: ResizeCallback = useCallback(
-    (event, direction, ref, delta) => {
+    (_event, direction, _ref, delta) => {
       if (!isResizable) {
         return;
       }
@@ -298,8 +298,8 @@ function RangeBox({
           'range-box',
           className,
           {
-            'is-draggable': isMovable,
-            'is-pending-edit': isBeingEdited && isBeingEdited(cell)
+            ['is-draggable']: isMovable,
+            ['is-pending-edit']: isBeingEdited && isBeingEdited(cell)
           }
         ])}
         ref={ref}
@@ -348,7 +348,7 @@ function Schedule({
   ranges,
   grid,
   className,
-  onMove,
+  onChange,
   isResizable,
   isDeletable,
   isMovable,
@@ -361,7 +361,7 @@ function Schedule({
   isResizable?: boolean;
   isDeletable?: boolean;
   isMovable?: boolean;
-  onMove?: OnMoveCallback;
+  onChange?: OnChangeCallback;
   isBeingEdited?(cell: CellInfo): boolean;
   cellInfoToDateRange(cell: CellInfo): DateRange;
 }) {
@@ -383,7 +383,7 @@ function Schedule({
                   rangeIndex={rangeIndex}
                   className={className}
                   isBeingEdited={isBeingEdited}
-                  onMove={onMove}
+                  onMove={onChange}
                   grid={grid}
                   cell={cell}
                 />
@@ -530,7 +530,7 @@ function App() {
     document
   );
 
-  const handleEventMove = useCallback<OnMoveCallback>(
+  const handleEventChange = useCallback<OnChangeCallback>(
     (newDateRange, rangeIndex) => {
       if (!scheduleState.present && newDateRange) {
         return [newDateRange];
@@ -647,7 +647,7 @@ function App() {
               isResizable
               isMovable
               isDeletable
-              onMove={handleEventMove}
+              onChange={handleEventChange}
               ranges={scheduleState.present}
               grid={grid}
             />
