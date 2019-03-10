@@ -250,7 +250,7 @@ html {
   border-left: 0;
 }
 
-.cell + .cell:nth-child(even) {
+.cell:not(.is-hour-start) {
   border-top-width: 1px;
   border-top-style: dashed;
 }

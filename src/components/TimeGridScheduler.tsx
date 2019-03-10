@@ -1,6 +1,6 @@
 import useComponentSize from '@rehooks/component-size';
 import classcat from 'classcat';
-import { addDays, format } from 'date-fns';
+import { addDays, format, getMinutes } from 'date-fns';
 import invariant from 'invariant';
 import { times } from 'lodash';
 import React, {
@@ -37,6 +37,40 @@ const MINS_IN_DAY = 24 * 60;
 const horizontalPrecision = 1;
 const toDay = (x: number) => x * horizontalPrecision;
 const toX = (days: number) => days / horizontalPrecision;
+
+const Cell = React.memo(function Cell({
+  timeIndex,
+  children,
+  classes,
+  getDateRangeForVisualGrid
+}: {
+  timeIndex: number;
+  classes: Record<string, string>;
+  getDateRangeForVisualGrid(cell: CellInfo): DateRange[];
+  children?(options: { start: Date; isHourStart: boolean }): React.ReactNode;
+}) {
+  const [[start]] = getDateRangeForVisualGrid({
+    startX: 0,
+    startY: timeIndex,
+    endX: 0,
+    endY: timeIndex + 1,
+    spanX: 1,
+    spanY: 1
+  });
+
+  const isHourStart = getMinutes(start) === 0;
+
+  return (
+    <div
+      className={classcat([
+        classes['cell'],
+        { [classes['is-hour-start']]: isHourStart }
+      ])}
+    >
+      {children && children({ start, isHourStart })}
+    </div>
+  );
+});
 
 export const TimeGridScheduler = React.memo(function TimeGridScheduler({
   verticalPrecision = 30,
@@ -270,24 +304,26 @@ export const TimeGridScheduler = React.memo(function TimeGridScheduler({
         <div className={classes['calendar']}>
           <div className={classes['day-column']}>
             <div className={classes['day-hours']}>
-              {times(48).map(timeIndex => {
-                let startText = '';
-                if (timeIndex % 2 === 0) {
-                  const [[start]] = getDateRangeForVisualGrid({
-                    startX: 0,
-                    startY: timeIndex,
-                    endX: 0,
-                    endY: timeIndex + 1,
-                    spanX: 1,
-                    spanY: 1
-                  });
-                  startText = format(start, 'h a');
-                }
-
+              {times(visualGridVerticalPrecision * 4).map(timeIndex => {
                 return (
-                  <div key={timeIndex} className={classes['cell']}>
-                    <div className={classes['time']}>{startText}</div>
-                  </div>
+                  <Cell
+                    classes={classes}
+                    getDateRangeForVisualGrid={getDateRangeForVisualGrid}
+                    key={timeIndex}
+                    timeIndex={timeIndex}
+                  >
+                    {({ start, isHourStart }) => {
+                      if (isHourStart) {
+                        return (
+                          <div className={classes['time']}>
+                            {format(start, 'h a')}
+                          </div>
+                        );
+                      }
+
+                      return null;
+                    }}
+                  </Cell>
                 );
               })}
             </div>
@@ -343,13 +379,14 @@ export const TimeGridScheduler = React.memo(function TimeGridScheduler({
               return (
                 <div key={dayIndex} className={classes['day-column']}>
                   <div className={classes['day-hours']}>
-                    {times(48).map(timeIndex => {
+                    {times(visualGridVerticalPrecision * 4).map(timeIndex => {
                       return (
-                        <div key={timeIndex} className={classes['cell']}>
-                          <div className={classes['debug']}>
-                            ({dayIndex}, {timeIndex})
-                          </div>
-                        </div>
+                        <Cell
+                          classes={classes}
+                          getDateRangeForVisualGrid={getDateRangeForVisualGrid}
+                          key={timeIndex}
+                          timeIndex={timeIndex}
+                        />
                       );
                     })}
                   </div>
