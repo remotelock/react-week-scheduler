@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { isEqual } from 'lodash';
-import { fromEvent, merge } from 'rxjs';
+import { fromEvent, merge, of } from 'rxjs';
 import {
   tap,
   map,
@@ -8,7 +8,8 @@ import {
   mergeMap,
   startWith,
   distinctUntilChanged,
-  filter
+  filter,
+  delay
 } from 'rxjs/operators';
 import { createPageMapCoordsToContainer } from '../utils/createPageMapCoordsToContainer';
 import { Rect } from '../types';
@@ -27,9 +28,6 @@ export function useClickAndDrag(ref: React.RefObject<HTMLElement>) {
 
     const mapCoordsToContainer = createPageMapCoordsToContainer(container);
 
-    const touchStart$ = fromEvent<TouchEvent>(container, 'touchstart', {
-      passive: true
-    });
     const touchMove$ = fromEvent<TouchEvent>(window, 'touchmove', {
       passive: true
     });
@@ -37,21 +35,32 @@ export function useClickAndDrag(ref: React.RefObject<HTMLElement>) {
       passive: true
     });
 
+    const touchStart$ = fromEvent<TouchEvent>(container, 'touchstart', {
+      passive: true
+    });
+
+    const touchStartWithDelay$ = touchStart$.pipe(
+      mergeMap(start =>
+        of(start).pipe(
+          delay(300),
+          takeUntil(touchMove$)
+        )
+      )
+    );
+
     const mouseDown$ = fromEvent<MouseEvent>(container, 'mousedown', {
       passive: true
     }).pipe(filter(event => event.which === 1));
+
     const mouseMove$ = fromEvent<MouseEvent>(window, 'mousemove', {
       passive: true
     });
+
     const mouseUp$ = fromEvent<MouseEvent>(window, 'mouseup', {
       passive: true
     });
 
-    const dragStart$ = merge(mouseDown$, touchStart$).pipe(
-      tap(e => {
-        e.stopPropagation();
-        e.preventDefault();
-      }),
+    const dragStart$ = merge(mouseDown$, touchStartWithDelay$).pipe(
       map(mapCoordsToContainer)
     );
 
