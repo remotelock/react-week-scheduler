@@ -11,7 +11,8 @@ import React, {
 } from 'react';
 import Draggable, { DraggableEventHandler } from 'react-draggable';
 import useMousetrap from '../hooks/useMousetrap';
-import { CellInfo, DateRange, Grid, OnChangeCallback } from '../types';
+import { CellInfo } from '../types';
+import { ScheduleProps } from './Schedule';
 
 export function RangeBox({
   classes,
@@ -27,20 +28,12 @@ export function RangeBox({
   isResizable,
   isDeletable,
   isMovable
-}: {
-  classes: Record<string, string>;
-  grid: Grid;
-  cell: CellInfo;
+}: ScheduleProps & {
   cellIndex: number;
   cellArray: CellInfo[];
   className?: string;
-  onChange?: OnChangeCallback;
-  isResizable?: boolean;
-  isDeletable?: boolean;
-  isMovable?: boolean;
   rangeIndex: number;
-  isBeingEdited?(cell: CellInfo): boolean;
-  cellInfoToDateRange(cell: CellInfo): DateRange;
+  cell: CellInfo;
 }) {
   const ref = useRef(null);
   const [modifiedCell, setModifiedCell] = useState(cell);

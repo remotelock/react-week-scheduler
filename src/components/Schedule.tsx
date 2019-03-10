@@ -2,6 +2,17 @@ import React from 'react';
 import { CellInfo, DateRange, Event, Grid, OnChangeCallback } from '../types';
 import { RangeBox } from './RangeBox';
 
+export type ScheduleProps = {
+  classes: Record<string, string>;
+  grid: Grid;
+  onChange?: OnChangeCallback;
+  isResizable?: boolean;
+  isDeletable?: boolean;
+  isMovable?: boolean;
+  isBeingEdited?(cell: CellInfo): boolean;
+  cellInfoToDateRange(cell: CellInfo): DateRange;
+};
+
 export function Schedule({
   classes,
   ranges,
@@ -15,18 +26,11 @@ export function Schedule({
   dateRangeToCells,
   isBeingEdited
 }: {
-  classes: Record<string, string>;
-  ranges: Event;
-  grid: Grid;
-  className?: string;
-  isResizable?: boolean;
-  isDeletable?: boolean;
-  isMovable?: boolean;
-  onChange?: OnChangeCallback;
   dateRangeToCells(range: DateRange): CellInfo[];
-  isBeingEdited?(cell: CellInfo): boolean;
-  cellInfoToDateRange(cell: CellInfo): DateRange;
-}) {
+  ranges: Event;
+  className?: string;
+  classes: Record<string, string>;
+} & ScheduleProps) {
   return (
     <div className={classes['range-boxes']}>
       {ranges.map((dateRange, rangeIndex) => {
