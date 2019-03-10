@@ -11,6 +11,7 @@ export type ScheduleProps = {
   moveAxis: 'none' | 'both' | 'x' | 'y';
   isBeingEdited?(cell: CellInfo): boolean;
   cellInfoToDateRange(cell: CellInfo): DateRange;
+  onActiveChange?(...args: [number, number] | [number, null]): void;
 };
 
 export const Schedule = React.memo(function Schedule({
@@ -24,7 +25,8 @@ export const Schedule = React.memo(function Schedule({
   moveAxis: isMovable,
   cellInfoToDateRange,
   dateRangeToCells,
-  isBeingEdited
+  isBeingEdited,
+  onActiveChange: onActive
 }: {
   dateRangeToCells(range: DateRange): CellInfo[];
   ranges: Event;
@@ -40,6 +42,7 @@ export const Schedule = React.memo(function Schedule({
               return (
                 <RangeBox
                   classes={classes}
+                  onActiveChange={onActive}
                   key={cellIndex}
                   isResizable={isResizable}
                   moveAxis={isMovable}

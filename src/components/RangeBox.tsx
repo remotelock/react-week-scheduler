@@ -30,7 +30,8 @@ export const RangeBox = React.memo(function RangeBox({
   cellInfoToDateRange,
   isResizable,
   isDeletable,
-  moveAxis
+  moveAxis,
+  onActiveChange
 }: ScheduleProps & {
   cellIndex: number;
   cellArray: CellInfo[];
@@ -210,6 +211,14 @@ export const RangeBox = React.memo(function RangeBox({
     [grid, rect, isResizable, setModifiedCell, originalRect]
   );
 
+  const handleOnFocus = useCallback(() => {
+    onActiveChange && onActiveChange(rangeIndex, cellIndex);
+  }, [onActiveChange]);
+
+  const handleOnBlur = useCallback(() => {
+    onActiveChange && onActiveChange(rangeIndex, null);
+  }, [onActiveChange]);
+
   return (
     <Draggable
       axis={moveAxis}
@@ -225,6 +234,8 @@ export const RangeBox = React.memo(function RangeBox({
       cancel={`.${classes.handle}`}
     >
       <button
+        onFocus={handleOnFocus}
+        onBlur={handleOnBlur}
         className={classcat([
           classes['event'],
           classes['button-reset'],
