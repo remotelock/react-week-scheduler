@@ -63,8 +63,6 @@ export const RangeBox = React.memo(function RangeBox({
 
   const { top, left, width, height } = rect;
 
-  const style = { width, height };
-
   const isStart = cellIndex === 0;
   const isEnd = cellIndex === cellArray.length - 1;
 
@@ -174,7 +172,7 @@ export const RangeBox = React.memo(function RangeBox({
 
       const newSize = {
         height: delta.height + rect.height,
-        width: delta.width + rect.width
+        width: delta.width + rect.width + 20
       };
 
       const newRect = {
@@ -228,10 +226,10 @@ export const RangeBox = React.memo(function RangeBox({
         ])}
         ref={ref}
         tabIndex={0}
-        style={style}
+        style={{ width: width - 20, height }}
       >
         <Resizable
-          size={originalRect}
+          size={{ ...originalRect, width: originalRect.width - 20 }}
           onResize={handleResize}
           onResizeStop={handleStop}
           handleWrapperClass={classes['handle-wrapper']}
@@ -254,7 +252,7 @@ export const RangeBox = React.memo(function RangeBox({
             topRight: classcat([classes['handle'], classes['top-right']])
           }}
         >
-          <div className={classes['event-content']} style={style}>
+          <div className={classes['event-content']}>
             <span className={classes['start']}>
               {isStart && format(modifiedDateRange[0], 'h:mma')}
             </span>

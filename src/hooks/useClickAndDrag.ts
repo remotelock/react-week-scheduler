@@ -14,8 +14,17 @@ import {
 import { createPageMapCoordsToContainer } from '../utils/createPageMapCoordsToContainer';
 import { Rect } from '../types';
 
+const prevent = tap((e: TouchEvent) => {
+  e.preventDefault();
+  e.stopPropagation();
+});
+
 export function useClickAndDrag(ref: React.RefObject<HTMLElement>) {
-  const [style, setStyle] = useState({ top: 0, left: 0, width: 0, height: 0 });
+  const [style, setStyle] = useState({
+    transform: 'translate(0, 0)',
+    width: 0,
+    height: 0
+  });
   const [box, setBox] = useState<Rect | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [hasFinishedDragging, setHasFinishedDragging] = useState(false);
@@ -27,10 +36,6 @@ export function useClickAndDrag(ref: React.RefObject<HTMLElement>) {
     }
 
     const mapCoordsToContainer = createPageMapCoordsToContainer(container);
-    const prevent = tap((e: TouchEvent) => {
-      e.preventDefault();
-      e.stopPropagation();
-    });
 
     const touchMove$ = fromEvent<TouchEvent>(window, 'touchmove', {
       passive: false
@@ -121,8 +126,7 @@ export function useClickAndDrag(ref: React.RefObject<HTMLElement>) {
 
     const style$ = box$.pipe(
       map(({ top, left, width, height }) => ({
-        top,
-        left,
+        transform: `translate(${left}px, ${top}px)`,
         width,
         height
       }))
@@ -135,7 +139,7 @@ export function useClickAndDrag(ref: React.RefObject<HTMLElement>) {
       boxSubscriber.unsubscribe();
       styleSubscriber.unsubscribe();
     };
-  }, []);
+  }, [ref.current]);
 
   const cancel = useCallback(() => {
     setIsDragging(false);
