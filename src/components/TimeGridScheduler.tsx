@@ -254,6 +254,8 @@ export const TimeGridScheduler = React.memo(function TimeGridScheduler({
       });
   }, [root.current, document.activeElement, scheduleState.present]);
 
+  const numVisualVerticalCells = (24 * 60) / visualGridVerticalPrecision;
+
   return (
     <div
       ref={root}
@@ -271,7 +273,7 @@ export const TimeGridScheduler = React.memo(function TimeGridScheduler({
         <div className={classes['calendar']}>
           <div className={classes['day-column']}>
             <div className={classes['day-hours']}>
-              {times(visualGridVerticalPrecision * 4).map(timeIndex => {
+              {times(numVisualVerticalCells).map(timeIndex => {
                 return (
                   <Cell
                     classes={classes}
@@ -346,7 +348,7 @@ export const TimeGridScheduler = React.memo(function TimeGridScheduler({
               return (
                 <div key={dayIndex} className={classes['day-column']}>
                   <div className={classes['day-hours']}>
-                    {times(visualGridVerticalPrecision * 4).map(timeIndex => {
+                    {times(numVisualVerticalCells).map(timeIndex => {
                       return (
                         <Cell
                           classes={classes}
