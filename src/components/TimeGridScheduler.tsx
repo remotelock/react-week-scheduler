@@ -339,6 +339,7 @@ export const TimeGridScheduler = React.memo(function TimeGridScheduler({
               className={classes['is-pending-creation']}
               ranges={mergeEvents(scheduleState.present, pendingCreation)}
               grid={grid}
+              moveAxis="none"
             />
           )}
           {grid && !pendingCreation && (
@@ -347,7 +348,7 @@ export const TimeGridScheduler = React.memo(function TimeGridScheduler({
               dateRangeToCells={dateRangeToCells}
               cellInfoToDateRange={cellInfoToSingleDateRange}
               isResizable
-              isMovable
+              moveAxis="y"
               isDeletable
               onChange={handleEventChange}
               ranges={scheduleState.present}

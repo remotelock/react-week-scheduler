@@ -30,7 +30,7 @@ export const RangeBox = React.memo(function RangeBox({
   cellInfoToDateRange,
   isResizable,
   isDeletable,
-  isMovable
+  moveAxis
 }: ScheduleProps & {
   cellIndex: number;
   cellArray: CellInfo[];
@@ -76,7 +76,7 @@ export const RangeBox = React.memo(function RangeBox({
   useMousetrap(
     'up',
     () => {
-      if (!isMovable) {
+      if (moveAxis === 'none' || moveAxis === 'x') {
         return;
       }
 
@@ -98,7 +98,7 @@ export const RangeBox = React.memo(function RangeBox({
   useMousetrap(
     'down',
     () => {
-      if (!isMovable) {
+      if (moveAxis === 'none' || moveAxis === 'x') {
         return;
       }
 
@@ -119,29 +119,34 @@ export const RangeBox = React.memo(function RangeBox({
 
   const handleDrag: DraggableEventHandler = useCallback(
     (event, { y, x }) => {
-      if (!isMovable) {
+      if (moveAxis === 'none') {
         return;
       }
 
       event.preventDefault();
       event.stopPropagation();
 
-      const _startY = y;
-      const _endY = _startY + rect.height;
-      const _startX = x;
-      const _endX = _startX + rect.width;
-      const newTop = Math.min(_startY, _endY);
-      const newLeft = Math.min(_startX, _endX);
-      const newBottom = newTop + rect.height;
-      const newRight = newLeft + rect.width;
-
       const newRect = {
-        ...rect,
-        top: newTop,
-        bottom: newBottom,
-        right: newRight,
-        left: newLeft
+        ...rect
       };
+
+      if (moveAxis === 'both' || moveAxis === 'y') {
+        const _startY = y;
+        const _endY = _startY + rect.height;
+        const newTop = Math.min(_startY, _endY);
+        const newBottom = newTop + rect.height;
+        newRect.bottom = newBottom;
+        newRect.top = newTop;
+      }
+
+      if (moveAxis === 'both' || moveAxis === 'x') {
+        const _startX = x;
+        const _endX = _startX + rect.width;
+        const newLeft = Math.min(_startX, _endX);
+        const newRight = newLeft + rect.width;
+        newRect.right = newRight;
+        newRect.left = newLeft;
+      }
 
       const { startY, startX } = grid.getCellFromRect(newRect);
 
@@ -160,7 +165,7 @@ export const RangeBox = React.memo(function RangeBox({
 
       setModifiedCell(newCell);
     },
-    [grid, rect, isMovable, setModifiedCell]
+    [grid, rect, moveAxis, setModifiedCell]
   );
 
   const handleResize: ResizeCallback = useCallback(
@@ -207,7 +212,7 @@ export const RangeBox = React.memo(function RangeBox({
 
   return (
     <Draggable
-      axis={isMovable ? 'both' : 'none'}
+      axis={moveAxis}
       bounds={{
         top: 0,
         bottom: grid.totalHeight - height,
@@ -226,7 +231,7 @@ export const RangeBox = React.memo(function RangeBox({
           classes['range-box'],
           className,
           {
-            [classes['is-draggable']]: isMovable,
+            [classes['is-draggable']]: moveAxis !== 'none',
             [classes['is-being-edited']]: isBeingEdited && isBeingEdited(cell)
           }
         ])}
