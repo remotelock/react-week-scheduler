@@ -575,7 +575,7 @@ function App({ verticalPrecision = 1 / 30, visualGridPrecision = 1 / 30 }) {
       <div className={classes['timeline']}>
         <div className={classes['header']}>
           <div className={classes['day-column']}>
-            <div className={cc([classes['cell'], classes.title])}>Timeline</div>
+            <div className={cc([classes['cell'], classes.title])}>T</div>
           </div>
         </div>
         <div className={classes['calendar']}>

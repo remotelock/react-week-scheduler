@@ -140,6 +140,7 @@ html {
   border-radius: 0;
   all: unset;
   text-align: initial;
+  color: inherit;
 }
 
 .is-draggable {
@@ -214,7 +215,7 @@ html {
   .cell {
     .time {
       color: hsl(0, 0%, 48%);
-      font-size: 15px;
+      font-size: 0.75em;
       text-transform: uppercase;
     }
 
@@ -323,7 +324,7 @@ html {
 
   .time {
     background: white;
-    padding: 0 10px;
+    padding: 0 1ch;
   }
 
   border: none;
