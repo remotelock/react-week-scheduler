@@ -13,7 +13,7 @@ export type ScheduleProps = {
   cellInfoToDateRange(cell: CellInfo): DateRange;
 };
 
-export function Schedule({
+export const Schedule = React.memo(function Schedule({
   classes,
   ranges,
   grid,
@@ -61,4 +61,4 @@ export function Schedule({
       })}
     </div>
   );
-}
+});

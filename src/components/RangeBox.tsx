@@ -14,7 +14,7 @@ import useMousetrap from '../hooks/useMousetrap';
 import { CellInfo } from '../types';
 import { ScheduleProps } from './Schedule';
 
-export function RangeBox({
+export const RangeBox = React.memo(function RangeBox({
   classes,
   grid,
   isBeingEdited,
@@ -266,4 +266,4 @@ export function RangeBox({
       </button>
     </Draggable>
   );
-}
+});

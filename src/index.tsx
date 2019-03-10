@@ -35,7 +35,7 @@ import {
 import { createMapDateRangeToCells } from './utils/createMapDateRangeToCells';
 import { mergeEvents, mergeRanges } from './utils/mergeEvents';
 
-const defaultSchedule: [string, string][] = [
+const rangeStrings: [string, string][] = [
   ['2019-03-03T22:45:00.000Z', '2019-03-04T01:15:00.000Z'],
   ['2019-03-05T22:00:00.000Z', '2019-03-06T01:00:00.000Z'],
   ['2019-03-04T22:15:00.000Z', '2019-03-05T01:00:00.000Z'],
@@ -45,20 +45,32 @@ const defaultSchedule: [string, string][] = [
   ['2019-03-06T22:00:00.000Z', '2019-03-07T01:00:00.000Z']
 ];
 
+const defaultSchedule: CalendarEvent = rangeStrings
+  .map(range => range.map(dateString => new Date(dateString)) as [Date, Date])
+  .sort((range1, range2) => compareAsc(range1[0], range2[0]));
+
 const MINS_IN_DAY = 24 * 60;
 const horizontalPrecision = 1;
-const toDay = (x: number) => x / horizontalPrecision;
-const toX = (days: number) => days * horizontalPrecision;
+const toDay = (x: number) => x * horizontalPrecision;
+const toX = (days: number) => days / horizontalPrecision;
 
-function App({ verticalPrecision = 1 / 30, visualGridPrecision = 1 / 30 }) {
-  const originDate = startOfWeek(new Date('2019-03-04'), { weekStartsOn: 1 });
-
-  const numVerticalCells = MINS_IN_DAY * verticalPrecision;
-  const numHorizontalCells = 7 * horizontalPrecision;
-  const toMin = useCallback((y: number) => y / verticalPrecision, [
+const TimeGridScheduler = React.memo(function TimeGridScheduler({
+  verticalPrecision = 30,
+  visualGridVerticalPrecision = 30,
+  schedule,
+  originDate = new Date()
+}: {
+  originDate?: Date;
+  verticalPrecision?: number;
+  visualGridVerticalPrecision?: number;
+  schedule: CalendarEvent;
+}) {
+  const numVerticalCells = MINS_IN_DAY / verticalPrecision;
+  const numHorizontalCells = 7 / horizontalPrecision;
+  const toMin = useCallback((y: number) => y * verticalPrecision, [
     verticalPrecision
   ]);
-  const toY = (mins: number) => mins * verticalPrecision;
+  const toY = (mins: number) => mins / verticalPrecision;
 
   const cellInfoToDateRanges = useMemo(
     () =>
@@ -124,13 +136,7 @@ function App({ verticalPrecision = 1 / 30, visualGridPrecision = 1 / 30 }) {
       canUndo: canUndoSchedule,
       canRedo: canRedoSchedule
     }
-  ] = useUndo<CalendarEvent>(
-    defaultSchedule
-      .map(
-        range => range.map(dateString => new Date(dateString)) as [Date, Date]
-      )
-      .sort((range1, range2) => compareAsc(range1[0], range2[0]))
-  );
+  ] = useUndo<CalendarEvent>(schedule);
 
   const { totalHeight, totalWidth } = useMemo(() => {
     let totalHeight: number | null = null;
@@ -243,9 +249,9 @@ function App({ verticalPrecision = 1 / 30, visualGridPrecision = 1 / 30 }) {
       createMapCellInfoToContiguousDateRange({
         originDate,
         fromX: toDay,
-        fromY: y => y / visualGridPrecision
+        fromY: y => y * visualGridVerticalPrecision
       }),
-    [visualGridPrecision, toDay, originDate]
+    [visualGridVerticalPrecision, toDay, originDate]
   );
 
   useEffect(() => {
@@ -369,7 +375,14 @@ function App({ verticalPrecision = 1 / 30, visualGridPrecision = 1 / 30 }) {
       </div>
     </div>
   );
-}
+});
 
 const rootElement = document.getElementById('root');
-ReactDOM.render(<App verticalPrecision={1 / 30} />, rootElement);
+ReactDOM.render(
+  <TimeGridScheduler
+    originDate={startOfWeek(new Date('2019-03-04'), { weekStartsOn: 1 })}
+    schedule={defaultSchedule}
+    verticalPrecision={15}
+  />,
+  rootElement
+);
