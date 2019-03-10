@@ -32,6 +32,7 @@ import { mergeEvents, mergeRanges } from './utils/mergeEvents';
 
 import classes from './styles.module.scss';
 import { createMapCellInfoToContiguousDateRange } from './utils/createMapCellInfoToContiguousDateRange';
+import { useStickyStyle } from './hooks/useStickyStyle';
 
 const defaultSchedule: [string, string][] = [
   ['2019-03-03T22:45:00.000Z', '2019-03-04T01:15:00.000Z'],
@@ -411,6 +412,8 @@ function App({ verticalPrecision = 1 / 30, visualGridPrecision = 1 / 30 }) {
 
   const root = useRef<HTMLDivElement | null>(null);
   const parent = useRef<HTMLDivElement | null>(null);
+  const timelineStickyStyle = useStickyStyle(root, { top: false, left: true });
+  const headerStickyStyle = useStickyStyle(root, { top: false, left: false });
 
   const size = useComponentSize(parent);
   const {
@@ -575,7 +578,7 @@ function App({ verticalPrecision = 1 / 30, visualGridPrecision = 1 / 30 }) {
       ref={root}
       className={cc([classes['root'], { [classes['no-scroll']]: isDragging }])}
     >
-      <div className={classes['timeline']}>
+      <div style={timelineStickyStyle} className={classes['timeline']}>
         <div className={classes['header']}>
           <div className={classes['day-column']}>
             <div className={cc([classes['cell'], classes.title])}>T</div>
@@ -610,7 +613,10 @@ function App({ verticalPrecision = 1 / 30, visualGridPrecision = 1 / 30 }) {
       </div>
 
       <div>
-        <div className={cc([classes['calendar'], classes.header])}>
+        <div
+          style={headerStickyStyle}
+          className={cc([classes['calendar'], classes.header])}
+        >
           {times(7).map(i => (
             <div key={i} className={classes['day-column']}>
               <div className={cc([classes['cell'], classes.title])}>

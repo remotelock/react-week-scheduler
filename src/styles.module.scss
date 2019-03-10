@@ -30,7 +30,7 @@ html {
   height: 100vh;
   max-width: 100vw;
   width: 100%;
-  height: 600px;
+  height: 100vh;
   --cell-height: calc(600px / 12);
   position: relative;
   overflow: auto;
@@ -307,6 +307,7 @@ html {
   pointer-events: none;
 
   .day-column {
+    background: white;
     flex: 0 0 auto;
   }
 }

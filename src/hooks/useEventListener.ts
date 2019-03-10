@@ -7,14 +7,19 @@ export function useEventListener<
   ref: React.RefObject<Element>,
   event: K,
   listener: (this: Element, event: HTMLElementEventMap[K]) => any,
-  options?: boolean | AddEventListenerOptions
+  options?: boolean | AddEventListenerOptions,
+  { enabled = true } = {}
 ) {
   useEffect(() => {
     if (ref.current === null) {
       return;
     }
 
-    ref.current.addEventListener(event, listener, options);
+    if (enabled) {
+      ref.current.addEventListener(event, listener, options);
+    } else if (listener) {
+      ref.current.removeEventListener(event, listener);
+    }
 
     return () => {
       if (!ref.current) {
@@ -23,5 +28,5 @@ export function useEventListener<
 
       ref.current.removeEventListener(event, listener);
     };
-  }, [ref.current]);
+  }, [ref.current, listener, options, enabled]);
 }
