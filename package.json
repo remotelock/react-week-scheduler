@@ -14,6 +14,7 @@
   ],
   "main": "src/index.tsx",
   "dependencies": {
+    "@reach/visually-hidden": "^0.1.2",
     "@rehooks/component-size": "^1.0.2",
     "classcat": "^3.2.5",
     "date-fns": "^1.30.1",

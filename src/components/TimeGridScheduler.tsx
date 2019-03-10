@@ -264,7 +264,11 @@ export const TimeGridScheduler = React.memo(function TimeGridScheduler({
         { [classes['no-scroll']]: isDragging }
       ])}
     >
-      <div style={timelineStickyStyle} className={classes['timeline']}>
+      <div
+        style={timelineStickyStyle}
+        aria-hidden
+        className={classes['timeline']}
+      >
         <div className={classes['header']}>
           <div className={classes['day-column']}>
             <div className={classcat([classes['cell'], classes.title])}>T</div>
@@ -303,10 +307,11 @@ export const TimeGridScheduler = React.memo(function TimeGridScheduler({
       <div>
         <div
           style={headerStickyStyle}
+          role="presentation"
           className={classcat([classes['calendar'], classes.header])}
         >
           {times(7).map(i => (
-            <div key={i} className={classes['day-column']}>
+            <div key={i} role="presentation" className={classes['day-column']}>
               <div className={classcat([classes['cell'], classes.title])}>
                 {format(addDays(originDate, i), 'ddd')}
               </div>
@@ -343,10 +348,14 @@ export const TimeGridScheduler = React.memo(function TimeGridScheduler({
             />
           )}
 
-          <div ref={parent} className={classes['calendar']}>
+          <div ref={parent} role="grid" className={classes['calendar']}>
             {times(7).map(dayIndex => {
               return (
-                <div key={dayIndex} className={classes['day-column']}>
+                <div
+                  role="gridcell"
+                  key={dayIndex}
+                  className={classes['day-column']}
+                >
                   <div className={classes['day-hours']}>
                     {times(numVisualVerticalCells).map(timeIndex => {
                       return (
