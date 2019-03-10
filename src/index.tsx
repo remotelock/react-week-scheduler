@@ -371,12 +371,13 @@ function App({ verticalPrecision = 1 / 30, visualGridPrecision = 1 / 30 }) {
   ]);
   const toY = (mins: number) => mins * verticalPrecision;
 
-  const cellInfoToDateRanges = useCallback(
-    createMapCellInfoToRecurringTimeRange({
-      originDate,
-      fromY: toMin,
-      fromX: toDay
-    }),
+  const cellInfoToDateRanges = useMemo(
+    () =>
+      createMapCellInfoToRecurringTimeRange({
+        originDate,
+        fromY: toMin,
+        fromX: toDay
+      }),
     [toMin, toDay, originDate]
   );
 
@@ -396,14 +397,15 @@ function App({ verticalPrecision = 1 / 30, visualGridPrecision = 1 / 30 }) {
     [cellInfoToDateRanges]
   );
 
-  const dateRangeToCells = useCallback(
-    createMapDateRangeToCells({
-      originDate,
-      numVerticalCells,
-      numHorizontalCells,
-      toX,
-      toY
-    }),
+  const dateRangeToCells = useMemo(
+    () =>
+      createMapDateRangeToCells({
+        originDate,
+        numVerticalCells,
+        numHorizontalCells,
+        toX,
+        toY
+      }),
     [toY, toX, numVerticalCells, numHorizontalCells, originDate]
   );
 
@@ -545,12 +547,13 @@ function App({ verticalPrecision = 1 / 30, visualGridPrecision = 1 / 30 }) {
     [scheduleState.present]
   );
 
-  const getDateRangeForVisualGrid = useCallback(
-    createMapCellInfoToContiguousDateRange({
-      originDate,
-      fromX: toDay,
-      fromY: y => y / visualGridPrecision
-    }),
+  const getDateRangeForVisualGrid = useMemo(
+    () =>
+      createMapCellInfoToContiguousDateRange({
+        originDate,
+        fromX: toDay,
+        fromY: y => y / visualGridPrecision
+      }),
     [visualGridPrecision, toDay, originDate]
   );
 
