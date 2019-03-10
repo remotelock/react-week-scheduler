@@ -400,7 +400,7 @@ const defaultSchedule: [string, string][] = [
 function App() {
   const root = useRef<HTMLDivElement | null>(null);
   const parent = useRef<HTMLDivElement | null>(null);
-  const { scrollLeft, scrollTop } = useScrollPosition(root);
+  const { scrollLeft, scrollTop } = useScrollPosition(root, false);
 
   const stickyStyle = useMemo<React.CSSProperties>(
     () => ({ transform: `translate(${scrollLeft}, ${scrollTop}px)` }),

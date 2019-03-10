@@ -1,7 +1,10 @@
 import { useState } from 'react';
 import { useEventListener } from './useEventListener';
 
-export function useScrollPosition(root: React.RefObject<HTMLElement>) {
+export function useScrollPosition(
+  root: React.RefObject<HTMLElement>,
+  passive = true
+) {
   const [position, setPosition] = useState({ scrollTop: 0, scrollLeft: 0 });
 
   useEventListener(
@@ -14,7 +17,7 @@ export function useScrollPosition(root: React.RefObject<HTMLElement>) {
         setPosition({ scrollTop, scrollLeft });
       }
     },
-    { passive: true }
+    { passive }
   );
 
   return position;
