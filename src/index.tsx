@@ -22,8 +22,6 @@ import Draggable, { DraggableEventHandler } from 'react-draggable';
 import { Grid, Event as CalendarEvent, CellInfo, DateRange } from './types';
 
 import { useClickAndDrag } from './hooks/useClickAndDrag';
-import { useScrollPosition } from './hooks/useScrollPosition';
-
 import {
   createMapCellInfoToRecurringTimeRange,
   RecurringTimeRange
@@ -96,7 +94,7 @@ function RangeBox({
   cellArray,
   cell,
   className,
-  onMove,
+  onChange,
   cellInfoToDateRange,
   isResizable,
   isDeletable,
@@ -107,7 +105,7 @@ function RangeBox({
   cellIndex: number;
   cellArray: CellInfo[];
   className?: string;
-  onMove?: OnChangeCallback;
+  onChange?: OnChangeCallback;
   isResizable?: boolean;
   isDeletable?: boolean;
   isMovable?: boolean;
@@ -115,14 +113,13 @@ function RangeBox({
   isBeingEdited?(cell: CellInfo): boolean;
   cellInfoToDateRange(cell: CellInfo): DateRange;
 }) {
+  const ref = useRef(null);
   const [modifiedCell, setModifiedCell] = useState(cell);
   const originalRect = useMemo(() => grid.getRectFromCell(cell), [cell, grid]);
   const rect = useMemo(() => grid.getRectFromCell(modifiedCell), [
     modifiedCell,
     grid
   ]);
-
-  const ref = useRef(null);
 
   useEffect(() => {
     setModifiedCell(cell);
@@ -137,8 +134,8 @@ function RangeBox({
       return;
     }
 
-    onMove && onMove(undefined, rangeIndex);
-  }, [ref.current, onMove, isDeletable, rangeIndex]);
+    onChange && onChange(undefined, rangeIndex);
+  }, [ref.current, onChange, isDeletable, rangeIndex]);
 
   useMousetrap('del', handleDelete, ref.current);
 
@@ -150,8 +147,8 @@ function RangeBox({
   const isEnd = cellIndex === cellArray.length - 1;
 
   const handleStop = useCallback(() => {
-    onMove && onMove(cellInfoToDateRange(modifiedCell), rangeIndex);
-  }, [modifiedCell, rangeIndex, onMove]);
+    onChange && onChange(cellInfoToDateRange(modifiedCell), rangeIndex);
+  }, [modifiedCell, rangeIndex, cellInfoToDateRange, onChange]);
 
   useMousetrap(
     'up',
@@ -170,7 +167,7 @@ function RangeBox({
         endY: modifiedCell.endY - 1
       };
 
-      onMove && onMove(cellInfoToDateRange(newCell), rangeIndex);
+      onChange && onChange(cellInfoToDateRange(newCell), rangeIndex);
     },
     ref.current
   );
@@ -192,7 +189,7 @@ function RangeBox({
         endY: modifiedCell.endY + 1
       };
 
-      onMove && onMove(cellInfoToDateRange(newCell), rangeIndex);
+      onChange && onChange(cellInfoToDateRange(newCell), rangeIndex);
     },
     ref.current
   );
@@ -234,7 +231,7 @@ function RangeBox({
       );
       setModifiedCell(newCell);
     },
-    [grid, rect]
+    [grid, rect, isMovable, setModifiedCell]
   );
 
   const handleResize: ResizeCallback = useCallback(
@@ -273,7 +270,7 @@ function RangeBox({
 
       setModifiedCell(newCell);
     },
-    [grid, rect, originalRect]
+    [grid, rect, isResizable, setModifiedCell, originalRect]
   );
 
   return (
@@ -382,7 +379,7 @@ function Schedule({
                   rangeIndex={rangeIndex}
                   className={className}
                   isBeingEdited={isBeingEdited}
-                  onMove={onChange}
+                  onChange={onChange}
                   grid={grid}
                   cell={cell}
                 />
@@ -398,12 +395,6 @@ function Schedule({
 function App() {
   const root = useRef<HTMLDivElement | null>(null);
   const parent = useRef<HTMLDivElement | null>(null);
-  const { scrollLeft, scrollTop } = useScrollPosition(root, false);
-
-  const stickyStyle = useMemo<React.CSSProperties>(
-    () => ({ transform: `translate(${scrollLeft}, ${scrollTop}px)` }),
-    [scrollLeft, scrollTop]
-  );
 
   const size = useComponentSize(parent);
   const {
@@ -442,7 +433,7 @@ function App() {
     }
 
     return { totalHeight, totalWidth };
-  }, [size]);
+  }, [parent.current, size]);
 
   const grid = useMemo<Grid | null>(() => {
     if (totalHeight === null || totalWidth === null) {
@@ -562,7 +553,7 @@ function App() {
   return (
     <div ref={root} className={classes['root']}>
       <div className={classes['timeline']}>
-        <div style={stickyStyle} className={classes['header']}>
+        <div className={classes['header']}>
           <div className={classes['day-column']}>
             <div className={cc([classes['cell'], classes.title])}>Timeline</div>
           </div>
@@ -596,10 +587,7 @@ function App() {
       </div>
 
       <div>
-        <div
-          style={stickyStyle}
-          className={cc([classes['calendar'], classes.header])}
-        >
+        <div className={cc([classes['calendar'], classes.header])}>
           {times(7).map(i => (
             <div key={i} className={classes['day-column']}>
               <div className={cc([classes['cell'], classes.title])}>

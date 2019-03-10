@@ -152,7 +152,7 @@ html {
 
 .event {
   will-change: height;
-  contain: strict;
+  contain: content;
   user-select: none;
   display: block;
   z-index: 5;
