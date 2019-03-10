@@ -36,7 +36,7 @@ export function useClickAndDrag(ref: React.RefObject<HTMLElement>) {
     });
 
     const touchStart$ = fromEvent<TouchEvent>(container, 'touchstart', {
-      passive: true
+      passive: false
     });
 
     const touchStartWithDelay$ = touchStart$.pipe(
