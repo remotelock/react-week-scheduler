@@ -31,6 +31,7 @@ import { createGridForContainer } from './utils/createGridFromContainer';
 import { mergeEvents, mergeRanges } from './utils/mergeEvents';
 
 import classes from './styles.module.scss';
+import { createMapCellInfoToContiguousDateRange } from './utils/createMapCellInfoToContiguousDateRange';
 
 const defaultSchedule: [string, string][] = [
   ['2019-03-03T22:45:00.000Z', '2019-03-04T01:15:00.000Z'],
@@ -360,10 +361,7 @@ const horizontalPrecision = 1;
 const toDay = (x: number) => x / horizontalPrecision;
 const toX = (days: number) => days * horizontalPrecision;
 
-function App({
-  verticalPrecision = 1 / 30,
-  visualGridPrecision: visualGridVerticalPrecision = 1 / 30
-}) {
+function App({ verticalPrecision = 1 / 30, visualGridPrecision = 1 / 30 }) {
   const originDate = startOfWeek(new Date('2019-03-04'), { weekStartsOn: 1 });
 
   const numVerticalCells = MINS_IN_DAY * verticalPrecision;
@@ -373,14 +371,13 @@ function App({
   ]);
   const toY = (mins: number) => mins * verticalPrecision;
 
-  const cellInfoToDateRanges = useMemo(
-    () =>
-      createMapCellInfoToRecurringTimeRange({
-        originDate,
-        fromY: toMin,
-        fromX: toDay
-      }),
-    [toMin, toDay]
+  const cellInfoToDateRanges = useCallback(
+    createMapCellInfoToRecurringTimeRange({
+      originDate,
+      fromY: toMin,
+      fromX: toDay
+    }),
+    [toMin, toDay, originDate]
   );
 
   const cellInfoToSingleDateRange = useCallback(
@@ -548,14 +545,13 @@ function App({
     [scheduleState.present]
   );
 
-  const getDateRangeForVisualGrid = useMemo(
-    () =>
-      createMapCellInfoToRecurringTimeRange({
-        originDate,
-        fromX: toDay,
-        fromY: y => y * visualGridVerticalPrecision
-      }),
-    [toDay, originDate, visualGridVerticalPrecision]
+  const getDateRangeForVisualGrid = useCallback(
+    createMapCellInfoToContiguousDateRange({
+      originDate,
+      fromX: toDay,
+      fromY: y => y / visualGridPrecision
+    }),
+    [visualGridPrecision, toDay, originDate]
   );
 
   useEffect(() => {
