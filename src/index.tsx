@@ -272,8 +272,8 @@ function RangeBox({
           enable={
             isResizable
               ? {
-                  top: modifiedCell.startY > 0,
-                  bottom: modifiedCell.endY < grid.numVerticalCells - 2
+                  top: true,
+                  bottom: true
                 }
               : {}
           }
