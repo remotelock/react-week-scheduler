@@ -10,7 +10,6 @@ html {
 
 .root {
   contain: size paint layout style;
-  margin: 50px;
   position: relative;
   display: flex;
 
@@ -27,8 +26,10 @@ html {
   --border: hsl(207, 60%, 85%);
   height: 100vh;
   max-width: 100vw;
+  width: 100%;
+  height: 600px;
   position: relative;
-  overflow: auto;
+  overflow: hidden auto;
   background: white;
   border: 1px solid hsla(0, 0%, 83%, 1);
 
@@ -158,7 +159,7 @@ html {
   margin: 0;
   position: absolute;
   font-weight: bold;
-  font-size: 110%;
+  font-size: 1rem;
   --text: hsl(207, 65%, 93%);
   --background: hsl(202, 100%, 20%);
 

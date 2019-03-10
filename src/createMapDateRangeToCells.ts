@@ -12,7 +12,6 @@ export const createMapDateRangeToCells = ({
   toX = (x: number) => x,
   toY,
   numVerticalCells,
-  numHorizontalCells,
   originDate
 }: {
   toX: (day: number) => number;
@@ -32,8 +31,6 @@ export const createMapDateRangeToCells = ({
     const endX = i;
     const atStart = i === _startX;
     const atEnd = i === _endX;
-    const atEdge = atStart || atEnd;
-    const inside = !atEdge;
     const startY = !atStart ? 0 : _startY;
     const endY = !atEnd ? numVerticalCells - 1 : _endY;
     const spanX = getSpan(startX, endX);

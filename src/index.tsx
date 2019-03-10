@@ -33,8 +33,8 @@ import { Grid, Event as CalendarEvent, CellInfo, DateRange } from './types';
 import { createMapCellInfoToContiguousDateRange } from './createMapCellInfoToContiguousDateRange';
 import { mergeEvents, mergeRanges } from './utils/mergeEvents';
 
-import './styles.scss';
-import { useEventListener } from './utils/useEventListener';
+import classes from './styles.module.scss';
+import { useScrollPosition } from './utils/useScrollPosition';
 
 const originDate = startOfWeek(new Date(), { weekStartsOn: 1 });
 
@@ -47,15 +47,6 @@ const toMin = (y: number) => y / verticalPrecision;
 const toDay = (x: number) => x / horizontalPrecision;
 const toX = (days: number) => days * horizontalPrecision;
 const toY = (mins: number) => mins * verticalPrecision;
-
-const springConfig = {
-  mass: 0.5,
-  tension: 200,
-  friction: 10,
-  clamp: false,
-  precision: 0.01,
-  velocity: 0
-};
 
 const cellInfoToDateRanges = createMapCellInfoToRecurringTimeRange({
   originDate,
@@ -289,17 +280,17 @@ function RangeBox({
       position={{ x: left, y: top }}
       onDrag={handleDrag}
       onStop={handleStop}
-      cancel=".handle"
+      cancel={classes['handle']}
     >
       <button
         className={cc([
-          'event',
-          'button-reset',
-          'range-box',
+          classes['event'],
+          classes['button-reset'],
+          classes['range-box'],
           className,
           {
-            ['is-draggable']: isMovable,
-            ['is-pending-edit']: isBeingEdited && isBeingEdited(cell)
+            [classes['is-draggable']]: isMovable,
+            [classes['is-being-edited']]: isBeingEdited && isBeingEdited(cell)
           }
         ])}
         ref={ref}
@@ -310,7 +301,7 @@ function RangeBox({
           size={originalRect}
           onResize={handleResize}
           onResizeStop={handleStop}
-          handleWrapperClass="handle-wrapper"
+          handleWrapperClass={classes['handle-wrapper']}
           enable={
             isResizable
               ? {
@@ -320,21 +311,21 @@ function RangeBox({
               : {}
           }
           handleClasses={{
-            bottom: 'handle bottom',
-            bottomLeft: 'handle bottom-left',
-            bottomRight: 'handle bottom-right',
-            left: 'handle left',
-            right: 'handle right',
-            top: 'handle top',
-            topLeft: 'handle top-left',
-            topRight: 'handle top-right'
+            bottom: cc([classes['handle'], classes.bottom]),
+            bottomLeft: cc([classes['handle'], classes['bottom-left']]),
+            bottomRight: cc([classes['handle'], classes['bottom-right']]),
+            left: cc([classes['handle'], classes.left]),
+            right: cc([classes['handle'], classes.right]),
+            top: cc([classes['handle'], classes.top]),
+            topLeft: cc([classes['handle'], classes['top-left']]),
+            topRight: cc([classes['handle'], classes['top-right']])
           }}
         >
-          <div className="event-content" style={style}>
-            <span className="start">
+          <div className={classes['event-content']} style={style}>
+            <span className={classes['start']}>
               {isStart && format(modifiedDateRange[0], 'h:mma')}
             </span>
-            <span className="end">
+            <span className={classes['end']}>
               {isEnd && format(modifiedDateRange[1], 'h:mma')}
             </span>
           </div>
@@ -366,7 +357,7 @@ function Schedule({
   cellInfoToDateRange(cell: CellInfo): DateRange;
 }) {
   return (
-    <div className="range-boxes">
+    <div className={classes['range-boxes']}>
       {ranges.map((dateRange, rangeIndex) => {
         return (
           <span key={rangeIndex}>
@@ -409,11 +400,11 @@ const defaultSchedule: [string, string][] = [
 function App() {
   const root = useRef<HTMLDivElement | null>(null);
   const parent = useRef<HTMLDivElement | null>(null);
-  const [top, setTop] = useState(0);
+  const { scrollLeft, scrollTop } = useScrollPosition(root);
 
   const stickyStyle = useMemo<React.CSSProperties>(
-    () => ({ transform: `translateY(${top}px)` }),
-    [top]
+    () => ({ transform: `translate(${scrollLeft}, ${scrollTop}px)` }),
+    [scrollLeft, scrollTop]
   );
 
   const size = useComponentSize(parent);
@@ -432,7 +423,6 @@ function App() {
     scheduleState,
     {
       set: setSchedule,
-      reset: resetSchedule,
       undo: undoSchedule,
       redo: redoSchedule,
       canUndo: canUndoSchedule,
@@ -560,17 +550,6 @@ function App() {
     [toDay, originDate]
   );
 
-  useEventListener(
-    root,
-    'scroll',
-    event => {
-      // @ts-ignore
-      const top = event && event.target ? event.target.scrollTop : 0;
-      setTop(top);
-    },
-    { passive: true }
-  );
-
   useEffect(() => {
     // @ts-ignore
     document.activeElement &&
@@ -582,16 +561,16 @@ function App() {
   }, [document.activeElement, scheduleState.present]);
 
   return (
-    <div ref={root} className="root">
-      <div className="timeline">
-        <div className="header">
-          <div className="day-column">
-            <div className="cell title">Timeline</div>
+    <div ref={root} className={classes['root']}>
+      <div className={classes['timeline']}>
+        <div style={stickyStyle} className={classes['header']}>
+          <div className={classes['day-column']}>
+            <div className={cc([classes['cell'], classes.title])}>Timeline</div>
           </div>
         </div>
-        <div className="calendar">
-          <div className="day-column">
-            <div className="day-hours">
+        <div className={classes['calendar']}>
+          <div className={classes['day-column']}>
+            <div className={classes['day-hours']}>
               {times(48).map(timeIndex => {
                 let startText = '';
                 if (timeIndex % 2 === 0) {
@@ -607,8 +586,8 @@ function App() {
                 }
 
                 return (
-                  <div key={timeIndex} className="cell">
-                    <div className="time">{startText}</div>
+                  <div key={timeIndex} className={classes['cell']}>
+                    <div className={classes['time']}>{startText}</div>
                   </div>
                 );
               })}
@@ -618,25 +597,28 @@ function App() {
       </div>
 
       <div>
-        <div className="calendar header">
+        <div
+          style={stickyStyle}
+          className={cc([classes['calendar'], classes.header])}
+        >
           {times(7).map(i => (
-            <div key={i} className="day-column">
-              <div className="cell title">
+            <div key={i} className={classes['day-column']}>
+              <div className={cc([classes['cell'], classes.title])}>
                 {format(addDays(originDate, i), 'ddd')}
               </div>
             </div>
           ))}
         </div>
-        <div className="layer-container">
+        <div className={classes['layer-container']}>
           {isDragging && (
-            <div className="drag-box" style={style}>
-              {hasFinishedDragging && <div className="popup" />}
+            <div className={classes['drag-box']} style={style}>
+              {hasFinishedDragging && <div className={classes['popup']} />}
             </div>
           )}
           {grid && pendingCreation && isDragging && (
             <Schedule
               cellInfoToDateRange={cellInfoToSingleDateRange}
-              className="is-pending-creation"
+              className={classes['is-pending-creation']}
               ranges={mergeEvents(scheduleState.present, pendingCreation)}
               grid={grid}
             />
@@ -653,15 +635,15 @@ function App() {
             />
           )}
 
-          <div ref={parent} className="calendar">
+          <div ref={parent} className={classes['calendar']}>
             {times(7).map(dayIndex => {
               return (
-                <div key={dayIndex} className="day-column">
-                  <div className="day-hours">
+                <div key={dayIndex} className={classes['day-column']}>
+                  <div className={classes['day-hours']}>
                     {times(48).map(timeIndex => {
                       return (
-                        <div key={timeIndex} className="cell">
-                          <div className="debug">
+                        <div key={timeIndex} className={classes['cell']}>
+                          <div className={classes['debug']}>
                             ({dayIndex}, {timeIndex})
                           </div>
                         </div>

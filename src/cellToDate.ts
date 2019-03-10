@@ -4,7 +4,6 @@ export const cellToDate = ({
   startX,
   startY,
   toMin,
-  toDay,
   originDate
 }: {
   startX: number;
