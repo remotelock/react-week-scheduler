@@ -158,10 +158,13 @@ function RangeBox({
   );
 
   const handleDrag: DraggableEventHandler = useCallback(
-    (_event, { y }) => {
+    (event, { y }) => {
       if (!isMovable) {
         return;
       }
+
+      event.preventDefault();
+      event.stopPropagation();
 
       const _start = y;
       const _end = _start + rect.height;
@@ -198,10 +201,13 @@ function RangeBox({
   );
 
   const handleResize: ResizeCallback = useCallback(
-    (_event, direction, _ref, delta) => {
+    (event, direction, _ref, delta) => {
       if (!isResizable) {
         return;
       }
+
+      event.preventDefault();
+      event.stopPropagation();
 
       if (delta.height === 0) {
         return;
