@@ -36,10 +36,20 @@ import { mergeEvents, mergeRanges } from './utils/mergeEvents';
 import classes from './styles.module.scss';
 import { useScrollPosition } from './utils/useScrollPosition';
 
-const originDate = startOfWeek(new Date(), { weekStartsOn: 1 });
+const defaultSchedule: [string, string][] = [
+  ['2019-03-03T22:45:00.000Z', '2019-03-04T01:15:00.000Z'],
+  ['2019-03-05T22:00:00.000Z', '2019-03-06T01:00:00.000Z'],
+  ['2019-03-04T22:15:00.000Z', '2019-03-05T01:00:00.000Z'],
+  ['2019-03-07T05:30:00.000Z', '2019-03-07T10:00:00.000Z'],
+  ['2019-03-08T22:00:00.000Z', '2019-03-09T01:00:00.000Z'],
+  ['2019-03-09T22:00:00.000Z', '2019-03-10T01:00:00.000Z'],
+  ['2019-03-06T22:00:00.000Z', '2019-03-07T01:00:00.000Z']
+];
+
+const originDate = startOfWeek(new Date('2019-03-04'), { weekStartsOn: 1 });
 
 const MINS_IN_DAY = 24 * 60;
-const verticalPrecision = 1 / 15;
+const verticalPrecision = 1 / 60;
 const horizontalPrecision = 1;
 const numVerticalCells = MINS_IN_DAY * verticalPrecision;
 const numHorizontalCells = 7 * horizontalPrecision;
@@ -386,16 +396,6 @@ function Schedule({
     </div>
   );
 }
-
-const defaultSchedule: [string, string][] = [
-  // ['2019-03-03T22:45:00.000Z', '2019-03-04T01:15:00.000Z'],
-  ['2019-03-05T22:00:00.000Z', '2019-03-06T01:00:00.000Z'],
-  ['2019-03-04T22:15:00.000Z', '2019-03-05T01:00:00.000Z'],
-  ['2019-03-07T05:30:00.000Z', '2019-03-07T10:00:00.000Z'],
-  // ['2019-03-08T22:00:00.000Z', '2019-03-09T01:00:00.000Z'],
-  ['2019-03-09T22:00:00.000Z', '2019-03-10T01:00:00.000Z'],
-  ['2019-03-06T22:00:00.000Z', '2019-03-07T01:00:00.000Z']
-];
 
 function App() {
   const root = useRef<HTMLDivElement | null>(null);
