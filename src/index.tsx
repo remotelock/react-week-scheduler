@@ -42,45 +42,6 @@ const defaultSchedule: [string, string][] = [
   ['2019-03-06T22:00:00.000Z', '2019-03-07T01:00:00.000Z']
 ];
 
-const originDate = startOfWeek(new Date('2019-03-04'), { weekStartsOn: 1 });
-
-const MINS_IN_DAY = 24 * 60;
-const verticalPrecision = 1 / 30;
-const horizontalPrecision = 1;
-const numVerticalCells = MINS_IN_DAY * verticalPrecision;
-const numHorizontalCells = 7 * horizontalPrecision;
-const toMin = (y: number) => y / verticalPrecision;
-const toDay = (x: number) => x / horizontalPrecision;
-const toX = (days: number) => days * horizontalPrecision;
-const toY = (mins: number) => mins * verticalPrecision;
-
-const cellInfoToDateRanges = createMapCellInfoToRecurringTimeRange({
-  originDate,
-  fromY: toMin,
-  fromX: toDay
-});
-
-const cellInfoToSingleDateRange = (cell: CellInfo): DateRange => {
-  const [first, ...rest] = cellInfoToDateRanges(cell);
-
-  invariant(
-    rest.length === 0,
-    `Expected "cellInfoToSingleDateRange" to return a single date range, found ${
-      rest.length
-    } additional ranges instead. This is a bug in @remotelock/weekly-scheduler`
-  );
-
-  return first;
-};
-
-const dateRangeToCells = createMapDateRangeToCells({
-  originDate,
-  numVerticalCells,
-  numHorizontalCells,
-  toX,
-  toY
-});
-
 type OnChangeCallback = (
   newDateRange: DateRange | undefined,
   rangeIndex: number
@@ -349,6 +310,7 @@ function Schedule({
   isDeletable,
   isMovable,
   cellInfoToDateRange,
+  dateRangeToCells,
   isBeingEdited
 }: {
   ranges: CalendarEvent;
@@ -358,6 +320,7 @@ function Schedule({
   isDeletable?: boolean;
   isMovable?: boolean;
   onChange?: OnChangeCallback;
+  dateRangeToCells(range: DateRange): CellInfo[];
   isBeingEdited?(cell: CellInfo): boolean;
   cellInfoToDateRange(cell: CellInfo): DateRange;
 }) {
@@ -392,7 +355,61 @@ function Schedule({
   );
 }
 
-function App({ visualGridPrecision: visualGridVerticalPrecision = 1 / 30 }) {
+const MINS_IN_DAY = 24 * 60;
+const horizontalPrecision = 1;
+const toDay = (x: number) => x / horizontalPrecision;
+const toX = (days: number) => days * horizontalPrecision;
+
+function App({
+  verticalPrecision = 1 / 30,
+  visualGridPrecision: visualGridVerticalPrecision = 1 / 30
+}) {
+  const originDate = startOfWeek(new Date('2019-03-04'), { weekStartsOn: 1 });
+
+  const numVerticalCells = MINS_IN_DAY * verticalPrecision;
+  const numHorizontalCells = 7 * horizontalPrecision;
+  const toMin = useCallback((y: number) => y / verticalPrecision, [
+    verticalPrecision
+  ]);
+  const toY = (mins: number) => mins * verticalPrecision;
+
+  const cellInfoToDateRanges = useMemo(
+    () =>
+      createMapCellInfoToRecurringTimeRange({
+        originDate,
+        fromY: toMin,
+        fromX: toDay
+      }),
+    [toMin, toDay]
+  );
+
+  const cellInfoToSingleDateRange = useCallback(
+    (cell: CellInfo): DateRange => {
+      const [first, ...rest] = cellInfoToDateRanges(cell);
+
+      invariant(
+        rest.length === 0,
+        `Expected "cellInfoToSingleDateRange" to return a single date range, found ${
+          rest.length
+        } additional ranges instead. This is a bug in @remotelock/weekly-scheduler`
+      );
+
+      return first;
+    },
+    [cellInfoToDateRanges]
+  );
+
+  const dateRangeToCells = useCallback(
+    createMapDateRangeToCells({
+      originDate,
+      numVerticalCells,
+      numHorizontalCells,
+      toX,
+      toY
+    }),
+    [toY, toX, numVerticalCells, numHorizontalCells, originDate]
+  );
+
   const root = useRef<HTMLDivElement | null>(null);
   const parent = useRef<HTMLDivElement | null>(null);
 
@@ -608,6 +625,7 @@ function App({ visualGridPrecision: visualGridVerticalPrecision = 1 / 30 }) {
           )}
           {grid && pendingCreation && isDragging && (
             <Schedule
+              dateRangeToCells={dateRangeToCells}
               cellInfoToDateRange={cellInfoToSingleDateRange}
               className={classes['is-pending-creation']}
               ranges={mergeEvents(scheduleState.present, pendingCreation)}
@@ -616,6 +634,7 @@ function App({ visualGridPrecision: visualGridVerticalPrecision = 1 / 30 }) {
           )}
           {grid && !pendingCreation && (
             <Schedule
+              dateRangeToCells={dateRangeToCells}
               cellInfoToDateRange={cellInfoToSingleDateRange}
               isResizable
               isMovable
@@ -652,4 +671,4 @@ function App({ visualGridPrecision: visualGridVerticalPrecision = 1 / 30 }) {
 }
 
 const rootElement = document.getElementById('root');
-ReactDOM.render(<App />, rootElement);
+ReactDOM.render(<App verticalPrecision={1 / 30} />, rootElement);
