@@ -30,7 +30,6 @@ import {
 } from './utils/createMapCellInfoToRecurringTimeRange';
 import { createMapDateRangeToCells } from './utils/createMapDateRangeToCells';
 import { createGridForContainer } from './utils/createGridFromContainer';
-import { getTextForDateRange } from './utils/getTextForDateRange';
 import { mergeEvents, mergeRanges } from './utils/mergeEvents';
 
 import classes from './styles.module.scss';
@@ -468,7 +467,6 @@ function App() {
     const cell = grid.getCellFromRect(constrainedBox);
     const dateRanges = cellInfoToDateRanges(cell);
     const event = dateRanges;
-    console.log(...event.map(d => getTextForDateRange(d)));
     setPendingCreation(event);
   }, [box, grid, setPendingCreation]);
 
@@ -532,7 +530,6 @@ function App() {
       const newSchedule = [...scheduleState.present];
 
       if (!newDateRange) {
-        console.log(rangeIndex, 'will be deleted from', newSchedule);
         newSchedule.splice(rangeIndex, 1);
       } else {
         newSchedule[rangeIndex] = newDateRange;
