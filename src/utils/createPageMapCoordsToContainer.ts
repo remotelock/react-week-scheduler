@@ -1,5 +1,5 @@
 export const createPageMapCoordsToContainer = (container: HTMLElement) => {
-  return (event: any | React.MouseEvent | MouseEvent | TouchEvent) => {
+  return (event: React.MouseEvent | MouseEvent | TouchEvent) => {
     let clientX: number;
     let clientY: number;
     let pageX: number;

@@ -1,4 +1,4 @@
-import { DateRange, MapCellInfoToDateRange } from './types';
+import { DateRange, MapCellInfoToDateRange } from '../types';
 import { range } from 'lodash';
 import {
   addMinutes,

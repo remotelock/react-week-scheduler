@@ -118,7 +118,6 @@ html {
     position: absolute;
     overflow: hidden;
     text-overflow: ellipsis;
-    // white-space: nowrap;
     left: 0;
     top: 0;
     z-index: 2;
@@ -181,8 +180,6 @@ html {
   }
 
   border: 0.5px solid var(--border);
-  // padding: 15px;
-  // border-radius: 5px;
 
   background: var(--background);
   color: var(--text);
@@ -198,9 +195,7 @@ html {
   }
 
   &.is-being-edited {
-    // opacity: 0.1;
   }
-  // white-space: nowrap;
 }
 
 .hours-container {
@@ -208,8 +203,6 @@ html {
 }
 
 .day-column {
-  // border: 1px solid lightgray;
-
   flex: 1 1 250px;
 
   .day-hours {
@@ -227,7 +220,6 @@ html {
 
     transition-duration: 0.5s;
     transition-timing-function: ease-in-out;
-    // transition-property: height width;
     flex: 1 1 var(--cell-height, 50px);
     display: flex;
     justify-content: flex-start;
@@ -240,7 +232,6 @@ html {
 
     justify-content: center;
     align-items: center;
-    // border: 1px solid lightgray;
   }
 }
 

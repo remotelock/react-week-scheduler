@@ -14,27 +14,26 @@ import { format, startOfWeek, addDays, compareAsc } from 'date-fns';
 import useComponentSize from '@rehooks/component-size';
 import useUndo from 'use-undo';
 import scrollIntoView from 'scroll-into-view-if-needed';
-import useMousetrap from './useMousetrap';
+import useMousetrap from './hooks/useMousetrap';
 import cc from 'classcat';
-// @ts-ignore
 import Resizable, { ResizeCallback } from 're-resizable';
 import Draggable, { DraggableEventHandler } from 'react-draggable';
 
-import { useClickAndDrag } from './useClickAndDrag';
+import { Grid, Event as CalendarEvent, CellInfo, DateRange } from './types';
+
+import { useClickAndDrag } from './hooks/useClickAndDrag';
+import { useScrollPosition } from './hooks/useScrollPosition';
 
 import {
-  RecurringTimeRange,
-  createMapCellInfoToRecurringTimeRange
-} from './createMapCellInfoToRecurringTimeRange';
-import { createMapDateRangeToCells } from './createMapDateRangeToCells';
+  createMapCellInfoToRecurringTimeRange,
+  RecurringTimeRange
+} from './utils/createMapCellInfoToRecurringTimeRange';
+import { createMapDateRangeToCells } from './utils/createMapDateRangeToCells';
 import { createGridForContainer } from './utils/createGridFromContainer';
 import { getTextForDateRange } from './utils/getTextForDateRange';
-import { Grid, Event as CalendarEvent, CellInfo, DateRange } from './types';
-import { createMapCellInfoToContiguousDateRange } from './createMapCellInfoToContiguousDateRange';
 import { mergeEvents, mergeRanges } from './utils/mergeEvents';
 
 import classes from './styles.module.scss';
-import { useScrollPosition } from './utils/useScrollPosition';
 
 const defaultSchedule: [string, string][] = [
   ['2019-03-03T22:45:00.000Z', '2019-03-04T01:15:00.000Z'],
@@ -49,7 +48,7 @@ const defaultSchedule: [string, string][] = [
 const originDate = startOfWeek(new Date('2019-03-04'), { weekStartsOn: 1 });
 
 const MINS_IN_DAY = 24 * 60;
-const verticalPrecision = 1 / 60;
+const verticalPrecision = 1 / 30;
 const horizontalPrecision = 1;
 const numVerticalCells = MINS_IN_DAY * verticalPrecision;
 const numHorizontalCells = 7 * horizontalPrecision;
@@ -290,7 +289,7 @@ function RangeBox({
       position={{ x: left, y: top }}
       onDrag={handleDrag}
       onStop={handleStop}
-      cancel={classes['handle']}
+      cancel={`.${classes.handle}`}
     >
       <button
         className={cc([
@@ -520,6 +519,10 @@ function App() {
     document
   );
 
+  useEffect(() => {
+    cancel();
+  }, [size]);
+
   const handleEventChange = useCallback<OnChangeCallback>(
     (newDateRange, rangeIndex) => {
       if (!scheduleState.present && newDateRange) {
@@ -542,7 +545,7 @@ function App() {
 
   const getDateRangeForVisualGrid = useMemo(
     () =>
-      createMapCellInfoToContiguousDateRange({
+      createMapCellInfoToRecurringTimeRange({
         originDate,
         fromX: toDay,
         fromY: y => y * 30
@@ -551,7 +554,6 @@ function App() {
   );
 
   useEffect(() => {
-    // @ts-ignore
     document.activeElement &&
       scrollIntoView(document.activeElement, {
         scrollMode: 'if-needed',

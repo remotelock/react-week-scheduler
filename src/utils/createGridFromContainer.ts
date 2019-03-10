@@ -1,5 +1,5 @@
 import { Grid, CellInfo, Rect } from '../types';
-import { clamp, floor } from 'lodash';
+import { clamp, floor, round } from 'lodash';
 import { getSpan } from './getSpan';
 
 export const createGridForContainer = ({
@@ -56,7 +56,7 @@ export const createGridForContainer = ({
         numHorizontalCells - 1
       );
       const startY = clamp(
-        floor(data.top / this.cellHeight),
+        round(data.top / this.cellHeight),
         0,
         numVerticalCells - 1
       );
@@ -66,7 +66,7 @@ export const createGridForContainer = ({
         numHorizontalCells - 1
       );
       const endY = clamp(
-        floor(data.bottom / this.cellHeight),
+        round(data.bottom / this.cellHeight),
         0,
         numVerticalCells - 1
       );

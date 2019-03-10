@@ -10,8 +10,8 @@ import {
   distinctUntilChanged,
   filter
 } from 'rxjs/operators';
-import { createPageMapCoordsToContainer } from './utils/createPageMapCoordsToContainer';
-import { Rect } from './types';
+import { createPageMapCoordsToContainer } from '../utils/createPageMapCoordsToContainer';
+import { Rect } from '../types';
 
 export function useClickAndDrag(ref: React.RefObject<HTMLElement>) {
   const [style, setStyle] = useState({ top: 0, left: 0, width: 0, height: 0 });
@@ -27,18 +27,28 @@ export function useClickAndDrag(ref: React.RefObject<HTMLElement>) {
 
     const mapCoordsToContainer = createPageMapCoordsToContainer(container);
 
-    const touchStart$ = fromEvent(container, 'touchstart', { passive: true });
-    const touchMove$ = fromEvent(window, 'touchmove', { passive: true });
-    const touchEnd$ = fromEvent(window, 'touchend', { passive: true });
+    const touchStart$ = fromEvent<TouchEvent>(container, 'touchstart', {
+      passive: true
+    });
+    const touchMove$ = fromEvent<TouchEvent>(window, 'touchmove', {
+      passive: true
+    });
+    const touchEnd$ = fromEvent<TouchEvent>(window, 'touchend', {
+      passive: true
+    });
 
     const mouseDown$ = fromEvent<MouseEvent>(container, 'mousedown', {
       passive: true
     }).pipe(filter(event => event.which === 1));
-    const mouseMove$ = fromEvent(window, 'mousemove', { passive: true });
-    const mouseUp$ = fromEvent(window, 'mouseup', { passive: true });
+    const mouseMove$ = fromEvent<MouseEvent>(window, 'mousemove', {
+      passive: true
+    });
+    const mouseUp$ = fromEvent<MouseEvent>(window, 'mouseup', {
+      passive: true
+    });
 
     const dragStart$ = merge(mouseDown$, touchStart$).pipe(
-      tap((e: any) => {
+      tap(e => {
         e.stopPropagation();
         e.preventDefault();
       }),
@@ -53,8 +63,6 @@ export function useClickAndDrag(ref: React.RefObject<HTMLElement>) {
       })
     );
     const move$ = merge(mouseMove$, touchMove$).pipe(map(mapCoordsToContainer));
-
-    // move$.subscribe(({ x, y }) => console.log(x, y));
 
     const box$ = dragStart$.pipe(
       tap(() => {
@@ -89,12 +97,10 @@ export function useClickAndDrag(ref: React.RefObject<HTMLElement>) {
               };
             }
           ),
-          // tap(({ endY }) => console.log({ endY })),
           takeUntil(dragEnd$)
         );
       }),
       distinctUntilChanged(isEqual)
-      // tap(({ top, left }) => console.log(top, left))
     );
 
     const style$ = box$.pipe(

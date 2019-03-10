@@ -1,4 +1,4 @@
-import { DateRange, CellInfo } from './types';
+import { DateRange, CellInfo } from '../types';
 import {
   startOfDay,
   differenceInDays,
@@ -6,7 +6,7 @@ import {
   isEqual
 } from 'date-fns';
 import { range } from 'lodash';
-import { getSpan } from './utils/getSpan';
+import { getSpan } from './getSpan';
 
 export const createMapDateRangeToCells = ({
   toX = (x: number) => x,
