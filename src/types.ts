@@ -1,3 +1,8 @@
+export type OnChangeCallback = (
+  newDateRange: DateRange | undefined,
+  rangeIndex: number
+) => void;
+
 export type Coords = { x: number; y: number };
 
 export type Event = DateRange[];

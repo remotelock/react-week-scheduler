@@ -1,38 +1,39 @@
-import 'resize-observer-polyfill/dist/ResizeObserver.global';
-
-import React, {
-  useRef,
-  useState,
-  useMemo,
-  useCallback,
-  useEffect
-} from 'react';
-import ReactDOM from 'react-dom';
+import useComponentSize from '@rehooks/component-size';
+import classcat from 'classcat';
+import { addDays, compareAsc, format, startOfWeek } from 'date-fns';
 import invariant from 'invariant';
 import { times } from 'lodash';
-import { format, startOfWeek, addDays, compareAsc } from 'date-fns';
-import useComponentSize from '@rehooks/component-size';
-import useUndo from 'use-undo';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState
+} from 'react';
+import ReactDOM from 'react-dom';
+import 'resize-observer-polyfill/dist/ResizeObserver.global';
 import scrollIntoView from 'scroll-into-view-if-needed';
-import useMousetrap from './hooks/useMousetrap';
-import cc from 'classcat';
-import Resizable, { ResizeCallback } from 're-resizable';
-import Draggable, { DraggableEventHandler } from 'react-draggable';
-
-import { Grid, Event as CalendarEvent, CellInfo, DateRange } from './types';
-
+import useUndo from 'use-undo';
+import { Schedule } from './components/Schedule';
 import { useClickAndDrag } from './hooks/useClickAndDrag';
+import useMousetrap from './hooks/useMousetrap';
+import { useStickyStyle } from './hooks/useStickyStyle';
+import classes from './styles.module.scss';
+import {
+  CellInfo,
+  DateRange,
+  Event as CalendarEvent,
+  Grid,
+  OnChangeCallback
+} from './types';
+import { createGridForContainer } from './utils/createGridFromContainer';
+import { createMapCellInfoToContiguousDateRange } from './utils/createMapCellInfoToContiguousDateRange';
 import {
   createMapCellInfoToRecurringTimeRange,
   RecurringTimeRange
 } from './utils/createMapCellInfoToRecurringTimeRange';
 import { createMapDateRangeToCells } from './utils/createMapDateRangeToCells';
-import { createGridForContainer } from './utils/createGridFromContainer';
 import { mergeEvents, mergeRanges } from './utils/mergeEvents';
-
-import classes from './styles.module.scss';
-import { createMapCellInfoToContiguousDateRange } from './utils/createMapCellInfoToContiguousDateRange';
-import { useStickyStyle } from './hooks/useStickyStyle';
 
 const defaultSchedule: [string, string][] = [
   ['2019-03-03T22:45:00.000Z', '2019-03-04T01:15:00.000Z'],
@@ -43,325 +44,6 @@ const defaultSchedule: [string, string][] = [
   ['2019-03-09T22:00:00.000Z', '2019-03-10T01:00:00.000Z'],
   ['2019-03-06T22:00:00.000Z', '2019-03-07T01:00:00.000Z']
 ];
-
-type OnChangeCallback = (
-  newDateRange: DateRange | undefined,
-  rangeIndex: number
-) => void;
-
-function RangeBox({
-  grid,
-  isBeingEdited,
-  rangeIndex,
-  cellIndex,
-  cellArray,
-  cell,
-  className,
-  onChange,
-  cellInfoToDateRange,
-  isResizable,
-  isDeletable,
-  isMovable
-}: {
-  grid: Grid;
-  cell: CellInfo;
-  cellIndex: number;
-  cellArray: CellInfo[];
-  className?: string;
-  onChange?: OnChangeCallback;
-  isResizable?: boolean;
-  isDeletable?: boolean;
-  isMovable?: boolean;
-  rangeIndex: number;
-  isBeingEdited?(cell: CellInfo): boolean;
-  cellInfoToDateRange(cell: CellInfo): DateRange;
-}) {
-  const ref = useRef(null);
-  const [modifiedCell, setModifiedCell] = useState(cell);
-  const originalRect = useMemo(() => grid.getRectFromCell(cell), [cell, grid]);
-  const rect = useMemo(() => grid.getRectFromCell(modifiedCell), [
-    modifiedCell,
-    grid
-  ]);
-
-  useEffect(() => {
-    setModifiedCell(cell);
-  }, [cell]);
-
-  const modifiedDateRange = useMemo(() => cellInfoToDateRange(modifiedCell), [
-    modifiedCell
-  ]);
-
-  const handleDelete = useCallback(() => {
-    if (!isDeletable) {
-      return;
-    }
-
-    onChange && onChange(undefined, rangeIndex);
-  }, [ref.current, onChange, isDeletable, rangeIndex]);
-
-  useMousetrap('del', handleDelete, ref.current);
-
-  const { top, left, width, height } = rect;
-
-  const style = { width, height };
-
-  const isStart = cellIndex === 0;
-  const isEnd = cellIndex === cellArray.length - 1;
-
-  const handleStop = useCallback(() => {
-    onChange && onChange(cellInfoToDateRange(modifiedCell), rangeIndex);
-  }, [modifiedCell, rangeIndex, cellInfoToDateRange, onChange]);
-
-  useMousetrap(
-    'up',
-    () => {
-      if (!isMovable) {
-        return;
-      }
-
-      if (modifiedCell.startY === 0) {
-        return;
-      }
-
-      const newCell = {
-        ...modifiedCell,
-        startY: modifiedCell.startY - 1,
-        endY: modifiedCell.endY - 1
-      };
-
-      onChange && onChange(cellInfoToDateRange(newCell), rangeIndex);
-    },
-    ref.current
-  );
-
-  useMousetrap(
-    'down',
-    () => {
-      if (!isMovable) {
-        return;
-      }
-
-      if (modifiedCell.endY === grid.numVerticalCells - 1) {
-        return;
-      }
-
-      const newCell = {
-        ...modifiedCell,
-        startY: modifiedCell.startY + 1,
-        endY: modifiedCell.endY + 1
-      };
-
-      onChange && onChange(cellInfoToDateRange(newCell), rangeIndex);
-    },
-    ref.current
-  );
-
-  const handleDrag: DraggableEventHandler = useCallback(
-    (event, { y }) => {
-      if (!isMovable) {
-        return;
-      }
-
-      event.preventDefault();
-      event.stopPropagation();
-
-      const _start = y;
-      const _end = _start + rect.height;
-      const newTop = Math.min(_start, _end);
-      const newBottom = newTop + rect.height;
-
-      if (newTop === top) {
-        return;
-      }
-
-      const newRect = {
-        ...rect,
-        top: newTop,
-        bottom: newBottom
-      };
-
-      const { startY, endY } = grid.getCellFromRect(newRect);
-
-      const newCell = {
-        ...cell,
-        startY,
-        endY
-      };
-
-      invariant(
-        newCell.spanY === cell.spanY,
-        `Expected the dragged time cell to have the same height (${
-          newCell.spanY
-        }, ${cell.spanY})`
-      );
-      setModifiedCell(newCell);
-    },
-    [grid, rect, isMovable, setModifiedCell]
-  );
-
-  const handleResize: ResizeCallback = useCallback(
-    (event, direction, _ref, delta) => {
-      if (!isResizable) {
-        return;
-      }
-
-      event.preventDefault();
-      event.stopPropagation();
-
-      if (delta.height === 0) {
-        return;
-      }
-
-      const newSize = {
-        height: delta.height + rect.height,
-        width: delta.width + rect.width
-      };
-
-      const newRect = {
-        ...originalRect,
-        ...newSize
-      };
-
-      if (direction.includes('top')) {
-        newRect.top -= delta.height;
-      } else if (direction.includes('bottom')) {
-        newRect.bottom += delta.height;
-      }
-
-      const { spanY, startY, endY } = grid.getCellFromRect(newRect);
-      const newCell = {
-        ...cell,
-        spanY,
-        startY,
-        endY
-      };
-
-      setModifiedCell(newCell);
-    },
-    [grid, rect, isResizable, setModifiedCell, originalRect]
-  );
-
-  return (
-    <Draggable
-      axis={isMovable ? 'y' : 'none'}
-      bounds={{
-        top: 0,
-        bottom: grid.totalHeight - height,
-        left: 0,
-        right: grid.totalWidth
-      }}
-      position={{ x: left, y: top }}
-      onDrag={handleDrag}
-      onStop={handleStop}
-      cancel={`.${classes.handle}`}
-    >
-      <button
-        className={cc([
-          classes['event'],
-          classes['button-reset'],
-          classes['range-box'],
-          className,
-          {
-            [classes['is-draggable']]: isMovable,
-            [classes['is-being-edited']]: isBeingEdited && isBeingEdited(cell)
-          }
-        ])}
-        ref={ref}
-        tabIndex={0}
-        style={style}
-      >
-        <Resizable
-          size={originalRect}
-          onResize={handleResize}
-          onResizeStop={handleStop}
-          handleWrapperClass={classes['handle-wrapper']}
-          enable={
-            isResizable
-              ? {
-                  top: true,
-                  bottom: true
-                }
-              : {}
-          }
-          handleClasses={{
-            bottom: cc([classes['handle'], classes.bottom]),
-            bottomLeft: cc([classes['handle'], classes['bottom-left']]),
-            bottomRight: cc([classes['handle'], classes['bottom-right']]),
-            left: cc([classes['handle'], classes.left]),
-            right: cc([classes['handle'], classes.right]),
-            top: cc([classes['handle'], classes.top]),
-            topLeft: cc([classes['handle'], classes['top-left']]),
-            topRight: cc([classes['handle'], classes['top-right']])
-          }}
-        >
-          <div className={classes['event-content']} style={style}>
-            <span className={classes['start']}>
-              {isStart && format(modifiedDateRange[0], 'h:mma')}
-            </span>
-            <span className={classes['end']}>
-              {isEnd && format(modifiedDateRange[1], 'h:mma')}
-            </span>
-          </div>
-        </Resizable>
-      </button>
-    </Draggable>
-  );
-}
-
-function Schedule({
-  ranges,
-  grid,
-  className,
-  onChange,
-  isResizable,
-  isDeletable,
-  isMovable,
-  cellInfoToDateRange,
-  dateRangeToCells,
-  isBeingEdited
-}: {
-  ranges: CalendarEvent;
-  grid: Grid;
-  className?: string;
-  isResizable?: boolean;
-  isDeletable?: boolean;
-  isMovable?: boolean;
-  onChange?: OnChangeCallback;
-  dateRangeToCells(range: DateRange): CellInfo[];
-  isBeingEdited?(cell: CellInfo): boolean;
-  cellInfoToDateRange(cell: CellInfo): DateRange;
-}) {
-  return (
-    <div className={classes['range-boxes']}>
-      {ranges.map((dateRange, rangeIndex) => {
-        return (
-          <span key={rangeIndex}>
-            {dateRangeToCells(dateRange).map((cell, cellIndex, array) => {
-              return (
-                <RangeBox
-                  key={cellIndex}
-                  isResizable={isResizable}
-                  isMovable={isMovable}
-                  isDeletable={isDeletable}
-                  cellInfoToDateRange={cellInfoToDateRange}
-                  cellArray={array}
-                  cellIndex={cellIndex}
-                  rangeIndex={rangeIndex}
-                  className={className}
-                  isBeingEdited={isBeingEdited}
-                  onChange={onChange}
-                  grid={grid}
-                  cell={cell}
-                />
-              );
-            })}
-          </span>
-        );
-      })}
-    </div>
-  );
-}
 
 const MINS_IN_DAY = 24 * 60;
 const horizontalPrecision = 1;
@@ -582,12 +264,15 @@ function App({ verticalPrecision = 1 / 30, visualGridPrecision = 1 / 30 }) {
   return (
     <div
       ref={root}
-      className={cc([classes['root'], { [classes['no-scroll']]: isDragging }])}
+      className={classcat([
+        classes['root'],
+        { [classes['no-scroll']]: isDragging }
+      ])}
     >
       <div style={timelineStickyStyle} className={classes['timeline']}>
         <div className={classes['header']}>
           <div className={classes['day-column']}>
-            <div className={cc([classes['cell'], classes.title])}>T</div>
+            <div className={classcat([classes['cell'], classes.title])}>T</div>
           </div>
         </div>
         <div className={classes['calendar']}>
@@ -621,11 +306,11 @@ function App({ verticalPrecision = 1 / 30, visualGridPrecision = 1 / 30 }) {
       <div>
         <div
           style={headerStickyStyle}
-          className={cc([classes['calendar'], classes.header])}
+          className={classcat([classes['calendar'], classes.header])}
         >
           {times(7).map(i => (
             <div key={i} className={classes['day-column']}>
-              <div className={cc([classes['cell'], classes.title])}>
+              <div className={classcat([classes['cell'], classes.title])}>
                 {format(addDays(originDate, i), 'ddd')}
               </div>
             </div>
@@ -639,6 +324,7 @@ function App({ verticalPrecision = 1 / 30, visualGridPrecision = 1 / 30 }) {
           )}
           {grid && pendingCreation && isDragging && (
             <Schedule
+              classes={classes}
               dateRangeToCells={dateRangeToCells}
               cellInfoToDateRange={cellInfoToSingleDateRange}
               className={classes['is-pending-creation']}
@@ -648,6 +334,7 @@ function App({ verticalPrecision = 1 / 30, visualGridPrecision = 1 / 30 }) {
           )}
           {grid && !pendingCreation && (
             <Schedule
+              classes={classes}
               dateRangeToCells={dateRangeToCells}
               cellInfoToDateRange={cellInfoToSingleDateRange}
               isResizable
