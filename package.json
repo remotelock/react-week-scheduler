@@ -2,6 +2,7 @@
   "name": "@remotelock/weekly-scheduler",
   "version": "1.0.0",
   "description": "",
+  "homepage": "http://forabi.github.io/calendar",
   "keywords": [
     "calendar",
     "time grid",
