@@ -72,7 +72,6 @@ export const TimeGridScheduler = React.memo(function TimeGridScheduler({
   const cellInfoToSingleDateRange = useCallback(
     (cell: CellInfo): DateRange => {
       const [first, ...rest] = cellInfoToDateRanges(cell);
-
       invariant(
         rest.length === 0,
         `Expected "cellInfoToSingleDateRange" to return a single date range, found ${

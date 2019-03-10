@@ -16,6 +16,7 @@ import { ScheduleProps } from './Schedule';
 import { getTextForDateRange } from '../utils/getTextForDateRange';
 // @ts-ignore
 import VisuallyHidden from '@reach/visually-hidden';
+import { isEqual } from 'lodash';
 
 export const RangeBox = React.memo(function RangeBox({
   classes,
@@ -118,7 +119,7 @@ export const RangeBox = React.memo(function RangeBox({
   );
 
   const handleDrag: DraggableEventHandler = useCallback(
-    (event, { y }) => {
+    (event, { y, x }) => {
       if (!isMovable) {
         return;
       }
@@ -126,35 +127,42 @@ export const RangeBox = React.memo(function RangeBox({
       event.preventDefault();
       event.stopPropagation();
 
-      const _start = y;
-      const _end = _start + rect.height;
-      const newTop = Math.min(_start, _end);
+      const _startY = y;
+      const _endY = _startY + rect.height;
+      const _startX = x;
+      const _endX = _startX + rect.width;
+      const newTop = Math.min(_startY, _endY);
+      const newLeft = Math.min(_startX, _endX);
       const newBottom = newTop + rect.height;
-
-      if (newTop === top) {
-        return;
-      }
+      const newRight = newLeft + rect.width;
 
       const newRect = {
         ...rect,
         top: newTop,
-        bottom: newBottom
+        bottom: newBottom,
+        right: newRight,
+        left: newLeft
       };
 
-      const { startY, endY } = grid.getCellFromRect(newRect);
+      const { startY, startX } = grid.getCellFromRect(newRect);
 
       const newCell = {
         ...cell,
+        startX,
+        endX: startX + cell.spanX - 1,
         startY,
-        endY
+        endY: startY + cell.spanY - 1
       };
 
+      if (isEqual(newCell, cell)) {
+        return;
+      }
+
       invariant(
-        newCell.spanY === cell.spanY,
-        `Expected the dragged time cell to have the same height (${
-          newCell.spanY
-        }, ${cell.spanY})`
+        newCell.spanY === cell.spanY && newCell.spanX === cell.spanX,
+        `Expected the dragged time cell to have the same dimensions)`
       );
+
       setModifiedCell(newCell);
     },
     [grid, rect, isMovable, setModifiedCell]
@@ -204,7 +212,7 @@ export const RangeBox = React.memo(function RangeBox({
 
   return (
     <Draggable
-      axis={isMovable ? 'y' : 'none'}
+      axis={isMovable ? 'both' : 'none'}
       bounds={{
         top: 0,
         bottom: grid.totalHeight - height,
