@@ -8,6 +8,10 @@ html {
   box-sizing: border-box;
 }
 
+.no-scroll {
+  touch-action: none;
+}
+
 .root {
   contain: strict;
   position: relative;
@@ -29,7 +33,7 @@ html {
   height: 600px;
   --cell-height: calc(600px / 12);
   position: relative;
-  overflow: hidden auto;
+  overflow: auto;
   background: white;
   border: 1px solid hsla(0, 0%, 83%, 1);
 
@@ -204,7 +208,7 @@ html {
 }
 
 .day-column {
-  flex: 1 1 250px;
+  flex: 1 0 250px;
 
   .day-hours {
     display: flex;

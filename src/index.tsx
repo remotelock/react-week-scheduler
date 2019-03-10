@@ -571,7 +571,10 @@ function App({ verticalPrecision = 1 / 30, visualGridPrecision = 1 / 30 }) {
   }, [root.current, document.activeElement, scheduleState.present]);
 
   return (
-    <div ref={root} className={classes['root']}>
+    <div
+      ref={root}
+      className={cc([classes['root'], { [classes['no-scroll']]: isDragging }])}
+    >
       <div className={classes['timeline']}>
         <div className={classes['header']}>
           <div className={classes['day-column']}>

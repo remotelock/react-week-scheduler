@@ -29,7 +29,7 @@ export function useClickAndDrag(ref: React.RefObject<HTMLElement>) {
     const mapCoordsToContainer = createPageMapCoordsToContainer(container);
 
     const touchMove$ = fromEvent<TouchEvent>(window, 'touchmove', {
-      passive: true
+      passive: false
     });
     const touchEnd$ = fromEvent<TouchEvent>(window, 'touchend', {
       passive: true
@@ -61,6 +61,10 @@ export function useClickAndDrag(ref: React.RefObject<HTMLElement>) {
     });
 
     const dragStart$ = merge(mouseDown$, touchStartWithDelay$).pipe(
+      tap(e => {
+        e.preventDefault();
+        e.stopPropagation();
+      }),
       map(mapCoordsToContainer)
     );
 
@@ -71,7 +75,14 @@ export function useClickAndDrag(ref: React.RefObject<HTMLElement>) {
         setHasFinishedDragging(true);
       })
     );
-    const move$ = merge(mouseMove$, touchMove$).pipe(map(mapCoordsToContainer));
+
+    const move$ = merge(mouseMove$, touchMove$).pipe(
+      tap(e => {
+        e.preventDefault();
+        e.stopPropagation();
+      }),
+      map(mapCoordsToContainer)
+    );
 
     const box$ = dragStart$.pipe(
       tap(() => {
