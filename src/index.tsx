@@ -392,7 +392,7 @@ function Schedule({
   );
 }
 
-function App() {
+function App({ visualGridPrecision: visualGridVerticalPrecision = 1 / 30 }) {
   const root = useRef<HTMLDivElement | null>(null);
   const parent = useRef<HTMLDivElement | null>(null);
 
@@ -536,9 +536,9 @@ function App() {
       createMapCellInfoToRecurringTimeRange({
         originDate,
         fromX: toDay,
-        fromY: y => y * 30
+        fromY: y => y * visualGridVerticalPrecision
       }),
-    [toDay, originDate]
+    [toDay, originDate, visualGridVerticalPrecision]
   );
 
   useEffect(() => {
