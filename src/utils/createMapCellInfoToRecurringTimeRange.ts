@@ -6,7 +6,8 @@ import {
   endOfDay,
   isEqual,
   subDays,
-  startOfDay
+  startOfDay,
+  compareAsc
 } from 'date-fns';
 import { cellToDate } from './cellToDate';
 
@@ -38,7 +39,7 @@ export const createMapCellInfoToRecurringTimeRange: MapCellInfoToDateRange = ({
 
       return range;
     })
-    .sort((rangeA, rangeB) => (isBefore(rangeA[0], rangeB[0]) ? 0 : 1));
+    .sort((range1, range2) => compareAsc(range1[0], range2[0]));
 
   return result;
 };
