@@ -542,13 +542,17 @@ function App() {
   );
 
   useEffect(() => {
+    if (!root.current || !root.current.contains(document.activeElement)) {
+      return;
+    }
+
     document.activeElement &&
       scrollIntoView(document.activeElement, {
         scrollMode: 'if-needed',
         block: 'nearest',
         inline: 'nearest'
       });
-  }, [document.activeElement, scheduleState.present]);
+  }, [root.current, document.activeElement, scheduleState.present]);
 
   return (
     <div ref={root} className={classes['root']}>
