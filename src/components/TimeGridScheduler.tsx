@@ -1,6 +1,6 @@
 import useComponentSize from '@rehooks/component-size';
 import classcat from 'classcat';
-import { addDays, format } from 'date-fns';
+import { addDays, format, isEqual } from 'date-fns';
 import invariant from 'invariant';
 import { times } from 'lodash';
 import React, {
@@ -222,6 +222,12 @@ export const TimeGridScheduler = React.memo(function TimeGridScheduler({
       if (!newDateRange) {
         newSchedule.splice(rangeIndex, 1);
       } else {
+        if (
+          isEqual(newDateRange[0], newSchedule[rangeIndex][0]) &&
+          isEqual(newDateRange[1], newSchedule[rangeIndex][1])
+        ) {
+          return;
+        }
         newSchedule[rangeIndex] = newDateRange;
       }
 

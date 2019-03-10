@@ -16,7 +16,6 @@ import { ScheduleProps } from './Schedule';
 import { getTextForDateRange } from '../utils/getTextForDateRange';
 // @ts-ignore
 import VisuallyHidden from '@reach/visually-hidden';
-import { isEqual } from 'lodash';
 
 export const RangeBox = React.memo(function RangeBox({
   classes,
@@ -153,10 +152,6 @@ export const RangeBox = React.memo(function RangeBox({
         startY,
         endY: startY + cell.spanY - 1
       };
-
-      if (isEqual(newCell, cell)) {
-        return;
-      }
 
       invariant(
         newCell.spanY === cell.spanY && newCell.spanX === cell.spanX,
