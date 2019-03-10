@@ -155,6 +155,7 @@ html {
 
 .is-draggable.react-draggable-dragging {
   cursor: grabbing;
+  z-index: 5;
 }
 
 .event {

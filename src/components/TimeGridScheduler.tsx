@@ -217,7 +217,7 @@ export const TimeGridScheduler = React.memo(function TimeGridScheduler({
         return [newDateRange];
       }
 
-      const newSchedule = [...scheduleState.present];
+      let newSchedule = [...scheduleState.present];
 
       if (!newDateRange) {
         newSchedule.splice(rangeIndex, 1);
@@ -225,7 +225,9 @@ export const TimeGridScheduler = React.memo(function TimeGridScheduler({
         newSchedule[rangeIndex] = newDateRange;
       }
 
-      setSchedule(mergeRanges(newSchedule));
+      newSchedule = mergeRanges(newSchedule);
+
+      setSchedule(newSchedule);
     },
     [scheduleState.present]
   );
