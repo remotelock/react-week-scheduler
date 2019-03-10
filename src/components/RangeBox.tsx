@@ -258,7 +258,7 @@ export const RangeBox = React.memo(function RangeBox({
             topRight: classcat([classes['handle'], classes['top-right']])
           }}
         >
-          <div className={classes['event-content']}>
+          <div style={{ width, height }} className={classes['event-content']}>
             <VisuallyHidden>
               {getTextForDateRange(modifiedDateRange)}
             </VisuallyHidden>
