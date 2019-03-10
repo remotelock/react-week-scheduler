@@ -208,7 +208,8 @@ html {
 }
 
 .day-column {
-  flex: 1 0 250px;
+  flex: 1 1 250px;
+  min-width: 75px;
 
   .day-hours {
     display: flex;
