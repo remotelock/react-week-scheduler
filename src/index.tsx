@@ -22,6 +22,7 @@ const defaultSchedule: CalendarEvent = rangeStrings
   .sort((range1, range2) => compareAsc(range1[0], range2[0]));
 
 const rootElement = document.getElementById('root');
+
 ReactDOM.render(
   <TimeGridScheduler
     classes={classes}
