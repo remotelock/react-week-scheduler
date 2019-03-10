@@ -27,10 +27,15 @@ export function useClickAndDrag(ref: React.RefObject<HTMLElement>) {
     }
 
     const mapCoordsToContainer = createPageMapCoordsToContainer(container);
+    const prevent = tap((e: TouchEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+    });
 
     const touchMove$ = fromEvent<TouchEvent>(window, 'touchmove', {
       passive: false
-    });
+    }).pipe(prevent);
+
     const touchEnd$ = fromEvent<TouchEvent>(window, 'touchend', {
       passive: true
     });
@@ -43,7 +48,8 @@ export function useClickAndDrag(ref: React.RefObject<HTMLElement>) {
       mergeMap(start =>
         of(start).pipe(
           delay(300),
-          takeUntil(touchMove$)
+          takeUntil(touchMove$),
+          prevent
         )
       )
     );
@@ -61,10 +67,6 @@ export function useClickAndDrag(ref: React.RefObject<HTMLElement>) {
     });
 
     const dragStart$ = merge(mouseDown$, touchStartWithDelay$).pipe(
-      tap(e => {
-        e.preventDefault();
-        e.stopPropagation();
-      }),
       map(mapCoordsToContainer)
     );
 
@@ -76,13 +78,7 @@ export function useClickAndDrag(ref: React.RefObject<HTMLElement>) {
       })
     );
 
-    const move$ = merge(mouseMove$, touchMove$).pipe(
-      tap(e => {
-        e.preventDefault();
-        e.stopPropagation();
-      }),
-      map(mapCoordsToContainer)
-    );
+    const move$ = merge(mouseMove$, touchMove$).pipe(map(mapCoordsToContainer));
 
     const box$ = dragStart$.pipe(
       tap(() => {
