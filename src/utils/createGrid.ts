@@ -2,7 +2,7 @@ import { Grid, CellInfo, Rect } from '../types';
 import { clamp, floor, round } from 'lodash';
 import { getSpan } from './getSpan';
 
-export const createGridForContainer = ({
+export const createGrid = ({
   totalHeight,
   totalWidth,
   numVerticalCells,
@@ -13,8 +13,8 @@ export const createGridForContainer = ({
   numVerticalCells: number;
   numHorizontalCells: number;
 }): Grid => {
-  const cellHeight = totalHeight / numVerticalCells;
-  const cellWidth = totalWidth / numHorizontalCells;
+  const cellHeight = floor(totalHeight / numVerticalCells);
+  const cellWidth = floor(totalWidth / numHorizontalCells);
 
   return {
     totalHeight,

@@ -24,7 +24,7 @@ import {
   Grid,
   OnChangeCallback
 } from '../types';
-import { createGridForContainer } from '../utils/createGridFromContainer';
+import { createGrid } from '../utils/createGrid';
 import { createMapCellInfoToContiguousDateRange } from '../utils/createMapCellInfoToContiguousDateRange';
 import {
   createMapCellInfoToRecurringTimeRange,
@@ -139,7 +139,7 @@ export const TimeGridScheduler = React.memo(function TimeGridScheduler({
       return null;
     }
 
-    return createGridForContainer({
+    return createGrid({
       totalHeight,
       totalWidth,
       numHorizontalCells,
