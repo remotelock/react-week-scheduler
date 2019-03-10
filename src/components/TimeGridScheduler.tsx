@@ -1,6 +1,6 @@
 import useComponentSize from '@rehooks/component-size';
 import classcat from 'classcat';
-import { addDays, format, getMinutes } from 'date-fns';
+import { addDays, format } from 'date-fns';
 import invariant from 'invariant';
 import { times } from 'lodash';
 import React, {
@@ -13,7 +13,6 @@ import React, {
 import 'resize-observer-polyfill/dist/ResizeObserver.global';
 import scrollIntoView from 'scroll-into-view-if-needed';
 import useUndo from 'use-undo';
-import { Schedule } from './Schedule';
 import { useClickAndDrag } from '../hooks/useClickAndDrag';
 import useMousetrap from '../hooks/useMousetrap';
 import { useStickyStyle } from '../hooks/useStickyStyle';
@@ -32,45 +31,13 @@ import {
 } from '../utils/createMapCellInfoToRecurringTimeRange';
 import { createMapDateRangeToCells } from '../utils/createMapDateRangeToCells';
 import { mergeEvents, mergeRanges } from '../utils/mergeEvents';
+import { Cell } from './Cell';
+import { Schedule } from './Schedule';
 
 const MINS_IN_DAY = 24 * 60;
 const horizontalPrecision = 1;
 const toDay = (x: number) => x * horizontalPrecision;
 const toX = (days: number) => days / horizontalPrecision;
-
-const Cell = React.memo(function Cell({
-  timeIndex,
-  children,
-  classes,
-  getDateRangeForVisualGrid
-}: {
-  timeIndex: number;
-  classes: Record<string, string>;
-  getDateRangeForVisualGrid(cell: CellInfo): DateRange[];
-  children?(options: { start: Date; isHourStart: boolean }): React.ReactNode;
-}) {
-  const [[start]] = getDateRangeForVisualGrid({
-    startX: 0,
-    startY: timeIndex,
-    endX: 0,
-    endY: timeIndex + 1,
-    spanX: 1,
-    spanY: 1
-  });
-
-  const isHourStart = getMinutes(start) === 0;
-
-  return (
-    <div
-      className={classcat([
-        classes['cell'],
-        { [classes['is-hour-start']]: isHourStart }
-      ])}
-    >
-      {children && children({ start, isHourStart })}
-    </div>
-  );
-});
 
 export const TimeGridScheduler = React.memo(function TimeGridScheduler({
   verticalPrecision = 30,
