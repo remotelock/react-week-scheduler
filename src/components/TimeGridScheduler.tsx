@@ -125,6 +125,8 @@ export const TimeGridScheduler = React.memo(function TimeGridScheduler({
     return { totalHeight, totalWidth };
   }, [parent.current, size]);
 
+  const numVisualVerticalCells = (24 * 60) / visualGridVerticalPrecision;
+
   const grid = useMemo<Grid | null>(() => {
     if (totalHeight === null || totalWidth === null) {
       return null;
@@ -136,7 +138,13 @@ export const TimeGridScheduler = React.memo(function TimeGridScheduler({
       numHorizontalCells,
       numVerticalCells
     });
-  }, [totalHeight, totalWidth, numHorizontalCells, numVerticalCells]);
+  }, [
+    totalHeight,
+    totalWidth,
+    numHorizontalCells,
+    numVerticalCells,
+    numVisualVerticalCells
+  ]);
 
   useEffect(() => {
     if (grid === null || box === null) {
@@ -230,8 +238,6 @@ export const TimeGridScheduler = React.memo(function TimeGridScheduler({
       inline: 'nearest'
     });
   }, [root.current, schedule]);
-
-  const numVisualVerticalCells = (24 * 60) / visualGridVerticalPrecision;
 
   return (
     <div

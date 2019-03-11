@@ -1,14 +1,16 @@
 import { compareAsc, startOfWeek } from 'date-fns';
 import useUndo from 'use-undo';
-import React from 'react';
+import React, { useState } from 'react';
 import ReactDOM from 'react-dom';
+// @ts-ignore
+import humanizeDuration from 'humanize-duration';
 import 'resize-observer-polyfill/dist/ResizeObserver.global';
-import { Event as CalendarEvent } from './types';
 
+import { Event as CalendarEvent } from './types';
 import { TimeGridScheduler } from './components/TimeGridScheduler';
-import classes from './styles';
-import useMousetrap from './hooks/useMousetrap';
 import { Key } from './components/Key/Key';
+import useMousetrap from './hooks/useMousetrap';
+import defaultStyleClasses from './styles';
 
 const rangeStrings: [string, string][] = [
   ['2019-03-03T22:45:00.000Z', '2019-03-04T01:15:00.000Z'],
@@ -60,27 +62,64 @@ function App() {
     document
   );
 
+  const [verticalPrecision, setVerticalPrecision] = useState(30);
+  const [
+    visualGridVerticalPrecision,
+    setVisualGridVerticalPrecision
+  ] = useState(30);
+
   return (
     <>
-      <div className={classes['buttons-wrapper']}>
+      <div className={defaultStyleClasses['buttons-wrapper']}>
         <button disabled={!canUndoSchedule} onClick={undoSchedule}>
           ⟲ Undo
         </button>
         <button disabled={!canRedoSchedule} onClick={redoSchedule}>
           Redo ⟳
         </button>
+        <label>
+          Vertical increments:
+          <select
+            value={verticalPrecision}
+            onChange={({ target: { value } }) =>
+              setVerticalPrecision(Number(value))
+            }
+          >
+            {[5, 10, 15, 30, 60].map(value => (
+              <option key={value} value={value}>
+                {humanizeDuration(value * 60 * 1000)}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label>
+          Visual vertical increments:
+          <select
+            value={visualGridVerticalPrecision}
+            onChange={({ target: { value } }) =>
+              setVisualGridVerticalPrecision(Number(value))
+            }
+          >
+            {[15, 30, 60].map(value => (
+              <option key={value} value={value}>
+                {humanizeDuration(value * 60 * 1000)}
+              </option>
+            ))}
+          </select>
+        </label>
         <div>
           Tip: use <Key>Delete</Key> key to remove time blocks. <Key>↑</Key> and{' '}
           <Key>↓</Key> to move.
         </div>
       </div>
       <TimeGridScheduler
-        classes={classes}
+        key={visualGridVerticalPrecision}
+        classes={defaultStyleClasses}
         originDate={startOfWeek(new Date('2019-03-04'), { weekStartsOn: 1 })}
         schedule={scheduleState.present}
         onChange={setSchedule}
-        verticalPrecision={15}
-        visualGridVerticalPrecision={30}
+        verticalPrecision={verticalPrecision}
+        visualGridVerticalPrecision={visualGridVerticalPrecision}
       />
     </>
   );
