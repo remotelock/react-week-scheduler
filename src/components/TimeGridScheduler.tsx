@@ -33,6 +33,7 @@ import { createMapDateRangeToCells } from '../utils/createMapDateRangeToCells';
 import { mergeEvents, mergeRanges } from '../utils/mergeEvents';
 import { Cell } from './Cell';
 import { Schedule } from './Schedule';
+import { Key } from './Key/Key';
 
 const MINS_IN_DAY = 24 * 60;
 const horizontalPrecision = 1;
@@ -268,12 +269,18 @@ export const TimeGridScheduler = React.memo(function TimeGridScheduler({
 
   return (
     <>
-      <button disabled={!canUndoSchedule} onClick={undoSchedule}>
-        Undo
-      </button>
-      <button disabled={!canRedoSchedule} onClick={redoSchedule}>
-        Redo
-      </button>
+      <div className={classes['buttons-wrapper']}>
+        <button disabled={!canUndoSchedule} onClick={undoSchedule}>
+          ⟲ Undo
+        </button>
+        <button disabled={!canRedoSchedule} onClick={redoSchedule}>
+          Redo ⟳
+        </button>
+        <div>
+          Tip: use <Key>Delete</Key> key to remove time blocks. <Key>↑</Key> and{' '}
+          <Key>↓</Key> to move.
+        </div>
+      </div>
       <div
         ref={root}
         className={classcat([
