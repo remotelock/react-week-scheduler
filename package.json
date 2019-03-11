@@ -81,6 +81,7 @@
   },
   "husky": {
     "hooks": {
+      "commit-msg": "yarn commitlint",
       "pre-commit": "npm-run-all -s lint-staged -p -c --aggregate-output pre-commit",
       "post-merge": "yarnhook",
       "post-checkout": "yarnhook",
@@ -122,7 +123,9 @@
     "eject": "react-scripts eject",
     "predeploy": "yarn build",
     "deploy": "gh-pages -d build",
-    "run-prettier": "prettier --write '*.json' 'types/**/*.ts' 'src/**/*.ts{,x}' 'src/**/*.scss'"
+    "run-prettier": "prettier --write '*.json' 'types/**/*.ts' 'src/**/*.ts{,x}' 'src/**/*.scss'",
+    "semantic-release": "semantic-release",
+    "commitlint": "commitlint -e $GIT_PARAMS"
   },
   "browserslist": [
     ">0.5%",
