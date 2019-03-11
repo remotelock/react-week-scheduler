@@ -14,10 +14,10 @@ To use the default styles, import the default classes object and pass it to the 
 
 ```jsx
 import { TimeGridScheduler } from '@remotelock/react-week-scheduler';
-import classes from '@remotelock/react-week-scheduler/styles';
+import defaultStyleClasses from '@remotelock/react-week-scheduler/styles';
 
 function App() {
-  return <TimeGridScheduler classes={classes} />;
+  return <TimeGridScheduler classes={defaultStyleClasses} {...otherProps} />;
 }
 ```
 
