@@ -1,0 +1,18 @@
+{
+  "plugins": [
+    "stylelint-no-unsupported-browser-features",
+    "stylelint-csstree-validator"
+  ],
+  "rules": {
+    "plugin/no-unsupported-browser-features": [true],
+    "at-rule-no-vendor-prefix": [true],
+    "media-feature-name-no-vendor-prefix": [true],
+    "selector-no-vendor-prefix": [true],
+    "property-no-vendor-prefix": [true],
+    "value-no-vendor-prefix": [true],
+    "csstree/validator": {
+      "ignore": ["composes"]
+    }
+  },
+  "ignoreFiles": ["./coverage/**/*"]
+}

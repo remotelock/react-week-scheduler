@@ -1,11 +1,11 @@
 export type OnChangeCallback = (
   newDateRange: DateRange | undefined,
-  rangeIndex: number
+  rangeIndex: number,
 ) => void;
 
 export type Coords = { x: number; y: number };
 
-export type Event = DateRange[];
+export type ScheduleType = DateRange[];
 
 export type CellInfo = {
   spanX: number;
@@ -19,7 +19,7 @@ export type CellInfo = {
 export type DateRange = [Date, Date];
 
 export type MapCellInfoToDateRange = (
-  options: MapCellInfoToDateRangeOptions
+  options: MapCellInfoToDateRangeOptions,
 ) => (cellInfo: CellInfo) => DateRange[];
 
 export type MapCellInfoToDateRangeOptions = {

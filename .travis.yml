@@ -1,0 +1,14 @@
+language: node_js
+
+script: yarn && yarn test && yarn build
+
+deploy:
+  provider: script
+  skip_cleanup: true
+  script:
+    - yarn semantic-release
+
+cache: yarn
+
+notifications:
+  email: false

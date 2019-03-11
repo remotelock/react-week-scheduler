@@ -1,3 +1,3 @@
 export default function humanizeDuration(
-  durationInMilliseconds: number
+  durationInMilliseconds: number,
 ): string;

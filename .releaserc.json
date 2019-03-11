@@ -1,0 +1,22 @@
+{
+  "analyzeCommits": {
+    "preset": "angular",
+    "releaseRules": [
+      { "type": "fix", "release": "patch" },
+      { "type": "Fix", "release": "patch" },
+      { "type": "Feature", "release": "minor" },
+      { "type": "feature", "release": "minor" },
+      { "type": "breaking", "release": "major" },
+      { "type": "Breaking", "release": "major" }
+    ]
+  },
+  "generateNotes": {
+    "preset": "angular",
+    "writerOpts": {
+      "commitsSort": "type",
+      "transform": {}
+    }
+  },
+  "success": [],
+  "fail": []
+}

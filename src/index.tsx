@@ -1,18 +1,19 @@
+/* eslint-disable import/no-extraneous-dependencies */
+
 import { startOfWeek } from 'date-fns';
-import useUndo from 'use-undo';
-import React, { useState } from 'react';
-import ReactDOM from 'react-dom';
 // @ts-ignore
 import humanizeDuration from 'humanize-duration';
+import React, { useState } from 'react';
 import CustomProperties from 'react-custom-properties';
+import ReactDOM from 'react-dom';
 import 'resize-observer-polyfill/dist/ResizeObserver.global';
-
-import { Event as CalendarEvent } from './types';
+import useUndo from 'use-undo';
 import { TimeGridScheduler } from './components/TimeGridScheduler';
 import { Key } from './demo/components/Key/Key';
+import demoClasses from './demo/index.module.scss';
 import useMousetrap from './hooks/useMousetrap';
 import defaultStyleClasses from './styles';
-import demoClasses from './demo/index.module.scss';
+import { ScheduleType } from './types';
 
 const rangeStrings: [string, string][] = [
   ['2019-03-03T22:45:00.000Z', '2019-03-04T01:15:00.000Z'],
@@ -21,11 +22,11 @@ const rangeStrings: [string, string][] = [
   ['2019-03-06T22:00:00.000Z', '2019-03-07T01:00:00.000Z'],
   ['2019-03-07T05:30:00.000Z', '2019-03-07T10:00:00.000Z'],
   ['2019-03-08T22:00:00.000Z', '2019-03-09T01:00:00.000Z'],
-  ['2019-03-09T22:00:00.000Z', '2019-03-10T01:00:00.000Z']
+  ['2019-03-09T22:00:00.000Z', '2019-03-10T01:00:00.000Z'],
 ];
 
-const defaultSchedule: CalendarEvent = rangeStrings.map(
-  range => range.map(dateString => new Date(dateString)) as [Date, Date]
+const defaultSchedule: ScheduleType = rangeStrings.map(
+  range => range.map(dateString => new Date(dateString)) as [Date, Date],
 );
 
 function App() {
@@ -36,9 +37,9 @@ function App() {
       undo: undoSchedule,
       redo: redoSchedule,
       canUndo: canUndoSchedule,
-      canRedo: canRedoSchedule
-    }
-  ] = useUndo<CalendarEvent>(defaultSchedule);
+      canRedo: canRedoSchedule,
+    },
+  ] = useUndo<ScheduleType>(defaultSchedule);
 
   useMousetrap(
     'ctrl+z',
@@ -49,7 +50,7 @@ function App() {
 
       undoSchedule();
     },
-    document
+    document,
   );
 
   useMousetrap(
@@ -61,13 +62,13 @@ function App() {
 
       redoSchedule();
     },
-    document
+    document,
   );
 
   const [verticalPrecision, setVerticalPrecision] = useState(30);
   const [
     visualGridVerticalPrecision,
-    setVisualGridVerticalPrecision
+    setVisualGridVerticalPrecision,
   ] = useState(30);
   const [cellHeight, setCellHeight] = useState(50);
   const [cellWidth, setCellWidth] = useState(250);
@@ -75,15 +76,25 @@ function App() {
   return (
     <>
       <div className={demoClasses['buttons-wrapper']}>
-        <button disabled={!canUndoSchedule} onClick={undoSchedule}>
+        <button
+          type="button"
+          disabled={!canUndoSchedule}
+          onClick={undoSchedule}
+        >
           ⟲ Undo
         </button>
-        <button disabled={!canRedoSchedule} onClick={redoSchedule}>
+        <button
+          type="button"
+          disabled={!canRedoSchedule}
+          onClick={redoSchedule}
+        >
           Redo ⟳
         </button>
-        <label>
+        <label htmlFor="vertical_precision">
           Precision:
           <select
+            name="vertical_precision"
+            id="vertical_precision"
             value={verticalPrecision}
             onChange={({ target: { value } }) =>
               setVerticalPrecision(Number(value))
@@ -96,9 +107,11 @@ function App() {
             ))}
           </select>
         </label>
-        <label>
+        <label htmlFor="visual_grid_vertical_precision">
           Grid increments:
           <select
+            name="visual_grid_vertical_precision"
+            id="visual_grid_vertical_precision"
             value={visualGridVerticalPrecision}
             onChange={({ target: { value } }) =>
               setVisualGridVerticalPrecision(Number(value))
@@ -111,9 +124,11 @@ function App() {
             ))}
           </select>
         </label>
-        <label>
+        <label htmlFor="cell_height">
           Cell height:
           <input
+            id="cell_height"
+            name="cell_height"
             type="range"
             max={100}
             step={10}
@@ -122,9 +137,11 @@ function App() {
             onChange={({ target: { value } }) => setCellHeight(Number(value))}
           />
         </label>
-        <label>
+        <label htmlFor="cell_width">
           Preferred cell width:
           <input
+            id="cell_width"
+            name="cell_width"
             type="range"
             max={300}
             step={25}
@@ -143,7 +160,7 @@ function App() {
         global={false}
         properties={{
           '--cell-height': `${cellHeight}px`,
-          '--cell-width': `${cellWidth}px`
+          '--cell-width': `${cellWidth}px`,
         }}
       >
         <TimeGridScheduler

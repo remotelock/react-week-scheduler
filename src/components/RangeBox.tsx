@@ -1,3 +1,5 @@
+// @ts-ignore
+import VisuallyHidden from '@reach/visually-hidden';
 import classcat from 'classcat';
 import { format } from 'date-fns';
 import invariant from 'invariant';
@@ -7,15 +9,13 @@ import React, {
   useEffect,
   useMemo,
   useRef,
-  useState
+  useState,
 } from 'react';
 import Draggable, { DraggableEventHandler } from 'react-draggable';
 import useMousetrap from '../hooks/useMousetrap';
 import { CellInfo } from '../types';
-import { ScheduleProps } from './Schedule';
 import { getTextForDateRange } from '../utils/getTextForDateRange';
-// @ts-ignore
-import VisuallyHidden from '@reach/visually-hidden';
+import { ScheduleProps } from './Schedule';
 
 export const RangeBox = React.memo(function RangeBox({
   classes,
@@ -30,7 +30,7 @@ export const RangeBox = React.memo(function RangeBox({
   cellInfoToDateRange,
   isResizable,
   moveAxis,
-  onActiveChange
+  onActiveChange,
 }: ScheduleProps & {
   cellIndex: number;
   cellArray: CellInfo[];
@@ -43,7 +43,7 @@ export const RangeBox = React.memo(function RangeBox({
   const originalRect = useMemo(() => grid.getRectFromCell(cell), [cell, grid]);
   const rect = useMemo(() => grid.getRectFromCell(modifiedCell), [
     modifiedCell,
-    grid
+    grid,
   ]);
 
   useEffect(() => {
@@ -51,7 +51,7 @@ export const RangeBox = React.memo(function RangeBox({
   }, [cell]);
 
   const modifiedDateRange = useMemo(() => cellInfoToDateRange(modifiedCell), [
-    modifiedCell
+    modifiedCell,
   ]);
 
   const { top, left, width, height } = rect;
@@ -60,12 +60,20 @@ export const RangeBox = React.memo(function RangeBox({
   const isEnd = cellIndex === cellArray.length - 1;
 
   const handleStop = useCallback(() => {
-    onChange && onChange(cellInfoToDateRange(modifiedCell), rangeIndex);
+    if (!onChange) {
+      return;
+    }
+
+    onChange(cellInfoToDateRange(modifiedCell), rangeIndex);
   }, [modifiedCell, rangeIndex, cellInfoToDateRange, onChange]);
 
   useMousetrap(
     'up',
     () => {
+      if (!onChange) {
+        return;
+      }
+
       if (moveAxis === 'none' || moveAxis === 'x') {
         return;
       }
@@ -77,17 +85,21 @@ export const RangeBox = React.memo(function RangeBox({
       const newCell = {
         ...modifiedCell,
         startY: modifiedCell.startY - 1,
-        endY: modifiedCell.endY - 1
+        endY: modifiedCell.endY - 1,
       };
 
-      onChange && onChange(cellInfoToDateRange(newCell), rangeIndex);
+      onChange(cellInfoToDateRange(newCell), rangeIndex);
     },
-    ref.current
+    ref.current,
   );
 
   useMousetrap(
     'down',
     () => {
+      if (!onChange) {
+        return;
+      }
+
       if (moveAxis === 'none' || moveAxis === 'x') {
         return;
       }
@@ -99,12 +111,12 @@ export const RangeBox = React.memo(function RangeBox({
       const newCell = {
         ...modifiedCell,
         startY: modifiedCell.startY + 1,
-        endY: modifiedCell.endY + 1
+        endY: modifiedCell.endY + 1,
       };
 
-      onChange && onChange(cellInfoToDateRange(newCell), rangeIndex);
+      onChange(cellInfoToDateRange(newCell), rangeIndex);
     },
-    ref.current
+    ref.current,
   );
 
   const handleDrag: DraggableEventHandler = useCallback(
@@ -117,22 +129,22 @@ export const RangeBox = React.memo(function RangeBox({
       event.stopPropagation();
 
       const newRect = {
-        ...rect
+        ...rect,
       };
 
       if (moveAxis === 'both' || moveAxis === 'y') {
-        const _startY = y;
-        const _endY = _startY + rect.height;
-        const newTop = Math.min(_startY, _endY);
+        const startOrEnd1 = y;
+        const startOrEnd2 = startOrEnd1 + rect.height;
+        const newTop = Math.min(startOrEnd1, startOrEnd2);
         const newBottom = newTop + rect.height;
         newRect.bottom = newBottom;
         newRect.top = newTop;
       }
 
       if (moveAxis === 'both' || moveAxis === 'x') {
-        const _startX = x;
-        const _endX = _startX + rect.width;
-        const newLeft = Math.min(_startX, _endX);
+        const startOrEnd1 = x;
+        const startOrEnd2 = startOrEnd1 + rect.width;
+        const newLeft = Math.min(startOrEnd1, startOrEnd2);
         const newRight = newLeft + rect.width;
         newRect.right = newRight;
         newRect.left = newLeft;
@@ -145,17 +157,17 @@ export const RangeBox = React.memo(function RangeBox({
         startX,
         endX: startX + cell.spanX - 1,
         startY,
-        endY: startY + cell.spanY - 1
+        endY: startY + cell.spanY - 1,
       };
 
       invariant(
         newCell.spanY === cell.spanY && newCell.spanX === cell.spanX,
-        `Expected the dragged time cell to have the same dimensions)`
+        `Expected the dragged time cell to have the same dimensions)`,
       );
 
       setModifiedCell(newCell);
     },
-    [grid, rect, moveAxis, setModifiedCell]
+    [grid, rect, moveAxis, setModifiedCell],
   );
 
   const handleResize: ResizeCallback = useCallback(
@@ -173,12 +185,12 @@ export const RangeBox = React.memo(function RangeBox({
 
       const newSize = {
         height: delta.height + rect.height,
-        width: delta.width + rect.width + 20
+        width: delta.width + rect.width + 20,
       };
 
       const newRect = {
         ...originalRect,
-        ...newSize
+        ...newSize,
       };
 
       if (direction.includes('top')) {
@@ -192,16 +204,20 @@ export const RangeBox = React.memo(function RangeBox({
         ...cell,
         spanY,
         startY,
-        endY
+        endY,
       };
 
       setModifiedCell(newCell);
     },
-    [grid, rect, isResizable, setModifiedCell, originalRect]
+    [grid, rect, isResizable, setModifiedCell, originalRect],
   );
 
   const handleOnFocus = useCallback(() => {
-    onActiveChange && onActiveChange([rangeIndex, cellIndex]);
+    if (!onActiveChange) {
+      return;
+    }
+
+    onActiveChange([rangeIndex, cellIndex]);
   }, [onActiveChange, rangeIndex, cellIndex]);
 
   return (
@@ -211,7 +227,7 @@ export const RangeBox = React.memo(function RangeBox({
         top: 0,
         bottom: grid.totalHeight - height,
         left: 0,
-        right: grid.totalWidth
+        right: grid.totalWidth,
       }}
       position={{ x: left, y: top }}
       onDrag={handleDrag}
@@ -219,16 +235,17 @@ export const RangeBox = React.memo(function RangeBox({
       cancel={`.${classes.handle}`}
     >
       <button
+        type="button"
         onFocus={handleOnFocus}
         className={classcat([
-          classes['event'],
+          classes.event,
           classes['button-reset'],
           classes['range-box'],
           className,
           {
             [classes['is-draggable']]: moveAxis !== 'none',
-            [classes['is-being-edited']]: isBeingEdited && isBeingEdited(cell)
-          }
+            [classes['is-being-edited']]: isBeingEdited && isBeingEdited(cell),
+          },
         ])}
         ref={ref}
         tabIndex={0}
@@ -246,7 +263,7 @@ export const RangeBox = React.memo(function RangeBox({
             isResizable
               ? {
                   top: true,
-                  bottom: true
+                  bottom: true,
                 }
               : {}
           }
@@ -258,7 +275,7 @@ export const RangeBox = React.memo(function RangeBox({
             right: classcat([classes.handle, classes.right]),
             top: classcat([classes.handle, classes.top]),
             topLeft: classcat([classes.handle, classes['top-left']]),
-            topRight: classcat([classes.handle, classes['top-right']])
+            topRight: classcat([classes.handle, classes['top-right']]),
           }}
         >
           <div
@@ -268,10 +285,10 @@ export const RangeBox = React.memo(function RangeBox({
             <VisuallyHidden>
               {getTextForDateRange(modifiedDateRange)}
             </VisuallyHidden>
-            <span aria-hidden className={classes['start']}>
+            <span aria-hidden className={classes.start}>
               {isStart && format(modifiedDateRange[0], 'h:mma')}
             </span>
-            <span aria-hidden className={classes['end']}>
+            <span aria-hidden className={classes.end}>
               {isEnd && format(modifiedDateRange[1], 'h:mma')}
             </span>
           </div>

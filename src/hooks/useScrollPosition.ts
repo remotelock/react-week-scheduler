@@ -3,7 +3,7 @@ import { useEventListener } from './useEventListener';
 
 export function useScrollPosition(
   root: React.RefObject<HTMLElement>,
-  { passive = true, enabled = true } = {}
+  { passive = true, enabled = true } = {},
 ) {
   const [position, setPosition] = useState({ scrollTop: 0, scrollLeft: 0 });
 
@@ -18,7 +18,7 @@ export function useScrollPosition(
       }
     },
     { passive },
-    { enabled }
+    { enabled },
   );
 
   return position;

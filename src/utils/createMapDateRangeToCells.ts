@@ -3,7 +3,7 @@ import {
   startOfDay,
   differenceInDays,
   differenceInMinutes,
-  isEqual
+  isEqual,
 } from 'date-fns';
 import { range } from 'lodash';
 import { getSpan } from './getSpan';
@@ -12,7 +12,7 @@ export const createMapDateRangeToCells = ({
   toX = (x: number) => x,
   toY,
   numVerticalCells,
-  originDate
+  originDate,
 }: {
   toX: (day: number) => number;
   toY: (min: number) => number;
@@ -42,7 +42,7 @@ export const createMapDateRangeToCells = ({
       endX,
       endY,
       spanX,
-      spanY
+      spanY,
     };
   });
 

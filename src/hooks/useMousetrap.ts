@@ -10,7 +10,7 @@ import { useEffect, useRef } from 'react';
 export default function useMousetrap(
   handlerKey: string | string[],
   handlerCallback: () => void,
-  element: typeof document | Element | null
+  element: typeof document | Element | null,
 ) {
   const actionRef = useRef<typeof handlerCallback | null>(null);
   actionRef.current = handlerCallback;

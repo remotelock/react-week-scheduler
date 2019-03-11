@@ -1,5 +1,11 @@
 import React from 'react';
-import { CellInfo, DateRange, Event, Grid, OnChangeCallback } from '../types';
+import {
+  CellInfo,
+  DateRange,
+  Grid,
+  OnChangeCallback,
+  ScheduleType,
+} from '../types';
 import { RangeBox } from './RangeBox';
 
 export type ScheduleProps = {
@@ -26,10 +32,10 @@ export const Schedule = React.memo(function Schedule({
   cellInfoToDateRange,
   dateRangeToCells,
   isBeingEdited,
-  onActiveChange: onActive
+  onActiveChange: onActive,
 }: {
   dateRangeToCells(range: DateRange): CellInfo[];
-  ranges: Event;
+  ranges: ScheduleType;
   className?: string;
   classes: Record<string, string>;
 } & ScheduleProps) {

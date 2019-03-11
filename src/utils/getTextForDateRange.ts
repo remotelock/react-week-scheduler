@@ -3,7 +3,7 @@ import { isSameDay, format, getMinutes } from 'date-fns';
 const dropSame = (
   dates: [Date, Date],
   template: string,
-  takeSecond: boolean = false
+  takeSecond: boolean = false,
 ) => {
   const [first, second] = dates.map(date => format(date, template));
   if (first !== second) {
@@ -28,7 +28,7 @@ const formatHour = (date: Date) => {
 export const getTextForDateRange = (
   dates: [Date, Date],
   template?: string,
-  template2?: string
+  template2?: string,
 ) => {
   const start = dates[0];
   const end = dates[dates.length - 1];
@@ -36,7 +36,7 @@ export const getTextForDateRange = (
   if (isSameDay(start, end) && !template) {
     const [firstM, secondM] = dropSame(dates, 'a', true);
     return `${format(start, 'ddd')} ${formatHour(
-      start
+      start,
     )}${firstM} – ${formatHour(end)}${secondM}`;
   }
 

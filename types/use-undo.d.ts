@@ -8,7 +8,7 @@ declare module 'use-undo' {
   };
 
   function useUndo<Value>(
-    initialValue: Value
+    initialValue: Value,
   ): [
     State<Value>,
     {

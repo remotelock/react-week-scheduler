@@ -9,7 +9,7 @@ import {
   startWith,
   distinctUntilChanged,
   filter,
-  delay
+  delay,
 } from 'rxjs/operators';
 import { createPageMapCoordsToContainer } from '../utils/createPageMapCoordsToContainer';
 import { Rect } from '../types';
@@ -23,7 +23,7 @@ export function useClickAndDrag(ref: React.RefObject<HTMLElement>) {
   const [style, setStyle] = useState({
     transform: 'translate(0, 0)',
     width: 0,
-    height: 0
+    height: 0,
   });
   const [box, setBox] = useState<Rect | null>(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -38,15 +38,15 @@ export function useClickAndDrag(ref: React.RefObject<HTMLElement>) {
     const mapCoordsToContainer = createPageMapCoordsToContainer(container);
 
     const touchMove$ = fromEvent<TouchEvent>(window, 'touchmove', {
-      passive: false
+      passive: false,
     }).pipe(prevent);
 
     const touchEnd$ = fromEvent<TouchEvent>(window, 'touchend', {
-      passive: true
+      passive: true,
     });
 
     const touchStart$ = fromEvent<TouchEvent>(container, 'touchstart', {
-      passive: false
+      passive: false,
     });
 
     const touchStartWithDelay$ = touchStart$.pipe(
@@ -54,25 +54,25 @@ export function useClickAndDrag(ref: React.RefObject<HTMLElement>) {
         of(start).pipe(
           delay(300),
           takeUntil(touchMove$),
-          prevent
-        )
-      )
+          prevent,
+        ),
+      ),
     );
 
     const mouseDown$ = fromEvent<MouseEvent>(container, 'mousedown', {
-      passive: true
+      passive: true,
     }).pipe(filter(event => event.which === 1));
 
     const mouseMove$ = fromEvent<MouseEvent>(window, 'mousemove', {
-      passive: true
+      passive: true,
     });
 
     const mouseUp$ = fromEvent<MouseEvent>(window, 'mouseup', {
-      passive: true
+      passive: true,
     });
 
     const dragStart$ = merge(mouseDown$, touchStartWithDelay$).pipe(
-      map(mapCoordsToContainer)
+      map(mapCoordsToContainer),
     );
 
     const dragEnd$ = merge(mouseUp$, touchEnd$).pipe(
@@ -80,7 +80,7 @@ export function useClickAndDrag(ref: React.RefObject<HTMLElement>) {
       tap(() => {
         setIsDragging(false);
         setHasFinishedDragging(true);
-      })
+      }),
     );
 
     const move$ = merge(mouseMove$, touchMove$).pipe(map(mapCoordsToContainer));
@@ -114,22 +114,22 @@ export function useClickAndDrag(ref: React.RefObject<HTMLElement>) {
                 left,
                 right,
                 width: right - left,
-                height: bottom - top
+                height: bottom - top,
               };
-            }
+            },
           ),
-          takeUntil(dragEnd$)
+          takeUntil(dragEnd$),
         );
       }),
-      distinctUntilChanged(isEqual)
+      distinctUntilChanged(isEqual),
     );
 
     const style$ = box$.pipe(
       map(({ top, left, width, height }) => ({
         transform: `translate(${left}px, ${top}px)`,
         width,
-        height
-      }))
+        height,
+      })),
     );
 
     const boxSubscriber = box$.subscribe(setBox);

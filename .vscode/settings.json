@@ -2,8 +2,37 @@
   "cSpell.words": [
     "Deletable",
     "Resizable",
+    "classcat",
     "fullcalendar",
+    "gridcell",
     "polyfill",
     "remotelock"
-  ]
+  ],
+  "css.validate": false,
+  "scss.validate": false,
+  "editor.tabSize": 2,
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.organizeImports": true
+  },
+  "files.associations": {
+    "**/.stylelintrc": "json",
+    "**/.babelrc": "jsonc",
+    "**/.babelrc.json": "jsonc",
+    "**/tslint.json": "jsonc",
+    "**/tsconfig.json": "jsonc",
+    "**/.eslintrc.json": "jsonc",
+    "**/.prettierignore": "gitignore"
+  },
+  "typescript.implementationsCodeLens.enabled": true,
+  "typescript.referencesCodeLens.enabled": true,
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "files.exclude": {
+    "**/node_modules/**": true
+  },
+  "eslint.options": {
+    "reportUnusedDisableDirectives": true
+  },
+  "eslint.validate": ["typescript", "typescriptreact"],
+  "eslint.enable": true
 }

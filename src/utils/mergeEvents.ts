@@ -1,18 +1,21 @@
-import { Event } from '../types';
+import { compareAsc } from 'date-fns';
 // @ts-ignore
 import _mergeRanges from 'merge-ranges';
-import { compareAsc } from 'date-fns';
+import { ScheduleType } from '../types';
 
-export function mergeRanges(event: Event): Event {
+export function mergeRanges(event: ScheduleType): ScheduleType {
   return _mergeRanges([...event].map(d => d.map(c => new Date(c))));
 }
 
-export function mergeEvents(event1: Event, event2: Event | null): Event {
+export function mergeEvents(
+  event1: ScheduleType,
+  event2: ScheduleType | null,
+): ScheduleType {
   if (event2 === null) {
     return event1;
   }
 
   return mergeRanges([...event1, ...event2]).sort((range1, range2) =>
-    compareAsc(range1[0], range2[0])
+    compareAsc(range1[0], range2[0]),
   );
 }

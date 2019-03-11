@@ -6,9 +6,9 @@ export function useEventListener<
 >(
   ref: React.RefObject<Element>,
   event: K,
-  listener: (this: Element, event: HTMLElementEventMap[K]) => any,
+  listener: (this: Element, event: HTMLElementEventMap[K]) => void,
   options?: boolean | AddEventListenerOptions,
-  { enabled = true } = {}
+  { enabled = true } = {},
 ) {
   useEffect(() => {
     if (ref.current === null) {

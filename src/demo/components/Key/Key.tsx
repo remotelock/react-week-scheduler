@@ -3,7 +3,7 @@ import defaultClasses from './Key.module.scss';
 
 export function Key({
   children,
-  classes
+  classes,
 }: {
   children: string;
   classes?: Record<string, string>;

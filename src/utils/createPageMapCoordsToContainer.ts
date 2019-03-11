@@ -20,7 +20,7 @@ export const createPageMapCoordsToContainer = (container: HTMLElement) => {
       top,
       left,
       x: clientX - left,
-      y: clientY - top
+      y: clientY - top,
     };
   };
 };

@@ -8,7 +8,7 @@ import React, {
   useEffect,
   useMemo,
   useRef,
-  useState
+  useState,
 } from 'react';
 import scrollIntoView from 'scroll-into-view-if-needed';
 import { useClickAndDrag } from '../hooks/useClickAndDrag';
@@ -17,15 +17,15 @@ import { useStickyStyle } from '../hooks/useStickyStyle';
 import {
   CellInfo,
   DateRange,
-  Event as CalendarEvent,
   Grid,
-  OnChangeCallback
+  OnChangeCallback,
+  ScheduleType,
 } from '../types';
 import { createGrid } from '../utils/createGrid';
 import { createMapCellInfoToContiguousDateRange } from '../utils/createMapCellInfoToContiguousDateRange';
 import {
   createMapCellInfoToRecurringTimeRange,
-  RecurringTimeRange
+  RecurringTimeRange,
 } from '../utils/createMapCellInfoToRecurringTimeRange';
 import { createMapDateRangeToCells } from '../utils/createMapDateRangeToCells';
 import { mergeEvents, mergeRanges } from '../utils/mergeEvents';
@@ -34,8 +34,8 @@ import { Schedule } from './Schedule';
 
 const MINS_IN_DAY = 24 * 60;
 const horizontalPrecision = 1;
-const toDay = (x: number) => x * horizontalPrecision;
-const toX = (days: number) => days / horizontalPrecision;
+const toDay = (x: number): number => x * horizontalPrecision;
+const toX = (days: number): number => days / horizontalPrecision;
 
 export const TimeGridScheduler = React.memo(function TimeGridScheduler({
   verticalPrecision = 30,
@@ -45,32 +45,32 @@ export const TimeGridScheduler = React.memo(function TimeGridScheduler({
   originDate = new Date(),
   classes,
   className,
-  onChange
+  onChange,
 }: {
   originDate?: Date;
   verticalPrecision?: number;
   visualGridVerticalPrecision?: number;
   style?: React.CSSProperties;
-  schedule: CalendarEvent;
+  schedule: ScheduleType;
   classes: Record<string, string>;
   className?: string;
-  onChange(newSchedule: CalendarEvent): void;
+  onChange(newSchedule: ScheduleType): void;
 }) {
   const numVerticalCells = MINS_IN_DAY / verticalPrecision;
   const numHorizontalCells = 7 / horizontalPrecision;
   const toMin = useCallback((y: number) => y * verticalPrecision, [
-    verticalPrecision
+    verticalPrecision,
   ]);
-  const toY = (mins: number) => mins / verticalPrecision;
+  const toY = (mins: number): number => mins / verticalPrecision;
 
   const cellInfoToDateRanges = useMemo(
     () =>
       createMapCellInfoToRecurringTimeRange({
         originDate,
         fromY: toMin,
-        fromX: toDay
+        fromX: toDay,
       }),
-    [toMin, toDay, originDate]
+    [toMin, toDay, originDate],
   );
 
   const cellInfoToSingleDateRange = useCallback(
@@ -80,12 +80,12 @@ export const TimeGridScheduler = React.memo(function TimeGridScheduler({
         rest.length === 0,
         `Expected "cellInfoToSingleDateRange" to return a single date range, found ${
           rest.length
-        } additional ranges instead. This is a bug in @remotelock/weekly-scheduler`
+        } additional ranges instead. This is a bug in @remotelock/weekly-scheduler`,
       );
 
       return first;
     },
-    [cellInfoToDateRanges]
+    [cellInfoToDateRanges],
   );
 
   const dateRangeToCells = useMemo(
@@ -95,9 +95,9 @@ export const TimeGridScheduler = React.memo(function TimeGridScheduler({
         numVerticalCells,
         numHorizontalCells,
         toX,
-        toY
+        toY,
       }),
-    [toY, toX, numVerticalCells, numHorizontalCells, originDate]
+    [toY, toX, numVerticalCells, numHorizontalCells, originDate],
   );
 
   const root = useRef<HTMLDivElement | null>(null);
@@ -111,21 +111,19 @@ export const TimeGridScheduler = React.memo(function TimeGridScheduler({
     box,
     isDragging,
     hasFinishedDragging,
-    cancel
+    cancel,
   } = useClickAndDrag(parent);
   const [
     pendingCreation,
-    setPendingCreation
+    setPendingCreation,
   ] = useState<RecurringTimeRange | null>(null);
 
-  const { totalHeight, totalWidth } = useMemo(() => {
-    let totalHeight: number | null = null;
-    let totalWidth: number | null = null;
+  const [totalHeight, totalWidth] = useMemo(() => {
     if (parent.current !== null) {
-      ({ scrollHeight: totalHeight, scrollWidth: totalWidth } = parent.current);
+      return [parent.current.scrollHeight, parent.current.scrollWidth];
     }
 
-    return { totalHeight, totalWidth };
+    return [null, null];
   }, [parent.current, size]);
 
   const numVisualVerticalCells = (24 * 60) / visualGridVerticalPrecision;
@@ -139,14 +137,14 @@ export const TimeGridScheduler = React.memo(function TimeGridScheduler({
       totalHeight,
       totalWidth,
       numHorizontalCells,
-      numVerticalCells
+      numVerticalCells,
     });
   }, [
     totalHeight,
     totalWidth,
     numHorizontalCells,
     numVerticalCells,
-    numVisualVerticalCells
+    numVisualVerticalCells,
   ]);
 
   useEffect(() => {
@@ -172,13 +170,15 @@ export const TimeGridScheduler = React.memo(function TimeGridScheduler({
     onChange,
     setPendingCreation,
     pendingCreation,
-    schedule
+    schedule,
   ]);
 
   const handleEventChange = useCallback<OnChangeCallback>(
     (newDateRange, rangeIndex) => {
       if (!schedule && newDateRange) {
-        return [newDateRange];
+        onChange([newDateRange]);
+
+        return;
       }
 
       let newSchedule = [...schedule];
@@ -199,7 +199,7 @@ export const TimeGridScheduler = React.memo(function TimeGridScheduler({
 
       onChange(newSchedule);
     },
-    [schedule]
+    [schedule],
   );
 
   useMousetrap(
@@ -209,7 +209,7 @@ export const TimeGridScheduler = React.memo(function TimeGridScheduler({
         cancel();
       }
     },
-    document
+    document,
   );
 
   const [[activeRangeIndex], setActive] = useState<
@@ -235,9 +235,9 @@ export const TimeGridScheduler = React.memo(function TimeGridScheduler({
       createMapCellInfoToContiguousDateRange({
         originDate,
         fromX: toDay,
-        fromY: y => y * visualGridVerticalPrecision
+        fromY: y => y * visualGridVerticalPrecision,
       }),
-    [visualGridVerticalPrecision, toDay, originDate]
+    [visualGridVerticalPrecision, toDay, originDate],
   );
 
   useEffect(() => {
@@ -252,7 +252,7 @@ export const TimeGridScheduler = React.memo(function TimeGridScheduler({
     scrollIntoView(document.activeElement, {
       scrollMode: 'if-needed',
       block: 'nearest',
-      inline: 'nearest'
+      inline: 'nearest',
     });
   }, [root.current, document.activeElement, schedule]);
 
@@ -263,21 +263,17 @@ export const TimeGridScheduler = React.memo(function TimeGridScheduler({
       style={style}
       className={classcat([
         className,
-        classes['root'],
-        { [classes['no-scroll']]: isDragging }
+        classes.root,
+        { [classes['no-scroll']]: isDragging },
       ])}
     >
-      <div
-        style={timelineStickyStyle}
-        aria-hidden
-        className={classes['timeline']}
-      >
-        <div className={classes['header']}>
+      <div style={timelineStickyStyle} aria-hidden className={classes.timeline}>
+        <div className={classes.header}>
           <div className={classes['day-column']}>
-            <div className={classcat([classes['cell'], classes.title])}>T</div>
+            <div className={classcat([classes.cell, classes.title])}>T</div>
           </div>
         </div>
-        <div className={classes['calendar']}>
+        <div className={classes.calendar}>
           <div className={classes['day-column']}>
             <div className={classes['day-hours']}>
               {times(numVisualVerticalCells).map(timeIndex => {
@@ -291,7 +287,7 @@ export const TimeGridScheduler = React.memo(function TimeGridScheduler({
                     {({ start, isHourStart }) => {
                       if (isHourStart) {
                         return (
-                          <div className={classes['time']}>
+                          <div className={classes.time}>
                             {format(start, 'h a')}
                           </div>
                         );
@@ -311,11 +307,11 @@ export const TimeGridScheduler = React.memo(function TimeGridScheduler({
         <div
           style={headerStickyStyle}
           role="presentation"
-          className={classcat([classes['calendar'], classes.header])}
+          className={classcat([classes.calendar, classes.header])}
         >
           {times(7).map(i => (
             <div key={i} role="presentation" className={classes['day-column']}>
-              <div className={classcat([classes['cell'], classes.title])}>
+              <div className={classcat([classes.cell, classes.title])}>
                 {format(addDays(originDate, i), 'ddd')}
               </div>
             </div>
@@ -324,7 +320,7 @@ export const TimeGridScheduler = React.memo(function TimeGridScheduler({
         <div className={classes['layer-container']}>
           {isDragging && (
             <div className={classes['drag-box']} style={dragBoxStyle}>
-              {hasFinishedDragging && <div className={classes['popup']} />}
+              {hasFinishedDragging && <div className={classes.popup} />}
             </div>
           )}
           {grid && pendingCreation && isDragging && (
@@ -353,7 +349,7 @@ export const TimeGridScheduler = React.memo(function TimeGridScheduler({
             />
           )}
 
-          <div ref={parent} role="grid" className={classes['calendar']}>
+          <div ref={parent} role="grid" className={classes.calendar}>
             {times(7).map(dayIndex => {
               return (
                 <div

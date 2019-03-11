@@ -1,0 +1,16 @@
+{
+  "recommendations": [
+    "kisstkondoros.csstriggers",
+    "shinnn.stylelint",
+    "streetsidesoftware.code-spell-checker",
+    "esbenp.prettier-vscode",
+    "christian-kohler.path-intellisense",
+    "christian-kohler.npm-intellisense",
+    "eamodio.gitlens",
+    "EditorConfig.editorconfig",
+    "kisstkondoros.csstriggers",
+    "codezombiech.gitignore",
+    "pflannery.vscode-versionlens",
+    "dbaeumer.vscode-eslint"
+  ]
+}

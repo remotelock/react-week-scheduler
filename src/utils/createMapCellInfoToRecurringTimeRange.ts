@@ -7,7 +7,7 @@ import {
   isEqual,
   subDays,
   startOfDay,
-  compareAsc
+  compareAsc,
 } from 'date-fns';
 import { cellToDate } from './cellToDate';
 
@@ -16,7 +16,7 @@ export type RecurringTimeRange = DateRange[];
 export const createMapCellInfoToRecurringTimeRange: MapCellInfoToDateRange = ({
   fromY: toMin,
   fromX: toDay,
-  originDate
+  originDate,
 }) => ({ startX, startY, endX, spanY }) => {
   const result = range(startX, endX + 1)
     .map(i => {
@@ -25,7 +25,7 @@ export const createMapCellInfoToRecurringTimeRange: MapCellInfoToDateRange = ({
         startY,
         toMin,
         toDay,
-        originDate
+        originDate,
       });
       let endDate = addMinutes(startDate, toMin(spanY));
 

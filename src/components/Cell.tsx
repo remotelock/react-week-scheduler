@@ -7,7 +7,7 @@ export const Cell = React.memo(function Cell({
   timeIndex,
   children,
   classes,
-  getDateRangeForVisualGrid
+  getDateRangeForVisualGrid,
 }: {
   timeIndex: number;
   classes: Record<string, string>;
@@ -20,7 +20,7 @@ export const Cell = React.memo(function Cell({
     endX: 0,
     endY: timeIndex + 1,
     spanX: 1,
-    spanY: 1
+    spanY: 1,
   });
 
   const isHourStart = getMinutes(start) === 0;
@@ -28,8 +28,8 @@ export const Cell = React.memo(function Cell({
   return (
     <div
       className={classcat([
-        classes['cell'],
-        { [classes['is-hour-start']]: isHourStart }
+        classes.cell,
+        { [classes['is-hour-start']]: isHourStart },
       ])}
     >
       {children && children({ start, isHourStart })}

@@ -1,0 +1,8 @@
+.git/
+package.json
+node_modules/
+
+coverage
+
+.rts2_cache_*/
+build

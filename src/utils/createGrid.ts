@@ -6,7 +6,7 @@ export const createGrid = ({
   totalHeight,
   totalWidth,
   numVerticalCells,
-  numHorizontalCells
+  numHorizontalCells,
 }: {
   totalHeight: number;
   totalWidth: number;
@@ -45,7 +45,7 @@ export const createGrid = ({
         startX: startX * this.cellWidth,
         endX: endX * this.cellWidth,
         startY: startY * this.cellHeight,
-        endY: endY * this.cellHeight
+        endY: endY * this.cellHeight,
       };
     },
 
@@ -53,22 +53,22 @@ export const createGrid = ({
       const startX = clamp(
         floor(data.left / this.cellWidth),
         0,
-        numHorizontalCells - 1
+        numHorizontalCells - 1,
       );
       const startY = clamp(
         round(data.top / this.cellHeight),
         0,
-        numVerticalCells - 1
+        numVerticalCells - 1,
       );
       const endX = clamp(
         floor(data.right / this.cellWidth),
         0,
-        numHorizontalCells - 1
+        numHorizontalCells - 1,
       );
       const endY = clamp(
         round(data.bottom / this.cellHeight),
         0,
-        numVerticalCells - 1
+        numVerticalCells - 1,
       );
       const spanX = clamp(getSpan(startX, endX), 1, numHorizontalCells);
       const spanY = clamp(getSpan(startY, endY), 1, numVerticalCells);
@@ -79,8 +79,8 @@ export const createGrid = ({
         startX,
         startY,
         endX,
-        endY
+        endY,
       };
-    }
+    },
   };
 };
