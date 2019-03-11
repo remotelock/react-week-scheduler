@@ -12,7 +12,6 @@ import React, {
 } from 'react';
 import 'resize-observer-polyfill/dist/ResizeObserver.global';
 import scrollIntoView from 'scroll-into-view-if-needed';
-import useUndo from 'use-undo';
 import { useClickAndDrag } from '../hooks/useClickAndDrag';
 import useMousetrap from '../hooks/useMousetrap';
 import { useStickyStyle } from '../hooks/useStickyStyle';
@@ -33,7 +32,6 @@ import { createMapDateRangeToCells } from '../utils/createMapDateRangeToCells';
 import { mergeEvents, mergeRanges } from '../utils/mergeEvents';
 import { Cell } from './Cell';
 import { Schedule } from './Schedule';
-import { Key } from './Key/Key';
 
 const MINS_IN_DAY = 24 * 60;
 const horizontalPrecision = 1;
@@ -45,13 +43,15 @@ export const TimeGridScheduler = React.memo(function TimeGridScheduler({
   visualGridVerticalPrecision = 30,
   schedule,
   originDate = new Date(),
-  classes
+  classes,
+  onChange
 }: {
   originDate?: Date;
   verticalPrecision?: number;
   visualGridVerticalPrecision?: number;
   schedule: CalendarEvent;
   classes: Record<string, string>;
+  onChange(newSchedule: CalendarEvent): void;
 }) {
   const numVerticalCells = MINS_IN_DAY / verticalPrecision;
   const numHorizontalCells = 7 / horizontalPrecision;
@@ -114,16 +114,6 @@ export const TimeGridScheduler = React.memo(function TimeGridScheduler({
     pendingCreation,
     setPendingCreation
   ] = useState<RecurringTimeRange | null>(null);
-  const [
-    scheduleState,
-    {
-      set: setSchedule,
-      undo: undoSchedule,
-      redo: redoSchedule,
-      canUndo: canUndoSchedule,
-      canRedo: canRedoSchedule
-    }
-  ] = useUndo<CalendarEvent>(schedule);
 
   const { totalHeight, totalWidth } = useMemo(() => {
     let totalHeight: number | null = null;
@@ -163,62 +153,24 @@ export const TimeGridScheduler = React.memo(function TimeGridScheduler({
 
   useEffect(() => {
     if (hasFinishedDragging) {
-      setSchedule(mergeEvents(scheduleState.present, pendingCreation));
+      onChange(mergeEvents(schedule, pendingCreation));
       setPendingCreation(null);
     }
   }, [
     hasFinishedDragging,
-    setSchedule,
+    onChange,
     setPendingCreation,
     pendingCreation,
-    scheduleState.present
+    schedule
   ]);
-
-  useMousetrap(
-    'ctrl+z',
-    () => {
-      if (!canUndoSchedule) {
-        return;
-      }
-
-      undoSchedule();
-    },
-    document
-  );
-
-  useMousetrap(
-    'ctrl+shift+z',
-    () => {
-      if (!canRedoSchedule) {
-        return;
-      }
-
-      redoSchedule();
-    },
-    document
-  );
-
-  useMousetrap(
-    'esc',
-    () => {
-      if (pendingCreation) {
-        cancel();
-      }
-    },
-    document
-  );
-
-  useEffect(() => {
-    cancel();
-  }, [size]);
 
   const handleEventChange = useCallback<OnChangeCallback>(
     (newDateRange, rangeIndex) => {
-      if (!scheduleState.present && newDateRange) {
+      if (!schedule && newDateRange) {
         return [newDateRange];
       }
 
-      let newSchedule = [...scheduleState.present];
+      let newSchedule = [...schedule];
 
       if (!newDateRange) {
         newSchedule.splice(rangeIndex, 1);
@@ -234,10 +186,24 @@ export const TimeGridScheduler = React.memo(function TimeGridScheduler({
 
       newSchedule = mergeRanges(newSchedule);
 
-      setSchedule(newSchedule);
+      onChange(newSchedule);
     },
-    [scheduleState.present]
+    [schedule]
   );
+
+  useMousetrap(
+    'esc',
+    () => {
+      if (pendingCreation) {
+        cancel();
+      }
+    },
+    document
+  );
+
+  useEffect(() => {
+    cancel();
+  }, [size]);
 
   const getDateRangeForVisualGrid = useMemo(
     () =>
@@ -263,151 +229,129 @@ export const TimeGridScheduler = React.memo(function TimeGridScheduler({
       block: 'nearest',
       inline: 'nearest'
     });
-  }, [root.current, scheduleState.present]);
+  }, [root.current, schedule]);
 
   const numVisualVerticalCells = (24 * 60) / visualGridVerticalPrecision;
 
   return (
-    <>
-      <div className={classes['buttons-wrapper']}>
-        <button disabled={!canUndoSchedule} onClick={undoSchedule}>
-          ⟲ Undo
-        </button>
-        <button disabled={!canRedoSchedule} onClick={redoSchedule}>
-          Redo ⟳
-        </button>
-        <div>
-          Tip: use <Key>Delete</Key> key to remove time blocks. <Key>↑</Key> and{' '}
-          <Key>↓</Key> to move.
-        </div>
-      </div>
+    <div
+      ref={root}
+      className={classcat([
+        classes['root'],
+        { [classes['no-scroll']]: isDragging }
+      ])}
+    >
       <div
-        ref={root}
-        className={classcat([
-          classes['root'],
-          { [classes['no-scroll']]: isDragging }
-        ])}
+        style={timelineStickyStyle}
+        aria-hidden
+        className={classes['timeline']}
       >
-        <div
-          style={timelineStickyStyle}
-          aria-hidden
-          className={classes['timeline']}
-        >
-          <div className={classes['header']}>
-            <div className={classes['day-column']}>
-              <div className={classcat([classes['cell'], classes.title])}>
-                T
-              </div>
-            </div>
-          </div>
-          <div className={classes['calendar']}>
-            <div className={classes['day-column']}>
-              <div className={classes['day-hours']}>
-                {times(numVisualVerticalCells).map(timeIndex => {
-                  return (
-                    <Cell
-                      classes={classes}
-                      getDateRangeForVisualGrid={getDateRangeForVisualGrid}
-                      key={timeIndex}
-                      timeIndex={timeIndex}
-                    >
-                      {({ start, isHourStart }) => {
-                        if (isHourStart) {
-                          return (
-                            <div className={classes['time']}>
-                              {format(start, 'h a')}
-                            </div>
-                          );
-                        }
-
-                        return null;
-                      }}
-                    </Cell>
-                  );
-                })}
-              </div>
-            </div>
+        <div className={classes['header']}>
+          <div className={classes['day-column']}>
+            <div className={classcat([classes['cell'], classes.title])}>T</div>
           </div>
         </div>
-
-        <div>
-          <div
-            style={headerStickyStyle}
-            role="presentation"
-            className={classcat([classes['calendar'], classes.header])}
-          >
-            {times(7).map(i => (
-              <div
-                key={i}
-                role="presentation"
-                className={classes['day-column']}
-              >
-                <div className={classcat([classes['cell'], classes.title])}>
-                  {format(addDays(originDate, i), 'ddd')}
-                </div>
-              </div>
-            ))}
-          </div>
-          <div className={classes['layer-container']}>
-            {isDragging && (
-              <div className={classes['drag-box']} style={style}>
-                {hasFinishedDragging && <div className={classes['popup']} />}
-              </div>
-            )}
-            {grid && pendingCreation && isDragging && (
-              <Schedule
-                classes={classes}
-                dateRangeToCells={dateRangeToCells}
-                cellInfoToDateRange={cellInfoToSingleDateRange}
-                className={classes['is-pending-creation']}
-                ranges={mergeEvents(scheduleState.present, pendingCreation)}
-                grid={grid}
-                moveAxis="none"
-              />
-            )}
-            {grid && !pendingCreation && (
-              <Schedule
-                classes={classes}
-                dateRangeToCells={dateRangeToCells}
-                cellInfoToDateRange={cellInfoToSingleDateRange}
-                isResizable
-                moveAxis="y"
-                isDeletable
-                onChange={handleEventChange}
-                ranges={scheduleState.present}
-                grid={grid}
-              />
-            )}
-
-            <div ref={parent} role="grid" className={classes['calendar']}>
-              {times(7).map(dayIndex => {
+        <div className={classes['calendar']}>
+          <div className={classes['day-column']}>
+            <div className={classes['day-hours']}>
+              {times(numVisualVerticalCells).map(timeIndex => {
                 return (
-                  <div
-                    role="gridcell"
-                    key={dayIndex}
-                    className={classes['day-column']}
+                  <Cell
+                    classes={classes}
+                    getDateRangeForVisualGrid={getDateRangeForVisualGrid}
+                    key={timeIndex}
+                    timeIndex={timeIndex}
                   >
-                    <div className={classes['day-hours']}>
-                      {times(numVisualVerticalCells).map(timeIndex => {
+                    {({ start, isHourStart }) => {
+                      if (isHourStart) {
                         return (
-                          <Cell
-                            classes={classes}
-                            getDateRangeForVisualGrid={
-                              getDateRangeForVisualGrid
-                            }
-                            key={timeIndex}
-                            timeIndex={timeIndex}
-                          />
+                          <div className={classes['time']}>
+                            {format(start, 'h a')}
+                          </div>
                         );
-                      })}
-                    </div>
-                  </div>
+                      }
+
+                      return null;
+                    }}
+                  </Cell>
                 );
               })}
             </div>
           </div>
         </div>
       </div>
-    </>
+
+      <div>
+        <div
+          style={headerStickyStyle}
+          role="presentation"
+          className={classcat([classes['calendar'], classes.header])}
+        >
+          {times(7).map(i => (
+            <div key={i} role="presentation" className={classes['day-column']}>
+              <div className={classcat([classes['cell'], classes.title])}>
+                {format(addDays(originDate, i), 'ddd')}
+              </div>
+            </div>
+          ))}
+        </div>
+        <div className={classes['layer-container']}>
+          {isDragging && (
+            <div className={classes['drag-box']} style={style}>
+              {hasFinishedDragging && <div className={classes['popup']} />}
+            </div>
+          )}
+          {grid && pendingCreation && isDragging && (
+            <Schedule
+              classes={classes}
+              dateRangeToCells={dateRangeToCells}
+              cellInfoToDateRange={cellInfoToSingleDateRange}
+              className={classes['is-pending-creation']}
+              ranges={mergeEvents(schedule, pendingCreation)}
+              grid={grid}
+              moveAxis="none"
+            />
+          )}
+          {grid && !pendingCreation && (
+            <Schedule
+              classes={classes}
+              dateRangeToCells={dateRangeToCells}
+              cellInfoToDateRange={cellInfoToSingleDateRange}
+              isResizable
+              moveAxis="y"
+              isDeletable
+              onChange={handleEventChange}
+              ranges={schedule}
+              grid={grid}
+            />
+          )}
+
+          <div ref={parent} role="grid" className={classes['calendar']}>
+            {times(7).map(dayIndex => {
+              return (
+                <div
+                  role="gridcell"
+                  key={dayIndex}
+                  className={classes['day-column']}
+                >
+                  <div className={classes['day-hours']}>
+                    {times(numVisualVerticalCells).map(timeIndex => {
+                      return (
+                        <Cell
+                          classes={classes}
+                          getDateRangeForVisualGrid={getDateRangeForVisualGrid}
+                          key={timeIndex}
+                          timeIndex={timeIndex}
+                        />
+                      );
+                    })}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+    </div>
   );
 });
