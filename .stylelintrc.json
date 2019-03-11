@@ -4,7 +4,7 @@
     "stylelint-csstree-validator"
   ],
   "rules": {
-    "plugin/no-unsupported-browser-features": [true],
+    "plugin/no-unsupported-browser-features": [true, { "severity": "warning" }],
     "at-rule-no-vendor-prefix": [true],
     "media-feature-name-no-vendor-prefix": [true],
     "selector-no-vendor-prefix": [true],

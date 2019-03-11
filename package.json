@@ -82,7 +82,6 @@
   "husky": {
     "hooks": {
       "pre-commit": "npm-run-all -s lint-staged -p -c --aggregate-output pre-commit",
-      "pre-push": "yarn pre-push",
       "post-merge": "yarnhook",
       "post-checkout": "yarnhook",
       "post-rewrite": "yarnhook"
@@ -109,11 +108,13 @@
     "pre-commit": "yarn common-check",
     "lint-staged": "lint-staged",
     "check-prettier": "prettier './**/*.{t,j}s{,x}' '**/*.{css,scss,json,md}' --list-different",
-    "common-check": "run-p -c --aggregate-output check-prettier check-integrity",
+    "common-check": "run-p -c --aggregate-output lint check-prettier check-integrity",
     "check-integrity": "yarn check --integrity",
     "check-ts": "tsc --project . --noEmit",
     "lint-ts/eslint": "eslint '**/*.ts{,x}'",
+    "lint-scss": "stylelint '**/*.scss'",
     "lint-ts": "run-p -c --aggregate-output 'lint-ts/*'",
+    "lint": "run-p -c --aggregate-output lint-ts lint-scss",
     "analyze": "source-map-explorer 'build/static/js/*.js'",
     "start": "react-scripts start",
     "build": "react-scripts build",
@@ -124,7 +125,7 @@
     "run-prettier": "prettier --write '*.json' 'types/**/*.ts' 'src/**/*.ts{,x}' 'src/**/*.scss'"
   },
   "browserslist": [
-    ">0.2%",
+    ">0.5%",
     "not dead",
     "not ie <= 11",
     "not op_mini all"
