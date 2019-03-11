@@ -121,7 +121,7 @@ function App() {
           />
         </label>
         <label>
-          Cell width:
+          Preferred cell width:
           <input
             type="range"
             max={300}
