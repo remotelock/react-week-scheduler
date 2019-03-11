@@ -67,6 +67,8 @@ function App() {
     visualGridVerticalPrecision,
     setVisualGridVerticalPrecision
   ] = useState(30);
+  const [cellHeight, setCellHeight] = useState(50);
+  const [cellWidth, setCellWidth] = useState(250);
 
   return (
     <>
@@ -107,20 +109,53 @@ function App() {
             ))}
           </select>
         </label>
+        <label>
+          Cell height:
+          <input
+            type="range"
+            max={100}
+            step={10}
+            min={40}
+            value={cellHeight}
+            onChange={({ target: { value } }) => setCellHeight(Number(value))}
+          />
+        </label>
+        <label>
+          Cell width:
+          <input
+            type="range"
+            max={300}
+            step={25}
+            min={150}
+            value={cellWidth}
+            onChange={({ target: { value } }) => setCellWidth(Number(value))}
+          />
+        </label>
         <div>
           Tip: use <Key>Delete</Key> key to remove time blocks. <Key>↑</Key> and{' '}
           <Key>↓</Key> to move.
         </div>
       </div>
-      <TimeGridScheduler
-        key={visualGridVerticalPrecision}
-        classes={defaultStyleClasses}
-        originDate={startOfWeek(new Date('2019-03-04'), { weekStartsOn: 1 })}
-        schedule={scheduleState.present}
-        onChange={setSchedule}
-        verticalPrecision={verticalPrecision}
-        visualGridVerticalPrecision={visualGridVerticalPrecision}
-      />
+      <div
+        key={`${cellHeight},${cellWidth}`}
+        style={
+          {
+            maxWidth: cellWidth * 7,
+            '--cell-height': `${cellHeight}px`,
+            '--cell-width': `${cellWidth}px`
+          } as any
+        }
+      >
+        <TimeGridScheduler
+          key={visualGridVerticalPrecision}
+          classes={defaultStyleClasses}
+          originDate={startOfWeek(new Date('2019-03-04'), { weekStartsOn: 1 })}
+          schedule={scheduleState.present}
+          onChange={setSchedule}
+          verticalPrecision={verticalPrecision}
+          visualGridVerticalPrecision={visualGridVerticalPrecision}
+        />
+      </div>
     </>
   );
 }
