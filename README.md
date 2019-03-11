@@ -70,6 +70,7 @@ The following web platform features are used:
 - CSS `touch-action`
 - Touch Events
 - [CSS containement](https://developers.google.com/web/updates/2016/06/css-containment) (optional)
+- Custom CSS Properties (optional)
 
 ### Mobile Browser Support
 
