@@ -10,8 +10,22 @@ import 'resize-observer-polyfill/dist/ResizeObserver.global';
 import { TimeGridScheduler } from '@remotelock/react-week-scheduler';
 import defaultStyleClasses from '@remotelock/react-week-scheduler/styles';
 
+const rangeStrings = [
+  ['2019-03-03T22:45:00.000Z', '2019-03-04T01:15:00.000Z'],
+  ['2019-03-04T22:15:00.000Z', '2019-03-05T01:00:00.000Z'],
+  ['2019-03-05T22:00:00.000Z', '2019-03-06T01:00:00.000Z'],
+  ['2019-03-06T22:00:00.000Z', '2019-03-07T01:00:00.000Z'],
+  ['2019-03-07T05:30:00.000Z', '2019-03-07T10:00:00.000Z'],
+  ['2019-03-08T22:00:00.000Z', '2019-03-09T01:00:00.000Z'],
+  ['2019-03-09T22:00:00.000Z', '2019-03-10T01:00:00.000Z']
+];
+
+const defaultSchedule: CalendarEvent = rangeStrings.map(range =>
+  range.map(dateString => new Date(dateString))
+);
+
 function App() {
-  const [schedule, setSchedule] = useState(schedule);
+  const [schedule, setSchedule] = useState(defaultSchedule);
 
   return (
     <TimeGridScheduler

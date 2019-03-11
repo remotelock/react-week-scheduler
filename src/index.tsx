@@ -1,4 +1,4 @@
-import { compareAsc, startOfWeek } from 'date-fns';
+import { startOfWeek } from 'date-fns';
 import useUndo from 'use-undo';
 import React, { useState } from 'react';
 import ReactDOM from 'react-dom';
@@ -15,17 +15,19 @@ import demoClasses from './index.module.scss';
 
 const rangeStrings: [string, string][] = [
   ['2019-03-03T22:45:00.000Z', '2019-03-04T01:15:00.000Z'],
-  ['2019-03-05T22:00:00.000Z', '2019-03-06T01:00:00.000Z'],
   ['2019-03-04T22:15:00.000Z', '2019-03-05T01:00:00.000Z'],
+  ['2019-03-05T22:00:00.000Z', '2019-03-06T01:00:00.000Z'],
+  ['2019-03-06T22:00:00.000Z', '2019-03-07T01:00:00.000Z'],
   ['2019-03-07T05:30:00.000Z', '2019-03-07T10:00:00.000Z'],
   ['2019-03-08T22:00:00.000Z', '2019-03-09T01:00:00.000Z'],
-  ['2019-03-09T22:00:00.000Z', '2019-03-10T01:00:00.000Z'],
-  ['2019-03-06T22:00:00.000Z', '2019-03-07T01:00:00.000Z']
+  ['2019-03-09T22:00:00.000Z', '2019-03-10T01:00:00.000Z']
 ];
 
-const defaultSchedule: CalendarEvent = rangeStrings
-  .map(range => range.map(dateString => new Date(dateString)) as [Date, Date])
-  .sort((range1, range2) => compareAsc(range1[0], range2[0]));
+const defaultSchedule: CalendarEvent = rangeStrings.map(
+  range => range.map(dateString => new Date(dateString)) as [Date, Date]
+);
+
+console.log(defaultSchedule);
 
 function App() {
   const [
