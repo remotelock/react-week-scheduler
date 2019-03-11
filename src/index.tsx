@@ -11,6 +11,7 @@ import { TimeGridScheduler } from './components/TimeGridScheduler';
 import { Key } from './components/Key/Key';
 import useMousetrap from './hooks/useMousetrap';
 import defaultStyleClasses from './styles';
+import demoClasses from './index.module.scss';
 
 const rangeStrings: [string, string][] = [
   ['2019-03-03T22:45:00.000Z', '2019-03-04T01:15:00.000Z'],
@@ -72,7 +73,7 @@ function App() {
 
   return (
     <>
-      <div className={defaultStyleClasses['buttons-wrapper']}>
+      <div className={demoClasses['buttons-wrapper']}>
         <button disabled={!canUndoSchedule} onClick={undoSchedule}>
           ⟲ Undo
         </button>
@@ -148,6 +149,7 @@ function App() {
       >
         <TimeGridScheduler
           key={visualGridVerticalPrecision}
+          className={demoClasses.root}
           classes={defaultStyleClasses}
           originDate={startOfWeek(new Date('2019-03-04'), { weekStartsOn: 1 })}
           schedule={scheduleState.present}

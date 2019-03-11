@@ -43,6 +43,7 @@ export const TimeGridScheduler = React.memo(function TimeGridScheduler({
   schedule,
   originDate = new Date(),
   classes,
+  className,
   onChange
 }: {
   originDate?: Date;
@@ -50,6 +51,7 @@ export const TimeGridScheduler = React.memo(function TimeGridScheduler({
   visualGridVerticalPrecision?: number;
   schedule: CalendarEvent;
   classes: Record<string, string>;
+  className?: string;
   onChange(newSchedule: CalendarEvent): void;
 }) {
   const numVerticalCells = MINS_IN_DAY / verticalPrecision;
@@ -242,6 +244,7 @@ export const TimeGridScheduler = React.memo(function TimeGridScheduler({
     <div
       ref={root}
       className={classcat([
+        className,
         classes['root'],
         { [classes['no-scroll']]: isDragging }
       ])}
