@@ -11,7 +11,7 @@ export type ScheduleProps = {
   moveAxis: 'none' | 'both' | 'x' | 'y';
   isBeingEdited?(cell: CellInfo): boolean;
   cellInfoToDateRange(cell: CellInfo): DateRange;
-  onActiveChange?(...args: [number, number] | [number, null]): void;
+  onActiveChange?(index: [number, number] | [null, null]): void;
 };
 
 export const Schedule = React.memo(function Schedule({

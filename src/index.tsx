@@ -27,8 +27,6 @@ const defaultSchedule: CalendarEvent = rangeStrings.map(
   range => range.map(dateString => new Date(dateString)) as [Date, Date]
 );
 
-console.log(defaultSchedule);
-
 function App() {
   const [
     scheduleState,

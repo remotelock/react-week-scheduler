@@ -29,7 +29,6 @@ export const RangeBox = React.memo(function RangeBox({
   onChange,
   cellInfoToDateRange,
   isResizable,
-  isDeletable,
   moveAxis,
   onActiveChange
 }: ScheduleProps & {
@@ -54,16 +53,6 @@ export const RangeBox = React.memo(function RangeBox({
   const modifiedDateRange = useMemo(() => cellInfoToDateRange(modifiedCell), [
     modifiedCell
   ]);
-
-  const handleDelete = useCallback(() => {
-    if (!isDeletable) {
-      return;
-    }
-
-    onChange && onChange(undefined, rangeIndex);
-  }, [ref.current, onChange, isDeletable, rangeIndex]);
-
-  useMousetrap('del', handleDelete, ref.current);
 
   const { top, left, width, height } = rect;
 
@@ -212,12 +201,8 @@ export const RangeBox = React.memo(function RangeBox({
   );
 
   const handleOnFocus = useCallback(() => {
-    onActiveChange && onActiveChange(rangeIndex, cellIndex);
-  }, [onActiveChange]);
-
-  const handleOnBlur = useCallback(() => {
-    onActiveChange && onActiveChange(rangeIndex, null);
-  }, [onActiveChange]);
+    onActiveChange && onActiveChange([rangeIndex, cellIndex]);
+  }, [onActiveChange, rangeIndex, cellIndex]);
 
   return (
     <Draggable
@@ -235,7 +220,6 @@ export const RangeBox = React.memo(function RangeBox({
     >
       <button
         onFocus={handleOnFocus}
-        onBlur={handleOnBlur}
         className={classcat([
           classes['event'],
           classes['button-reset'],

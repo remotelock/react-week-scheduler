@@ -212,6 +212,20 @@ export const TimeGridScheduler = React.memo(function TimeGridScheduler({
     document
   );
 
+  const [[activeRangeIndex], setActive] = useState<
+    [number, number] | [null, null]
+  >([null, null]);
+
+  const handleDelete = useCallback(() => {
+    if (activeRangeIndex === null) {
+      return;
+    }
+
+    handleEventChange(undefined, activeRangeIndex);
+  }, [activeRangeIndex, handleEventChange]);
+
+  useMousetrap('del', handleDelete, root.current);
+
   useEffect(() => {
     cancel();
   }, [size]);
@@ -240,11 +254,12 @@ export const TimeGridScheduler = React.memo(function TimeGridScheduler({
       block: 'nearest',
       inline: 'nearest'
     });
-  }, [root.current, schedule]);
+  }, [root.current, document.activeElement, schedule]);
 
   return (
     <div
       ref={root}
+      onBlur={() => setActive([null, null])}
       style={style}
       className={classcat([
         className,
@@ -326,6 +341,7 @@ export const TimeGridScheduler = React.memo(function TimeGridScheduler({
           {grid && !pendingCreation && (
             <Schedule
               classes={classes}
+              onActiveChange={setActive}
               dateRangeToCells={dateRangeToCells}
               cellInfoToDateRange={cellInfoToSingleDateRange}
               isResizable
