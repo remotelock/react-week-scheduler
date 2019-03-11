@@ -143,7 +143,6 @@ function App() {
         key={`${cellHeight},${cellWidth}`}
         style={
           {
-            maxWidth: cellWidth * 7,
             '--cell-height': `${cellHeight}px`,
             '--cell-width': `${cellWidth}px`
           } as any
