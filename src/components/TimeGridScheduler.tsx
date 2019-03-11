@@ -40,6 +40,7 @@ const toX = (days: number) => days / horizontalPrecision;
 export const TimeGridScheduler = React.memo(function TimeGridScheduler({
   verticalPrecision = 30,
   visualGridVerticalPrecision = 30,
+  style,
   schedule,
   originDate = new Date(),
   classes,
@@ -49,6 +50,7 @@ export const TimeGridScheduler = React.memo(function TimeGridScheduler({
   originDate?: Date;
   verticalPrecision?: number;
   visualGridVerticalPrecision?: number;
+  style?: React.CSSProperties;
   schedule: CalendarEvent;
   classes: Record<string, string>;
   className?: string;
@@ -105,7 +107,7 @@ export const TimeGridScheduler = React.memo(function TimeGridScheduler({
 
   const size = useComponentSize(parent);
   const {
-    style,
+    style: dragBoxStyle,
     box,
     isDragging,
     hasFinishedDragging,
@@ -243,6 +245,7 @@ export const TimeGridScheduler = React.memo(function TimeGridScheduler({
   return (
     <div
       ref={root}
+      style={style}
       className={classcat([
         className,
         classes['root'],
@@ -305,7 +308,7 @@ export const TimeGridScheduler = React.memo(function TimeGridScheduler({
         </div>
         <div className={classes['layer-container']}>
           {isDragging && (
-            <div className={classes['drag-box']} style={style}>
+            <div className={classes['drag-box']} style={dragBoxStyle}>
               {hasFinishedDragging && <div className={classes['popup']} />}
             </div>
           )}
