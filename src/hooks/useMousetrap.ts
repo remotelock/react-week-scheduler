@@ -1,8 +1,6 @@
 import mousetrap from 'mousetrap';
 import { useEffect, useRef } from 'react';
 
-const weakMap = new WeakMap<typeof document | Element, MousetrapInstance>();
-
 /**
  * Use mousetrap hook
  *
@@ -22,14 +20,7 @@ export default function useMousetrap(
       return;
     }
 
-    let instance = weakMap.get(element);
-
-    if (!instance) {
-      instance = new Mousetrap(element as Element);
-      weakMap.set(element, instance);
-    }
-
-    instance.bind(handlerKey, () => {
+    Mousetrap(element as Element).bind(handlerKey, () => {
       typeof actionRef.current === 'function' && actionRef.current();
     });
 
