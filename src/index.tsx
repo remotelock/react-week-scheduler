@@ -80,7 +80,7 @@ function App() {
           Redo ⟳
         </button>
         <label>
-          Vertical increments:
+          Precision:
           <select
             value={verticalPrecision}
             onChange={({ target: { value } }) =>
@@ -95,7 +95,7 @@ function App() {
           </select>
         </label>
         <label>
-          Visual vertical increments:
+          Grid increments:
           <select
             value={visualGridVerticalPrecision}
             onChange={({ target: { value } }) =>
