@@ -12,6 +12,7 @@ html {
 
 .buttons-wrapper {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   background: #fff8dc;
   height: 50px;
@@ -25,6 +26,9 @@ html {
     border-radius: 2px;
     font-size: 1.1rem;
     cursor: pointer;
+  }
+  > :last-child {
+    margin-left: auto;
   }
 }
 

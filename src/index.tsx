@@ -29,6 +29,7 @@ ReactDOM.render(
     originDate={startOfWeek(new Date('2019-03-04'), { weekStartsOn: 1 })}
     schedule={defaultSchedule}
     verticalPrecision={15}
+    visualGridVerticalPrecision={30}
   />,
   rootElement
 );
