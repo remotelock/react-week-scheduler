@@ -57,6 +57,13 @@ The following web platform features are used:
 - Touch Events
 - [CSS containement](https://developers.google.com/web/updates/2016/06/css-containment) (optional)
 
+### Mobile Browser Support
+
+Touch events are handled properly, with a 300ms delay on the initial touch start event to allow for scrolling.
+
+The component should work fine on any modern mobile browser. However, due to lack of support for `touch-action: none`
+on iOS Safari, dragging or resizing time blocks may not work very well.
+
 ## Known Issues
 
 - Resizing time blocks does not currently work on Firefox.
