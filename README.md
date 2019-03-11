@@ -6,6 +6,7 @@
 
 ```jsx
 import React, { useState } from 'react';
+import 'resize-observer-polyfill/dist/ResizeObserver.global';
 import { TimeGridScheduler } from '@remotelock/react-week-scheduler';
 import defaultStyleClasses from '@remotelock/react-week-scheduler/styles';
 

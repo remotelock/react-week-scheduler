@@ -10,7 +10,6 @@ import React, {
   useRef,
   useState
 } from 'react';
-import 'resize-observer-polyfill/dist/ResizeObserver.global';
 import scrollIntoView from 'scroll-into-view-if-needed';
 import { useClickAndDrag } from '../hooks/useClickAndDrag';
 import useMousetrap from '../hooks/useMousetrap';
