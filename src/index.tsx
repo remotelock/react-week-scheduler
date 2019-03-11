@@ -4,14 +4,15 @@ import React, { useState } from 'react';
 import ReactDOM from 'react-dom';
 // @ts-ignore
 import humanizeDuration from 'humanize-duration';
+import CustomProperties from 'react-custom-properties';
 import 'resize-observer-polyfill/dist/ResizeObserver.global';
 
 import { Event as CalendarEvent } from './types';
 import { TimeGridScheduler } from './components/TimeGridScheduler';
-import { Key } from './components/Key/Key';
+import { Key } from './demo/components/Key/Key';
 import useMousetrap from './hooks/useMousetrap';
 import defaultStyleClasses from './styles';
-import demoClasses from './index.module.scss';
+import demoClasses from './demo/index.module.scss';
 
 const rangeStrings: [string, string][] = [
   ['2019-03-03T22:45:00.000Z', '2019-03-04T01:15:00.000Z'],
@@ -137,14 +138,13 @@ function App() {
           <Key>↓</Key> to move.
         </div>
       </div>
-      <div
+      <CustomProperties
         key={`${cellHeight},${cellWidth}`}
-        style={
-          {
-            '--cell-height': `${cellHeight}px`,
-            '--cell-width': `${cellWidth}px`
-          } as any
-        }
+        global={false}
+        properties={{
+          '--cell-height': `${cellHeight}px`,
+          '--cell-width': `${cellWidth}px`
+        }}
       >
         <TimeGridScheduler
           key={visualGridVerticalPrecision}
@@ -156,7 +156,7 @@ function App() {
           verticalPrecision={verticalPrecision}
           visualGridVerticalPrecision={visualGridVerticalPrecision}
         />
-      </div>
+      </CustomProperties>
     </>
   );
 }

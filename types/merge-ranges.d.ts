@@ -1,2 +1,1 @@
-export = index;
-declare function index(ranges: [Date, Date][]): any;
+export default function index(ranges: [Date, Date][]): [Date, Date][];

@@ -251,14 +251,14 @@ export const RangeBox = React.memo(function RangeBox({
               : {}
           }
           handleClasses={{
-            bottom: classcat([classes['handle'], classes.bottom]),
-            bottomLeft: classcat([classes['handle'], classes['bottom-left']]),
-            bottomRight: classcat([classes['handle'], classes['bottom-right']]),
-            left: classcat([classes['handle'], classes.left]),
-            right: classcat([classes['handle'], classes.right]),
-            top: classcat([classes['handle'], classes.top]),
-            topLeft: classcat([classes['handle'], classes['top-left']]),
-            topRight: classcat([classes['handle'], classes['top-right']])
+            bottom: classcat([classes.handle, classes.bottom]),
+            bottomLeft: classcat([classes.handle, classes['bottom-left']]),
+            bottomRight: classcat([classes.handle, classes['bottom-right']]),
+            left: classcat([classes.handle, classes.left]),
+            right: classcat([classes.handle, classes.right]),
+            top: classcat([classes.handle, classes.top]),
+            topLeft: classcat([classes.handle, classes['top-left']]),
+            topRight: classcat([classes.handle, classes['top-right']])
           }}
         >
           <div
