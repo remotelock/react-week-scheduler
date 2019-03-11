@@ -150,6 +150,7 @@ html {
 }
 
 .is-draggable {
+  user-select: none;
   cursor: grab;
 }
 
