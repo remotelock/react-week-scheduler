@@ -18,6 +18,7 @@
   "dependencies": {
     "@reach/visually-hidden": "^0.1.2",
     "@rehooks/component-size": "^1.0.2",
+    "scroll-into-view-if-needed": "^2.2.20",
     "classcat": "^3.2.5",
     "date-fns": "^1.30.1",
     "eslint-config-airbnb": "^17.1.0",
@@ -31,18 +32,15 @@
     "mousetrap": "^1.6.3",
     "re-resizable": "^4.11.0",
     "react-draggable": "^3.2.1",
-    "react-hook-mousetrap": "^2.0.2",
-    "react-spring": "7.2.10",
-    "rxjs": "^6.4.0",
-    "use-undo": "^1.0.0"
+    "rxjs": "^6.4.0"
   },
   "peerDependencies": {
     "react": "^16.8.4",
     "react-dom": "^16.8.4",
-    "resize-observer-polyfill": "^1.5.1",
-    "scroll-into-view-if-needed": "^2.2.20"
+    "resize-observer-polyfill": "^1.5.1"
   },
   "devDependencies": {
+    "use-undo": "^1.0.0",
     "@commitlint/cli": "^7.5.2",
     "@types/invariant": "^2.2.29",
     "@types/jest": "^24.0.9",
@@ -100,11 +98,5 @@
     "run-prettier": "prettier --write '*.json' 'types/**/*.ts' 'src/**/*.ts{,x}' 'src/**/*.scss'",
     "semantic-release": "semantic-release",
     "commitlint": "commitlint -e $GIT_PARAMS"
-  },
-  "browserslist": [
-    ">0.5%",
-    "not dead",
-    "not ie <= 11",
-    "not op_mini all"
-  ]
+  }
 }
