@@ -1,13 +1,13 @@
 language: node_js
 
-script: yarn && yarn test && yarn build
+script: yarn && yarn test && yarn build-package
 
 deploy:
   provider: script
   skip_cleanup: true
   script:
     - yarn run semantic-release-pre
-    - yarn publish build/
+    - yarn publish dist/
     - yarn run semantic-release-post
 
 cache: yarn
