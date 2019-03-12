@@ -105,6 +105,7 @@
     "rollup": "NODE_ENV=production rollup -c rollup.config.js",
     "types": "yarn tsc -p ./tsconfig.types.json",
     "clean": "rm -rf index.js index.jsm index.d.ts index.css",
+    "build/demo": "parcel build demo/index.html --public-url /react-week-scheduler",
     "build": "npm-run-all -s clean -p --aggregate-output types rollup",
     "predeploy/demo": "yarn build/demo",
     "deploy/demo": "gh-pages -d dist",
