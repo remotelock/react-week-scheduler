@@ -1,18 +1,18 @@
-import React, { useState, useEffect, useCallback } from 'react';
 import { isEqual } from 'lodash';
+import React, { useCallback, useEffect, useState } from 'react';
 import { fromEvent, merge, of } from 'rxjs';
 import {
-  tap,
-  map,
-  takeUntil,
-  mergeMap,
-  startWith,
+  delay,
   distinctUntilChanged,
   filter,
-  delay,
+  map,
+  mergeMap,
+  startWith,
+  takeUntil,
+  tap,
 } from 'rxjs/operators';
-import { createPageMapCoordsToContainer } from '../utils/createPageMapCoordsToContainer';
 import { Rect } from '../types';
+import { createPageMapCoordsToContainer } from '../utils/createPageMapCoordsToContainer';
 
 const prevent = tap((e: TouchEvent) => {
   e.preventDefault();
@@ -28,9 +28,9 @@ export function useClickAndDrag(ref: React.RefObject<HTMLElement>) {
   const [box, setBox] = useState<Rect | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [hasFinishedDragging, setHasFinishedDragging] = useState(false);
+  const container = ref.current;
 
   useEffect(() => {
-    const container = ref.current;
     if (!container) {
       return;
     }
@@ -139,7 +139,7 @@ export function useClickAndDrag(ref: React.RefObject<HTMLElement>) {
       boxSubscriber.unsubscribe();
       styleSubscriber.unsubscribe();
     };
-  }, [ref.current]);
+  }, [container]);
 
   const cancel = useCallback(() => {
     setIsDragging(false);

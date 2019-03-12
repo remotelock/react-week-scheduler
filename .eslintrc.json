@@ -18,9 +18,11 @@
       "jsx": true
     }
   },
-  "plugins": ["react", "compat", "css-modules"],
+  "plugins": ["react", "compat", "css-modules", "react-hooks"],
   "rules": {
     "@typescript-eslint/no-var-requires": ["off"],
+    "react-hooks/rules-of-hooks": "error",
+    "react-hooks/exhaustive-deps": "warn",
     "max-len": ["error", 120],
     "max-depth": ["error", 4],
     "arrow-body-style": ["off"],

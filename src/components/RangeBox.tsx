@@ -52,6 +52,7 @@ export const RangeBox = React.memo(function RangeBox({
 
   const modifiedDateRange = useMemo(() => cellInfoToDateRange(modifiedCell), [
     modifiedCell,
+    cellInfoToDateRange,
   ]);
 
   const { top, left, width, height } = rect;
@@ -167,7 +168,7 @@ export const RangeBox = React.memo(function RangeBox({
 
       setModifiedCell(newCell);
     },
-    [grid, rect, moveAxis, setModifiedCell],
+    [grid, rect, moveAxis, cell, setModifiedCell],
   );
 
   const handleResize: ResizeCallback = useCallback(
@@ -209,7 +210,7 @@ export const RangeBox = React.memo(function RangeBox({
 
       setModifiedCell(newCell);
     },
-    [grid, rect, isResizable, setModifiedCell, originalRect],
+    [grid, rect, cell, isResizable, setModifiedCell, originalRect],
   );
 
   const handleOnFocus = useCallback(() => {

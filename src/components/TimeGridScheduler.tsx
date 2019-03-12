@@ -61,7 +61,9 @@ export const TimeGridScheduler = React.memo(function TimeGridScheduler({
   const toMin = useCallback((y: number) => y * verticalPrecision, [
     verticalPrecision,
   ]);
-  const toY = (mins: number): number => mins / verticalPrecision;
+  const toY = useCallback((mins: number): number => mins / verticalPrecision, [
+    verticalPrecision,
+  ]);
 
   const cellInfoToDateRanges = useMemo(
     () =>
@@ -70,7 +72,7 @@ export const TimeGridScheduler = React.memo(function TimeGridScheduler({
         fromY: toMin,
         fromX: toDay,
       }),
-    [toMin, toDay, originDate],
+    [toMin, originDate],
   );
 
   const cellInfoToSingleDateRange = useCallback(
@@ -97,7 +99,7 @@ export const TimeGridScheduler = React.memo(function TimeGridScheduler({
         toX,
         toY,
       }),
-    [toY, toX, numVerticalCells, numHorizontalCells, originDate],
+    [toY, numVerticalCells, numHorizontalCells, originDate],
   );
 
   const root = useRef<HTMLDivElement | null>(null);
@@ -118,13 +120,20 @@ export const TimeGridScheduler = React.memo(function TimeGridScheduler({
     setPendingCreation,
   ] = useState<RecurringTimeRange | null>(null);
 
-  const [totalHeight, totalWidth] = useMemo(() => {
-    if (parent.current !== null) {
-      return [parent.current.scrollHeight, parent.current.scrollWidth];
+  const currentParent = parent.current;
+  const currentRoot = root.current;
+
+  const [[totalHeight, totalWidth], setDimensions] = useState<
+    [null, null] | [number, number]
+  >([null, null]);
+
+  useEffect(() => {
+    if (currentParent !== null) {
+      setDimensions([currentParent.scrollHeight, currentParent.scrollWidth]);
     }
 
-    return [null, null];
-  }, [parent.current, size]);
+    return setDimensions([null, null]);
+  }, [currentParent, size]);
 
   const numVisualVerticalCells = (24 * 60) / visualGridVerticalPrecision;
 
@@ -139,13 +148,7 @@ export const TimeGridScheduler = React.memo(function TimeGridScheduler({
       numHorizontalCells,
       numVerticalCells,
     });
-  }, [
-    totalHeight,
-    totalWidth,
-    numHorizontalCells,
-    numVerticalCells,
-    numVisualVerticalCells,
-  ]);
+  }, [totalHeight, totalWidth, numHorizontalCells, numVerticalCells]);
 
   useEffect(() => {
     if (grid === null || box === null) {
@@ -158,7 +161,7 @@ export const TimeGridScheduler = React.memo(function TimeGridScheduler({
     const dateRanges = cellInfoToDateRanges(cell);
     const event = dateRanges;
     setPendingCreation(event);
-  }, [box, grid, setPendingCreation]);
+  }, [box, grid, cellInfoToDateRanges, setPendingCreation]);
 
   useEffect(() => {
     if (hasFinishedDragging) {
@@ -199,7 +202,7 @@ export const TimeGridScheduler = React.memo(function TimeGridScheduler({
 
       onChange(newSchedule);
     },
-    [schedule],
+    [schedule, onChange],
   );
 
   useMousetrap(
@@ -224,11 +227,11 @@ export const TimeGridScheduler = React.memo(function TimeGridScheduler({
     handleEventChange(undefined, activeRangeIndex);
   }, [activeRangeIndex, handleEventChange]);
 
-  useMousetrap('del', handleDelete, root.current);
+  useMousetrap('del', handleDelete, currentRoot);
 
   useEffect(() => {
     cancel();
-  }, [size]);
+  }, [size, cancel]);
 
   const getDateRangeForVisualGrid = useMemo(
     () =>
@@ -237,7 +240,7 @@ export const TimeGridScheduler = React.memo(function TimeGridScheduler({
         fromX: toDay,
         fromY: y => y * visualGridVerticalPrecision,
       }),
-    [visualGridVerticalPrecision, toDay, originDate],
+    [visualGridVerticalPrecision, originDate],
   );
 
   useEffect(() => {
@@ -245,7 +248,7 @@ export const TimeGridScheduler = React.memo(function TimeGridScheduler({
       return;
     }
 
-    if (!root.current || !root.current.contains(document.activeElement)) {
+    if (!currentRoot || !currentRoot.contains(document.activeElement)) {
       return;
     }
 
@@ -254,7 +257,7 @@ export const TimeGridScheduler = React.memo(function TimeGridScheduler({
       block: 'nearest',
       inline: 'nearest',
     });
-  }, [root.current, document.activeElement, schedule]);
+  }, [currentRoot, schedule]);
 
   return (
     <div

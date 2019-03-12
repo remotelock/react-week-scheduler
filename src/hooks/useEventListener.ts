@@ -10,23 +10,25 @@ export function useEventListener<
   options?: boolean | AddEventListenerOptions,
   { enabled = true } = {},
 ) {
+  const { current } = ref;
+
   useEffect(() => {
-    if (ref.current === null) {
+    if (current === null) {
       return;
     }
 
     if (enabled) {
-      ref.current.addEventListener(event, listener, options);
+      current.addEventListener(event, listener, options);
     } else if (listener) {
-      ref.current.removeEventListener(event, listener);
+      current.removeEventListener(event, listener);
     }
 
     return () => {
-      if (!ref.current) {
+      if (!current) {
         return;
       }
 
-      ref.current.removeEventListener(event, listener);
+      current.removeEventListener(event, listener);
     };
-  }, [ref.current, listener, options, enabled]);
+  }, [current, event, listener, options, enabled]);
 }

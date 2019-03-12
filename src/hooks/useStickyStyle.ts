@@ -16,7 +16,7 @@ export function useStickyStyle(
       }px)`,
       zIndex: 3,
     }),
-    [left ? scrollLeft : 0, top ? scrollTop : 0],
+    [left, scrollLeft, top, scrollTop],
   );
 
   return stickyStyle;
