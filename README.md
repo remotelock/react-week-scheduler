@@ -4,6 +4,8 @@
 
 [Demo](https://remotelock.github.io/react-week-scheduler/)
 
+[![Edit mmj3xzk4x](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/mmj3xzk4x?fontsize=14)
+
 ## Installation
 
 ```
