@@ -1,17 +1,16 @@
-language: node_js
-
-script: yarn && yarn test && yarn build-package
-
-deploy:
-  provider: script
-  skip_cleanup: true
-  script:
-    - yarn run semantic-release-pre
-    - cp package.json README.md ./dist
-    - yarn publish dist/
-    - yarn run semantic-release-post
-
 cache: yarn
 
 notifications:
   email: false
+
+jobs:
+  include:
+    - stage: release
+      node_js: lts/*
+      script:
+        - yarn build
+      deploy:
+        provider: script
+        skip_cleanup: true
+        script:
+          - npx semantic-release
