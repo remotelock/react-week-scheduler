@@ -106,7 +106,7 @@
     "types": "yarn tsc -p ./tsconfig.types.json",
     "clean": "rm -rf index.js index.jsm index.d.ts index.css",
     "build": "npm-run-all -s clean -p --aggregate-output types rollup",
-    "predeploy/demo": "yarn build",
+    "predeploy/demo": "yarn build/demo",
     "deploy/demo": "gh-pages -d dist",
     "run-prettier": "prettier --write '*.json' 'types/**/*.ts' 'src/**/*.ts{,x}' 'src/**/*.scss'",
     "semantic-release": "semantic-release",
