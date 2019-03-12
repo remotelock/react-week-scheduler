@@ -118,5 +118,8 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/forabi/react-week-scheduler.git"
+  },
+  "engines": {
+    "node": "^10.11.0"
   }
 }
