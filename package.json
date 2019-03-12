@@ -1,6 +1,6 @@
 {
   "name": "@remotelock/react-week-scheduler",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "",
   "homepage": "https://remotelock.github.io/react-week-scheduler/",
   "private": false,
@@ -102,6 +102,7 @@
     "analyze": "source-map-explorer 'dist/*.js'",
     "start": "react-scripts start",
     "build-package": "NODE_ENV=production rollup -c rollup.config.js",
+    "types": "yarn tsc",
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject",

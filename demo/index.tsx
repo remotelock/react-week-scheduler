@@ -10,8 +10,8 @@ import 'resize-observer-polyfill/dist/ResizeObserver.global';
 import useUndo from 'use-undo';
 import { TimeGridScheduler } from '../components/TimeGridScheduler';
 import useMousetrap from '../hooks/useMousetrap';
-import defaultStyleClasses from '../styles';
-import { ScheduleType } from '../types';
+import defaultStyleClasses from '../src/styles';
+import { ScheduleType } from '../src/types';
 import { Key } from './components/Key/Key';
 import demoClasses from './demo/index.module.scss';
 
