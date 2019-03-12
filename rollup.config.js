@@ -13,6 +13,7 @@ export default {
     postcss({
       modules: true,
       extract: true,
+      sourceMap: true,
     }),
     resolve({
       customResolveOptions: {

@@ -47,3 +47,4 @@ index.js
 index.mjs
 index.css
 .cache
+*.map

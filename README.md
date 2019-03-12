@@ -14,7 +14,7 @@ yarn add @remotelock/react-week-scheduler
 import React, { useState } from 'react';
 import 'resize-observer-polyfill/dist/ResizeObserver.global';
 import { TimeGridScheduler } from '@remotelock/react-week-scheduler';
-import classNames from '@remotelock/react-week-scheduler/styles.scss';
+import classNames from '@remotelock/react-week-scheduler/styles.css';
 
 const rangeStrings = [
   ['2019-03-03T22:45:00.000Z', '2019-03-04T01:15:00.000Z'],
@@ -35,7 +35,7 @@ function App() {
 
   return (
     <TimeGridScheduler
-      classes={defaultClassNamesStylesClassNames}
+      classes={classNames}
       originDate={new Date('2019-03-04')}
       schedule={schedule}
       onChange={setSchedule}
@@ -56,7 +56,7 @@ To use the default styles, import the default classes object and pass it to the 
 
 ```jsx
 import { TimeGridScheduler } from '@remotelock/react-week-scheduler';
-import classNames from '@remotelock/react-week-scheduler/styles.scss';
+import classNames from '@remotelock/react-week-scheduler/styles.css';
 
 function App() {
   return <TimeGridScheduler classes={classNames} {...otherProps} />;
