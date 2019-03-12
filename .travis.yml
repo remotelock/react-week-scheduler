@@ -8,13 +8,15 @@ jobs:
   include:
     - stage: release
       script:
-        - yarn --frozen-lockfile && yarn build
+        - yarn --frozen-lockfile && yarn build && yarn build/demo
       deploy:
         - provider: script
           skip_cleanup: true
           script: npx semantic-release
-        - provider: script
-          skip_cleanup: true
-          script: yarn deploy/demo
+        - provider: pages
+          github-token: $GH_TOKEN
+          skip-cleanup: true
+          local-dir: dist
+          keep-history: false
           on:
             branch: master
