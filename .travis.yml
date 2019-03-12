@@ -8,7 +8,7 @@ jobs:
   include:
     - stage: release
       script:
-        - yarn && yarn build
+        - yarn --frozen-lockfile && yarn build
       deploy:
         - provider: script
           skip_cleanup: true
