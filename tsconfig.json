@@ -19,5 +19,5 @@
     "jsx": "preserve",
     "isolatedModules": true
   },
-  "include": ["src", "types"]
+  "include": ["src", "demo", "types"]
 }
