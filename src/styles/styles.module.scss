@@ -200,7 +200,6 @@ html {
 
   &:not(.is-pending-creation) {
     &:focus,
-    &:focus-within,
     &:hover {
       --background: hsl(202, 100%, 30%);
       box-shadow: 0 1px 5px 1px hsla(202, 100%, 16%, 0.5),
@@ -208,8 +207,7 @@ html {
       z-index: 4;
     }
 
-    &:focus,
-    &:focus-within {
+    &:focus {
       --background: hsl(202, 100%, 40%);
     }
   }
