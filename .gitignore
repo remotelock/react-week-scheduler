@@ -44,6 +44,6 @@ build
 dist
 index.d.ts
 index.js
-index.m.js
+index.mjs
 index.css
 .cache
