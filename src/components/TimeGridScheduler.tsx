@@ -36,6 +36,7 @@ const MINS_IN_DAY = 24 * 60;
 const horizontalPrecision = 1;
 const toDay = (x: number): number => x * horizontalPrecision;
 const toX = (days: number): number => days / horizontalPrecision;
+const DELETE_KEYS = ['del', 'backspace'];
 
 export const TimeGridScheduler = React.memo(function TimeGridScheduler({
   verticalPrecision = 30,
@@ -224,7 +225,7 @@ export const TimeGridScheduler = React.memo(function TimeGridScheduler({
     handleEventChange(undefined, activeRangeIndex);
   }, [activeRangeIndex, handleEventChange]);
 
-  useMousetrap('del', handleDelete, root.current);
+  useMousetrap(DELETE_KEYS, handleDelete, root.current);
 
   useEffect(() => {
     cancel();
