@@ -42,8 +42,9 @@
   },
   "devDependencies": {
     "@babel/cli": "^7.2.3",
-    "@babel/core": "^7.3.4",
+    "@babel/core": "^7.0.0-0",
     "@babel/plugin-transform-runtime": "^7.3.4",
+    "@babel/preset-env": "^7.3.4",
     "@babel/preset-react": "^7.0.0",
     "@babel/preset-typescript": "^7.3.3",
     "@commitlint/cli": "^7.5.2",
@@ -106,7 +107,7 @@
     "clean": "rm -rf index.js index.jsm index.d.ts index.css",
     "build": "npm-run-all -s clean -p --aggregate-output types rollup",
     "predeploy/demo": "yarn build",
-    "deploy/demo": "gh-pages -d demo",
+    "deploy/demo": "gh-pages -d dist",
     "run-prettier": "prettier --write '*.json' 'types/**/*.ts' 'src/**/*.ts{,x}' 'src/**/*.scss'",
     "semantic-release": "semantic-release",
     "commitlint": "commitlint -e $GIT_PARAMS"
