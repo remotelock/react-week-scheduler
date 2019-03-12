@@ -1,6 +1,6 @@
 {
   "name": "@remotelock/react-week-scheduler",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "",
   "homepage": "https://remotelock.github.io/react-week-scheduler/",
   "private": false,
@@ -97,7 +97,7 @@
   "scripts": {
     "pre-commit": "yarn common-check",
     "lint-staged": "lint-staged",
-    "check-prettier": "prettier './**/*.{t,j}s{,x}' '**/*.{css,scss,json,md}' --list-different",
+    "check-prettier": "prettier '**/*.{t,j}s{,x}' '**/*.{css,scss,json,md}' --list-different",
     "common-check": "run-p -c --aggregate-output lint check-prettier check-integrity",
     "check-integrity": "yarn check --integrity",
     "check-ts": "tsc --project . --noEmit",
@@ -105,7 +105,7 @@
     "lint-scss": "stylelint '**/*.scss'",
     "lint-ts": "run-p -c --aggregate-output 'lint-ts/*'",
     "lint": "run-p -c --aggregate-output lint-ts lint-scss",
-    "analyze": "source-map-explorer 'build/static/js/*.js'",
+    "analyze": "source-map-explorer 'dist/*.js'",
     "start": "react-scripts start",
     "build-package": "NODE_ENV=production webpack",
     "build": "react-scripts build",

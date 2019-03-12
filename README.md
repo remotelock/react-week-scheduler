@@ -1,6 +1,12 @@
 # `@remotelock/react-week-scheduler`
 
+[Demo](https://remotelock.github.io/react-week-scheduler/)
+
 ## Installation
+
+```
+yarn add @remotelock/react-week-scheduler
+```
 
 ## Basic Usage
 

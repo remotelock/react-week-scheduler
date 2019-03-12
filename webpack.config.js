@@ -26,7 +26,7 @@ module.exports = {
     styles: path.resolve(__dirname, 'src/styles/index.tsx'),
   },
   output: {
-    path: path.resolve(__dirname, 'build'),
+    path: path.resolve(__dirname, 'dist'),
     filename: '[name].js',
     libraryTarget: 'commonjs',
   },
