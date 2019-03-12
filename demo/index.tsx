@@ -3,7 +3,7 @@
 import { startOfWeek } from 'date-fns';
 // @ts-ignore
 import humanizeDuration from 'humanize-duration';
-import React, { useState, Fragment } from 'react';
+import React, { Fragment, useState } from 'react';
 import CustomProperties from 'react-custom-properties';
 import ReactDOM from 'react-dom';
 import 'resize-observer-polyfill/dist/ResizeObserver.global';

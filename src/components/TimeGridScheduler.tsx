@@ -1,6 +1,6 @@
 import useComponentSize from '@rehooks/component-size';
 import classcat from 'classcat';
-import { addDays, format, isEqual } from 'date-fns';
+import { addDays, format, isEqual, startOfDay } from 'date-fns';
 import invariant from 'invariant';
 import { times } from 'lodash';
 import React, {
@@ -42,7 +42,7 @@ export const TimeGridScheduler = React.memo(function TimeGridScheduler({
   visualGridVerticalPrecision = 30,
   style,
   schedule,
-  originDate = new Date(),
+  originDate: _originDate = new Date(),
   classes,
   className,
   onChange,
@@ -56,6 +56,7 @@ export const TimeGridScheduler = React.memo(function TimeGridScheduler({
   className?: string;
   onChange(newSchedule: ScheduleType): void;
 }) {
+  const originDate = useMemo(() => startOfDay(_originDate), [_originDate]);
   const numVerticalCells = MINS_IN_DAY / verticalPrecision;
   const numHorizontalCells = 7 / horizontalPrecision;
   const toMin = useCallback((y: number) => y * verticalPrecision, [
