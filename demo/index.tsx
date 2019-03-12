@@ -8,12 +8,12 @@ import CustomProperties from 'react-custom-properties';
 import ReactDOM from 'react-dom';
 import 'resize-observer-polyfill/dist/ResizeObserver.global';
 import useUndo from 'use-undo';
-import { TimeGridScheduler } from '../components/TimeGridScheduler';
-import useMousetrap from '../hooks/useMousetrap';
+import { TimeGridScheduler } from '../src/components/TimeGridScheduler';
+import useMousetrap from '../src/hooks/useMousetrap';
 import defaultStyleClasses from '../src/styles';
 import { ScheduleType } from '../src/types';
 import { Key } from './components/Key/Key';
-import demoClasses from './demo/index.module.scss';
+import demoClasses from './index.module.scss';
 
 const rangeStrings: [string, string][] = [
   ['2019-03-03T22:45:00.000Z', '2019-03-04T01:15:00.000Z'],

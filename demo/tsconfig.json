@@ -1,0 +1,9 @@
+{
+  "compilerOptions": {
+    "jsx": "react",
+    "esModuleInterop": true,
+    "target": "es5",
+    "moduleResolution": "node"
+  },
+  "include": [".", "../src", "../types"]
+}

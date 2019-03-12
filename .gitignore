@@ -43,3 +43,4 @@ node_modules/
 build
 dist
 *.d.ts
+.cache

@@ -1,9 +1,6 @@
 {
   "compilerOptions": {
     "esModuleInterop": true,
-    "emitDeclarationOnly": true,
-    "declaration": true,
-    "outFile": "index.d.ts",
     "target": "esnext",
     "noUnusedLocals": true,
     "noUnusedParameters": true,
@@ -17,9 +14,7 @@
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "sourceMap": true,
-    "jsx": "preserve",
-    "isolatedModules": true,
-    "noEmit": true
+    "jsx": "preserve"
   },
   "include": ["src", "types"]
 }
