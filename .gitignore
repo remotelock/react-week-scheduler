@@ -42,5 +42,8 @@ node_modules/
 
 build
 dist
-*.d.ts
+index.d.ts
+index.js
+index.m.js
+index.css
 .cache
