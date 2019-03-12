@@ -217,13 +217,18 @@ export const TimeGridScheduler = React.memo(function TimeGridScheduler({
     [number, number] | [null, null]
   >([null, null]);
 
-  const handleDelete = useCallback(() => {
-    if (activeRangeIndex === null) {
-      return;
-    }
+  const handleDelete = useCallback(
+    (e: ExtendedKeyboardEvent) => {
+      if (activeRangeIndex === null) {
+        return;
+      }
 
-    handleEventChange(undefined, activeRangeIndex);
-  }, [activeRangeIndex, handleEventChange]);
+      e.preventDefault();
+      e.stopPropagation();
+      handleEventChange(undefined, activeRangeIndex);
+    },
+    [activeRangeIndex, handleEventChange],
+  );
 
   useMousetrap(DELETE_KEYS, handleDelete, root.current);
 

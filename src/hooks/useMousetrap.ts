@@ -9,7 +9,7 @@ import { useEffect, useRef } from 'react';
  */
 export default function useMousetrap(
   handlerKey: string | string[],
-  handlerCallback: () => void,
+  handlerCallback: (e: ExtendedKeyboardEvent, combo: string) => void,
   element: typeof document | Element | null,
 ) {
   const actionRef = useRef<typeof handlerCallback | null>(null);
@@ -20,8 +20,8 @@ export default function useMousetrap(
       return;
     }
 
-    Mousetrap(element as Element).bind(handlerKey, () => {
-      typeof actionRef.current === 'function' && actionRef.current();
+    Mousetrap(element as Element).bind(handlerKey, (e, combo) => {
+      typeof actionRef.current === 'function' && actionRef.current(e, combo);
     });
 
     return () => {
