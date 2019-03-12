@@ -123,6 +123,8 @@ export const TimeGridScheduler = React.memo(function TimeGridScheduler({
 
   const [[totalHeight, totalWidth], setDimensions] = useState([0, 0]);
 
+  const numVisualVerticalCells = (24 * 60) / visualGridVerticalPrecision;
+
   useEffect(() => {
     if (!parent.current) {
       setDimensions([0, 0]);
@@ -130,9 +132,7 @@ export const TimeGridScheduler = React.memo(function TimeGridScheduler({
     }
 
     setDimensions([parent.current.scrollHeight, parent.current.scrollWidth]);
-  }, [size]);
-
-  const numVisualVerticalCells = (24 * 60) / visualGridVerticalPrecision;
+  }, [size, numVisualVerticalCells]);
 
   const grid = useMemo<Grid | null>(() => {
     if (totalHeight === null || totalWidth === null) {

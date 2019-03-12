@@ -1,9 +1,9 @@
 /* eslint-disable import/no-extraneous-dependencies */
 
-import { startOfWeek } from 'date-fns';
+import { format, isSameWeek, setDay, startOfWeek } from 'date-fns';
 // @ts-ignore
 import humanizeDuration from 'humanize-duration';
-import React, { Fragment, useState } from 'react';
+import React, { Fragment, useMemo, useState } from 'react';
 import CustomProperties from 'react-custom-properties';
 import ReactDOM from 'react-dom';
 import 'resize-observer-polyfill/dist/ResizeObserver.global';
@@ -30,6 +30,14 @@ const defaultSchedule: ScheduleType = rangeStrings.map(
 );
 
 function App() {
+  const [weekStart, setWeekStart] = useState(1);
+  const originDate = useMemo(
+    () =>
+      startOfWeek(new Date('2019-03-04'), {
+        weekStartsOn: weekStart,
+      }),
+    [weekStart],
+  );
   const [
     scheduleState,
     {
@@ -39,7 +47,11 @@ function App() {
       canUndo: canUndoSchedule,
       canRedo: canRedoSchedule,
     },
-  ] = useUndo<ScheduleType>(defaultSchedule);
+  ] = useUndo<ScheduleType>(
+    defaultSchedule.filter(range =>
+      isSameWeek(originDate, range[0], { weekStartsOn: weekStart }),
+    ),
+  );
 
   useMousetrap(
     'ctrl+z',
@@ -107,6 +119,21 @@ function App() {
             ))}
           </select>
         </label>
+        <label style={{ display: 'none' }} htmlFor="start_of_week">
+          Start of week:
+          <select
+            name="start_of_week"
+            id="start_of_week"
+            value={weekStart}
+            onChange={({ target: { value } }) => setWeekStart(Number(value))}
+          >
+            {[0, 1, 2, 3, 4, 5, 6].map(value => (
+              <option key={value} value={value}>
+                {format(setDay(new Date(), value), 'ddd')}
+              </option>
+            ))}
+          </select>
+        </label>
         <label htmlFor="visual_grid_vertical_precision">
           Grid increments:
           <select
@@ -164,12 +191,10 @@ function App() {
       >
         <Fragment key={`${cellHeight},${cellWidth}`}>
           <TimeGridScheduler
-            key={visualGridVerticalPrecision}
+            key={originDate.toString()}
             className={demoClasses.root}
             classes={defaultStyleClasses}
-            originDate={startOfWeek(new Date('2019-03-04'), {
-              weekStartsOn: 1,
-            })}
+            originDate={originDate}
             schedule={scheduleState.present}
             onChange={setSchedule}
             verticalPrecision={verticalPrecision}

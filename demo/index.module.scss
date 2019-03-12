@@ -12,12 +12,13 @@ html {
 
 .buttons-wrapper {
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
   background: #fff8dc;
   height: 50px;
+  overflow-y: auto;
   > * {
     margin: 0 5px;
+    flex-shrink: 0;
   }
   button {
     appearance: none;
