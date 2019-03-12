@@ -8,3 +8,5 @@ public
 types
 .vscode
 *.log
+*.config.js
+.travis.yml

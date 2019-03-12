@@ -17,7 +17,9 @@
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "sourceMap": true,
-    "jsx": "preserve"
+    "jsx": "preserve",
+    "isolatedModules": true,
+    "noEmit": true
   },
   "include": ["src", "types"]
 }
