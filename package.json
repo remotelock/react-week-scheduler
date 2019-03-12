@@ -1,9 +1,9 @@
 {
-  "name": "@forabi/react-week-scheduler",
+  "name": "@remotelock/react-week-scheduler",
   "version": "0.0.0-development",
   "license": "MIT",
   "description": "",
-  "homepage": "https://forabi.github.io/react-week-scheduler/",
+  "homepage": "https://remotelock.github.io/react-week-scheduler/",
   "private": false,
   "sideEffects": false,
   "keywords": [
@@ -119,7 +119,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/forabi/react-week-scheduler.git"
+    "url": "https://github.com/remotelock/react-week-scheduler.git"
   },
   "engines": {
     "node": "^10.11.0"
