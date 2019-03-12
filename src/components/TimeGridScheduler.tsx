@@ -120,20 +120,16 @@ export const TimeGridScheduler = React.memo(function TimeGridScheduler({
     setPendingCreation,
   ] = useState<RecurringTimeRange | null>(null);
 
-  const currentParent = parent.current;
-  const currentRoot = root.current;
-
-  const [[totalHeight, totalWidth], setDimensions] = useState<
-    [null, null] | [number, number]
-  >([null, null]);
+  const [[totalHeight, totalWidth], setDimensions] = useState([0, 0]);
 
   useEffect(() => {
-    if (currentParent !== null) {
-      setDimensions([currentParent.scrollHeight, currentParent.scrollWidth]);
+    if (!parent.current) {
+      setDimensions([0, 0]);
+      return;
     }
 
-    return setDimensions([null, null]);
-  }, [currentParent, size]);
+    setDimensions([parent.current.scrollHeight, parent.current.scrollWidth]);
+  }, [size]);
 
   const numVisualVerticalCells = (24 * 60) / visualGridVerticalPrecision;
 
@@ -227,7 +223,7 @@ export const TimeGridScheduler = React.memo(function TimeGridScheduler({
     handleEventChange(undefined, activeRangeIndex);
   }, [activeRangeIndex, handleEventChange]);
 
-  useMousetrap('del', handleDelete, currentRoot);
+  useMousetrap('del', handleDelete, root.current);
 
   useEffect(() => {
     cancel();
@@ -248,7 +244,7 @@ export const TimeGridScheduler = React.memo(function TimeGridScheduler({
       return;
     }
 
-    if (!currentRoot || !currentRoot.contains(document.activeElement)) {
+    if (!root.current || !root.current.contains(document.activeElement)) {
       return;
     }
 
@@ -257,7 +253,7 @@ export const TimeGridScheduler = React.memo(function TimeGridScheduler({
       block: 'nearest',
       inline: 'nearest',
     });
-  }, [currentRoot, schedule]);
+  }, [schedule]);
 
   return (
     <div

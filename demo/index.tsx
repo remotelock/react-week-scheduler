@@ -3,7 +3,7 @@
 import { startOfWeek } from 'date-fns';
 // @ts-ignore
 import humanizeDuration from 'humanize-duration';
-import React, { useState } from 'react';
+import React, { useState, Fragment } from 'react';
 import CustomProperties from 'react-custom-properties';
 import ReactDOM from 'react-dom';
 import 'resize-observer-polyfill/dist/ResizeObserver.global';
@@ -156,23 +156,26 @@ function App() {
         </div>
       </div>
       <CustomProperties
-        key={`${cellHeight},${cellWidth}`}
         global={false}
         properties={{
           '--cell-height': `${cellHeight}px`,
           '--cell-width': `${cellWidth}px`,
         }}
       >
-        <TimeGridScheduler
-          key={visualGridVerticalPrecision}
-          className={demoClasses.root}
-          classes={defaultStyleClasses}
-          originDate={startOfWeek(new Date('2019-03-04'), { weekStartsOn: 1 })}
-          schedule={scheduleState.present}
-          onChange={setSchedule}
-          verticalPrecision={verticalPrecision}
-          visualGridVerticalPrecision={visualGridVerticalPrecision}
-        />
+        <Fragment key={`${cellHeight},${cellWidth}`}>
+          <TimeGridScheduler
+            key={visualGridVerticalPrecision}
+            className={demoClasses.root}
+            classes={defaultStyleClasses}
+            originDate={startOfWeek(new Date('2019-03-04'), {
+              weekStartsOn: 1,
+            })}
+            schedule={scheduleState.present}
+            onChange={setSchedule}
+            verticalPrecision={verticalPrecision}
+            visualGridVerticalPrecision={visualGridVerticalPrecision}
+          />
+        </Fragment>
       </CustomProperties>
     </>
   );
