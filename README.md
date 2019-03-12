@@ -1,5 +1,7 @@
 # `@remotelock/react-week-scheduler`
 
+![Travis (.org)](https://img.shields.io/travis/remotelock/react-week-scheduler.svg) ![npm](https://img.shields.io/npm/v/@remotelock/react-week-scheduler.svg)
+
 [Demo](https://remotelock.github.io/react-week-scheduler/)
 
 ## Installation
