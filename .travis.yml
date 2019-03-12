@@ -6,7 +6,9 @@ deploy:
   provider: script
   skip_cleanup: true
   script:
-    - yarn semantic-release
+    - yarn run semantic-release-pre
+    - yarn publish build/
+    - yarn run semantic-release-post
 
 cache: yarn
 

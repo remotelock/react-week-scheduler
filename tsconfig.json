@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "esModuleInterop": true,
+    "outDir": "build",
     "target": "esnext",
     "noUnusedLocals": true,
     "noUnusedParameters": true,
@@ -13,7 +14,7 @@
     "forceConsistentCasingInFileNames": true,
     "moduleResolution": "node",
     "resolveJsonModule": true,
-    "isolatedModules": true,
+    "sourceMap": true,
     "noEmit": true,
     "jsx": "preserve"
   },

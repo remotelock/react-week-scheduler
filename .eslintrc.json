@@ -20,6 +20,7 @@
   },
   "plugins": ["react", "compat", "css-modules"],
   "rules": {
+    "@typescript-eslint/no-var-requires": ["off"],
     "max-len": ["error", 120],
     "max-depth": ["error", 4],
     "arrow-body-style": ["off"],
