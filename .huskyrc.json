@@ -1,0 +1,9 @@
+{
+  "hooks": {
+    "commit-msg": "yarn commitlint",
+    "pre-commit": "npm-run-all -s lint-staged -p -c --aggregate-output pre-commit",
+    "post-merge": "yarnhook",
+    "post-checkout": "yarnhook",
+    "post-rewrite": "yarnhook"
+  }
+}

@@ -79,32 +79,6 @@
     "typescript": "^3.3.3333",
     "yarnhook": "^0.4.0"
   },
-  "husky": {
-    "hooks": {
-      "commit-msg": "yarn commitlint",
-      "pre-commit": "npm-run-all -s lint-staged -p -c --aggregate-output pre-commit",
-      "post-merge": "yarnhook",
-      "post-checkout": "yarnhook",
-      "post-rewrite": "yarnhook"
-    }
-  },
-  "lint-staged": {
-    "**/*.md": [
-      "prettier --write",
-      "git add"
-    ],
-    "**/*.{j,t}s{x,}": [
-      "prettier --write",
-      "git add"
-    ],
-    "**/*.json": [
-      "prettier --write",
-      "git add"
-    ],
-    "**/*.js{x,}": [
-      "eslint"
-    ]
-  },
   "scripts": {
     "pre-commit": "yarn common-check",
     "lint-staged": "lint-staged",
