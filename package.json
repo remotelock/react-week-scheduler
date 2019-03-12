@@ -1,6 +1,6 @@
 {
   "name": "@remotelock/react-week-scheduler",
-  "version": "1.0.7",
+  "version": "0.0.0-development",
   "description": "",
   "homepage": "https://remotelock.github.io/react-week-scheduler/",
   "private": false,
@@ -113,5 +113,9 @@
     "run-prettier": "prettier --write '*.json' 'types/**/*.ts' 'src/**/*.ts{,x}' 'src/**/*.scss'",
     "semantic-release": "semantic-release",
     "commitlint": "commitlint -e $GIT_PARAMS"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/remotelock/react-week-scheduler.git"
   }
 }
