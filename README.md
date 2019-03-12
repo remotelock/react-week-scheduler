@@ -42,7 +42,7 @@ function App() {
 
 `react-week-scheduler` ships with a set of default styles for convenience. The styles are compiled as [CSS Modules](https://github.com/css-modules/css-modules) class names. The components exported from the package do not import the styles by default. Instead, they expect a `classes` prop to be passed.
 
-To use the default styles uou need to have your bundler configured for CSS Modules. The class names need to be available at runtime as a regular JS object.
+To use the default styles you need to have your bundler configured for CSS Modules. The class names need to be available at runtime as a regular JS object.
 
 ### Using the default styles
 
