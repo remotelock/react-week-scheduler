@@ -8,9 +8,11 @@ jobs:
     - stage: release
       node_js: lts/*
       script:
-        - yarn build
+        - yarn && yarn build
       deploy:
-        provider: script
-        skip_cleanup: true
-        script:
-          - npx semantic-release
+        - provider: script
+          skip_cleanup: true
+          script: npx semantic-release
+        - provider: script
+          skip_cleanup: true
+          script: yarn deploy/demo
