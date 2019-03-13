@@ -235,7 +235,7 @@ export const RangeBox = React.memo(function RangeBox({
       classes.handle
         .split(' ')
         .map(className => `.${className}`)
-        .join(' '),
+        .join(', '),
     [classes.handle],
   );
 
