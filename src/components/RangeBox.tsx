@@ -233,7 +233,10 @@ export const RangeBox = React.memo(function RangeBox({
       position={{ x: left, y: top }}
       onDrag={handleDrag}
       onStop={handleStop}
-      cancel={`.${classes.handle}`}
+      cancel={classes.handle
+        .split(' ')
+        .map(className => `.${className}`)
+        .join(' ')}
     >
       <div
         role="button"
