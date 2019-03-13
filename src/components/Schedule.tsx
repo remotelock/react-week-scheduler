@@ -18,6 +18,7 @@ export type ScheduleProps = {
   isBeingEdited?(cell: CellInfo): boolean;
   cellInfoToDateRange(cell: CellInfo): DateRange;
   onActiveChange?(index: [number, number] | [null, null]): void;
+  onClick?(index: [number, number] | [null, null]): void;
 };
 
 export const Schedule = React.memo(function Schedule({

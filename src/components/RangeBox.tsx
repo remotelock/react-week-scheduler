@@ -31,6 +31,7 @@ export const RangeBox = React.memo(function RangeBox({
   isResizable,
   moveAxis,
   onActiveChange,
+  onClick,
 }: ScheduleProps & {
   cellIndex: number;
   cellArray: CellInfo[];
@@ -220,6 +221,14 @@ export const RangeBox = React.memo(function RangeBox({
 
     onActiveChange([rangeIndex, cellIndex]);
   }, [onActiveChange, rangeIndex, cellIndex]);
+
+  const handleOnClick = useCallback(() => {
+    if (!onClick) {
+      return;
+    }
+
+    onClick([rangeIndex, cellIndex]);
+  }, [onClick, rangeIndex, cellIndex]);
 
   return (
     <Draggable
