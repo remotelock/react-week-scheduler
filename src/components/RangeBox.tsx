@@ -230,6 +230,15 @@ export const RangeBox = React.memo(function RangeBox({
     onClick([rangeIndex, cellIndex]);
   }, [onClick, rangeIndex, cellIndex]);
 
+  const cancelClasses = useMemo(
+    () =>
+      classes.handle
+        .split(' ')
+        .map(className => `.${className}`)
+        .join(' '),
+    [classes.handle],
+  );
+
   return (
     <Draggable
       axis={moveAxis}
@@ -242,14 +251,12 @@ export const RangeBox = React.memo(function RangeBox({
       position={{ x: left, y: top }}
       onDrag={handleDrag}
       onStop={handleStop}
-      cancel={classes.handle
-        .split(' ')
-        .map(className => `.${className}`)
-        .join(' ')}
+      cancel={cancelClasses}
     >
       <div
         role="button"
         onFocus={handleOnFocus}
+        onClick={handleOnClick}
         className={classcat([
           classes.event,
           classes['button-reset'],
