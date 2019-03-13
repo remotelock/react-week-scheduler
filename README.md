@@ -78,8 +78,8 @@ However, [a _global_ polyfill for `ResizeObserver`](https://www.npmjs.com/packag
 The following web platform features are used:
 
 - Flexbox
-- CSS `pointer-events`
-- CSS `touch-action`
+- `touch-action: none`
+- `position: sticky`
 - Touch Events
 - [CSS containement](https://developers.google.com/web/updates/2016/06/css-containment) (optional)
 - Custom CSS Properties (optional)
@@ -90,7 +90,3 @@ Touch events are handled properly, with a 300ms delay on the initial touch start
 
 The component should work fine on any modern mobile browser. However, due to lack of support for `touch-action: none`
 on iOS Safari, dragging or resizing time blocks may not work very well.
-
-## Known Issues
-
-- Resizing time blocks does not currently work on Firefox.
