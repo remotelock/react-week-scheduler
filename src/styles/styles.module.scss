@@ -154,9 +154,9 @@ html {
   cursor: grab;
 }
 
-.is-draggable.react-draggable-dragging {
+.is-draggable:global(.react-draggable-dragging) {
   cursor: grabbing;
-  z-index: var(--z-index-dragging);
+  z-index: var(--z-index-dragging) !important;
 }
 
 .event {
@@ -178,7 +178,7 @@ html {
       --background: hsl(202, 100%, 30%);
       box-shadow: 0 1px 5px 1px hsla(202, 100%, 16%, 0.5),
         0 5px 10px 1px rgba(217, 217, 217, 0.5);
-      z-index: var(--z-index-event-is-pending-creation);
+      z-index: var(--z-index-event);
     }
 
     &:focus {
@@ -198,6 +198,7 @@ html {
   text-overflow: ellipsis;
 
   &.is-pending-creation {
+    z-index: var(--z-index-event-is-pending-creation);
     opacity: 0.75;
   }
 
