@@ -30,7 +30,7 @@
       "error",
       { "extensions": [".tsx", ".jsx"] }
     ],
-    "react/jsx-max-depth": ["error", { "max": 4 }],
+    "react/jsx-max-depth": ["error", { "max": 6 }],
     "react/no-array-index-key": ["off"],
     "react/no-access-state-in-setstate": "error",
     "react/no-children-prop": "error",

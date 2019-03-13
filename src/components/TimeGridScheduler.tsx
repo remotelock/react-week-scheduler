@@ -13,7 +13,6 @@ import React, {
 import scrollIntoView from 'scroll-into-view-if-needed';
 import { useClickAndDrag } from '../hooks/useClickAndDrag';
 import useMousetrap from '../hooks/useMousetrap';
-import { useStickyStyle } from '../hooks/useStickyStyle';
 import {
   CellInfo,
   DateRange,
@@ -106,8 +105,6 @@ export const TimeGridScheduler = React.memo(function TimeGridScheduler({
 
   const root = useRef<HTMLDivElement | null>(null);
   const parent = useRef<HTMLDivElement | null>(null);
-  const timelineStickyStyle = useStickyStyle(root, { top: false, left: true });
-  const headerStickyStyle = useStickyStyle(root, { top: false, left: false });
 
   const size = useComponentSize(parent);
   const {
@@ -125,7 +122,6 @@ export const TimeGridScheduler = React.memo(function TimeGridScheduler({
   const [[totalHeight, totalWidth], setDimensions] = useState([0, 0]);
 
   const numVisualVerticalCells = (24 * 60) / visualGridVerticalPrecision;
-
   useEffect(() => {
     if (!parent.current) {
       setDimensions([0, 0]);
@@ -265,63 +261,75 @@ export const TimeGridScheduler = React.memo(function TimeGridScheduler({
   return (
     <div
       ref={root}
-      onBlur={() => setActive([null, null])}
       style={style}
+      onBlur={() => setActive([null, null])}
       className={classcat([
-        className,
         classes.root,
+        className,
         { [classes['no-scroll']]: isDragging },
       ])}
     >
-      <div style={timelineStickyStyle} aria-hidden className={classes.timeline}>
-        <div className={classes.header}>
-          <div className={classes['day-column']}>
-            <div className={classcat([classes.cell, classes.title])}>T</div>
-          </div>
-        </div>
-        <div className={classes.calendar}>
-          <div className={classes['day-column']}>
-            <div className={classes['day-hours']}>
-              {times(numVisualVerticalCells).map(timeIndex => {
-                return (
-                  <Cell
-                    classes={classes}
-                    getDateRangeForVisualGrid={getDateRangeForVisualGrid}
-                    key={timeIndex}
-                    timeIndex={timeIndex}
-                  >
-                    {({ start, isHourStart }) => {
-                      if (isHourStart) {
-                        return (
-                          <div className={classes.time}>
-                            {format(start, 'h a')}
-                          </div>
-                        );
-                      }
-
-                      return null;
-                    }}
-                  </Cell>
-                );
-              })}
+      <div className={classes['grid-root']}>
+        <div
+          aria-hidden
+          className={classcat([classes.timeline, classes['sticky-left']])}
+        >
+          <div className={classes.header}>
+            <div className={classes['day-column']}>
+              <div className={classcat([classes.cell, classes.title])}>T</div>
             </div>
           </div>
-        </div>
-      </div>
+          <div className={classes.calendar}>
+            <div className={classes['day-column']}>
+              <div className={classes['day-hours']}>
+                {times(numVisualVerticalCells).map(timeIndex => {
+                  return (
+                    <Cell
+                      classes={classes}
+                      getDateRangeForVisualGrid={getDateRangeForVisualGrid}
+                      key={timeIndex}
+                      timeIndex={timeIndex}
+                    >
+                      {({ start, isHourStart }) => {
+                        if (isHourStart) {
+                          return (
+                            <div className={classes.time}>
+                              {format(start, 'h a')}
+                            </div>
+                          );
+                        }
 
-      <div>
-        <div
-          style={headerStickyStyle}
-          role="presentation"
-          className={classcat([classes.calendar, classes.header])}
-        >
-          {times(7).map(i => (
-            <div key={i} role="presentation" className={classes['day-column']}>
-              <div className={classcat([classes.cell, classes.title])}>
-                {format(addDays(originDate, i), 'ddd')}
+                        return null;
+                      }}
+                    </Cell>
+                  );
+                })}
               </div>
             </div>
-          ))}
+          </div>
+        </div>
+        <div
+          className={classcat([
+            classes['sticky-top'],
+            classes['day-header-row'],
+          ])}
+        >
+          <div
+            role="presentation"
+            className={classcat([classes.calendar, classes.header])}
+          >
+            {times(7).map(i => (
+              <div
+                key={i}
+                role="presentation"
+                className={classes['day-column']}
+              >
+                <div className={classcat([classes.cell, classes.title])}>
+                  {format(addDays(originDate, i), 'ddd')}
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
         <div className={classes['layer-container']}>
           {isDragging && (

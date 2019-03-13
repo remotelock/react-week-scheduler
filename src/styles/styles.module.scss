@@ -10,64 +10,39 @@ html {
   box-sizing: border-box;
 }
 
-.buttons-wrapper {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  background: #fff8dc;
-  height: 50px;
-  > * {
-    margin: 0 5px;
-  }
-  button {
-    appearance: none;
-    border: 1px solid hsl(0, 0%, 69%);
-    background: hsl(0, 0%, 91%);
-    border-radius: 2px;
-    font-size: 1.1rem;
-    cursor: pointer;
-  }
-  > :last-child {
-    margin-left: auto;
-  }
-  label {
-    display: flex;
-    align-items: center;
-    margin: 0 15px;
-
-    select {
-      margin: 0 10px;
-    }
-  }
-}
-
 .no-scroll {
   touch-action: none;
 }
 
 .root {
   contain: strict;
-  position: relative;
-  display: flex;
-
-  & > * {
-    flex: 1 0 auto;
-  }
-
-  & > .timeline {
-    flex-grow: 0;
-  }
-
-  --border: hsl(207, 60%, 85%);
-  position: relative;
   overflow: auto;
   background: white;
   border: 1px solid hsla(0, 0%, 83%, 1);
+  --border: hsl(207, 60%, 85%);
 
   &,
   * {
     box-sizing: border-box;
   }
+
+  --z-index-handle-wrapper: 1;
+  --z-index-layer-container: 1;
+  --z-index-event: 2;
+  --z-index-event-is-pending-creation: 1;
+  --z-index-draggable: 2;
+  --z-index-dragging: 3;
+  --z-index-day-header-row: 2;
+  --z-index-header: 1;
+  --z-index-timeline: 2;
+  --z-index-timeline-header: 1;
+}
+
+.grid-root {
+  position: relative;
+  display: table;
+  overflow: auto;
+  width: 100%;
 }
 
 .debug {
@@ -89,7 +64,7 @@ html {
 }
 
 .handle-wrapper {
-  z-index: 3;
+  z-index: var(--z-index-handle-wrapper);
   position: absolute;
   left: 0;
   bottom: 0;
@@ -126,8 +101,7 @@ html {
 .layer-container {
   position: relative;
   height: 100%;
-  width: 100%;
-  z-index: 1;
+  z-index: var(--z-index-layer-container);
   .calendar {
     top: 0;
     left: 0;
@@ -136,12 +110,12 @@ html {
   }
 
   .event {
-    z-index: 3;
+    z-index: var(--z-index-event);
   }
 
   .calendar {
     position: absolute;
-    z-index: -1;
+    z-index: var(--z-index-calendar);
   }
 
   .drag-box {
@@ -152,7 +126,7 @@ html {
     text-overflow: ellipsis;
     left: 0;
     top: 0;
-    z-index: 2;
+    z-index: var(--z-index-drag-box);
     border: 3px dashed hsla(209, 97%, 50%, 0.5);
     background: hsla(209, 97%, 65%, 0.5);
     width: 100px;
@@ -161,7 +135,7 @@ html {
 }
 
 .draggable {
-  z-index: 2;
+  z-index: var(--z-index-draggable);
 }
 
 .button-reset {
@@ -182,7 +156,7 @@ html {
 
 .is-draggable.react-draggable-dragging {
   cursor: grabbing;
-  z-index: 5;
+  z-index: var(--z-index-dragging);
 }
 
 .event {
@@ -190,7 +164,7 @@ html {
   contain: content;
   user-select: none;
   display: block;
-  z-index: 5;
+  z-index: var(--z-index-event);
   margin: 0;
   position: absolute;
   font-weight: bold;
@@ -204,7 +178,7 @@ html {
       --background: hsl(202, 100%, 30%);
       box-shadow: 0 1px 5px 1px hsla(202, 100%, 16%, 0.5),
         0 5px 10px 1px rgba(217, 217, 217, 0.5);
-      z-index: 4;
+      z-index: var(--z-index-event-is-pending-creation);
     }
 
     &:focus {
@@ -285,9 +259,23 @@ html {
   border-top-width: 0;
 }
 
+.day-header-row {
+  z-index: var(--z-index-day-header-row);
+}
+
+.sticky-top {
+  position: sticky;
+  top: 0;
+}
+
+.sticky-left {
+  position: sticky;
+  left: 0;
+}
+
 .header {
   will-change: transform;
-  z-index: 2;
+  z-index: var(--z-index-header);
   background: hsla(0, 0%, 97%, 1);
   box-shadow: 0 1px 5px hsla(0, 0%, 50%, 0.2),
     0 1px 10px hsla(0, 0%, 85%, 0.239);
@@ -333,8 +321,9 @@ html {
 }
 
 .timeline {
+  display: table-cell;
   text-align: end;
-  pointer-events: none;
+  z-index: var(--z-index-timeline);
 
   .day-column {
     background: white;
@@ -344,7 +333,7 @@ html {
 }
 
 .timeline .header {
-  z-index: 1;
+  z-index: var(--z-index-timeline-header);
   box-shadow: none;
   background: white;
   .cell {
