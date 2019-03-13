@@ -235,8 +235,8 @@ export const RangeBox = React.memo(function RangeBox({
       onStop={handleStop}
       cancel={`.${classes.handle}`}
     >
-      <button
-        type="button"
+      <div
+        role="button"
         onFocus={handleOnFocus}
         className={classcat([
           classes.event,
@@ -294,7 +294,7 @@ export const RangeBox = React.memo(function RangeBox({
             </span>
           </div>
         </Resizable>
-      </button>
+      </div>
     </Draggable>
   );
 });
