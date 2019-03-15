@@ -292,7 +292,6 @@ export const TimeGridScheduler = React.memo(function TimeGridScheduler({
       addHours(originDate, defaultHours[1]),
     ]);
     const rect = grid.getRectFromCell(range[0]);
-    console.log({ rect });
     const { top, bottom } = rect;
 
     if (top === 0 && bottom === 0) {
@@ -302,7 +301,7 @@ export const TimeGridScheduler = React.memo(function TimeGridScheduler({
     root.current.scrollBy(0, top);
 
     setWasInitialScrollPerformed(true);
-  }, [wasInitialScrollPerformed, grid, originDate, dateRangeToCells]);
+  }, [wasInitialScrollPerformed, grid, defaultHours, originDate, dateRangeToCells]);
 
   return (
     <div
