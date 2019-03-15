@@ -1,10 +1,11 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
-    "outDir": "./generated-types",
+    "declarationDir": "./generated-types",
     "emitDeclarationOnly": true,
     "declaration": true,
     "isolatedModules": false,
-    "noEmit": false
+    "noEmit": false,
+    "declarationMap": true
   }
 }
