@@ -233,9 +233,11 @@ export const RangeBox = React.memo(function RangeBox({
   const cancelClasses = useMemo(
     () =>
       classes.handle
-        .split(' ')
-        .map(className => `.${className}`)
-        .join(', '),
+        ? classes.handle
+            .split(' ')
+            .map(className => `.${className}`)
+            .join(', ')
+        : undefined,
     [classes.handle],
   );
 
