@@ -1,6 +1,6 @@
 import useComponentSize from '@rehooks/component-size';
 import classcat from 'classcat';
-import { addDays, format, isEqual, startOfDay } from 'date-fns';
+import { addDays, addHours, format, isEqual, startOfDay } from 'date-fns';
 import invariant from 'invariant';
 import { times } from 'lodash';
 import React, {
@@ -43,17 +43,44 @@ export const TimeGridScheduler = React.memo(function TimeGridScheduler({
   style,
   schedule,
   originDate: _originDate = new Date(),
+  defaultHours = [9, 15],
   classes,
   className,
   onChange,
 }: {
   originDate?: Date;
+
+  /**
+   * The minimum number of minutes a created range can span
+   * @default 30
+   */
   verticalPrecision?: number;
+
+  /**
+   * The visual grid increments in minutes.
+   * @default 30
+   */
   visualGridVerticalPrecision?: number;
+
+  /** Custom styles applied to the root of the view */
   style?: React.CSSProperties;
   schedule: ScheduleType;
+
+  /**
+   * A map of class names to the scoped class names
+   * The keys are class names like `'root'` and the values
+   * are the corresponding class names which can be scoped
+   * with CSS Modules, e.g. `'_root_7f2c6'`.
+   */
   classes: Record<string, string>;
   className?: string;
+
+  /**
+   * The view will initially be scrolled to these hours.
+   * Defaults to work hours (9-17).
+   * @default [9, 17]
+   */
+  defaultHours?: [number, number];
   onChange(newSchedule: ScheduleType): void;
 }) {
   const originDate = useMemo(() => startOfDay(_originDate), [_originDate]);
@@ -150,8 +177,7 @@ export const TimeGridScheduler = React.memo(function TimeGridScheduler({
       return;
     }
 
-    const constrainedBox = box;
-    const cell = grid.getCellFromRect(constrainedBox);
+    const cell = grid.getCellFromRect(box);
     const dateRanges = cellInfoToDateRanges(cell);
     const event = dateRanges;
     setPendingCreation(event);
@@ -162,13 +188,7 @@ export const TimeGridScheduler = React.memo(function TimeGridScheduler({
       onChange(mergeEvents(schedule, pendingCreation));
       setPendingCreation(null);
     }
-  }, [
-    hasFinishedDragging,
-    onChange,
-    setPendingCreation,
-    pendingCreation,
-    schedule,
-  ]);
+  }, [hasFinishedDragging, onChange, setPendingCreation, pendingCreation, schedule]);
 
   const handleEventChange = useCallback<OnChangeCallback>(
     (newDateRange, rangeIndex) => {
@@ -257,6 +277,32 @@ export const TimeGridScheduler = React.memo(function TimeGridScheduler({
       inline: 'nearest',
     });
   }, [schedule]);
+
+  const [wasInitialScrollPerformed, setWasInitialScrollPerformed] = useState(
+    false,
+  );
+
+  useEffect(() => {
+    if (wasInitialScrollPerformed || !root.current || !grid) {
+      return;
+    }
+
+    const range = dateRangeToCells([
+      addHours(originDate, defaultHours[0]),
+      addHours(originDate, defaultHours[1]),
+    ]);
+    const rect = grid.getRectFromCell(range[0]);
+    console.log({ rect });
+    const { top, bottom } = rect;
+
+    if (top === 0 && bottom === 0) {
+      return;
+    }
+
+    root.current.scrollBy(0, top);
+
+    setWasInitialScrollPerformed(true);
+  }, [wasInitialScrollPerformed, grid, originDate, dateRangeToCells]);
 
   return (
     <div
