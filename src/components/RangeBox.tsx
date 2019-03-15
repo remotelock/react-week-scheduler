@@ -164,7 +164,7 @@ export const RangeBox = React.memo(function RangeBox({
 
       invariant(
         newCell.spanY === cell.spanY && newCell.spanX === cell.spanX,
-        `Expected the dragged time cell to have the same dimensions)`,
+        `Expected the dragged time cell to have the same dimensions`,
       );
 
       setModifiedCell(newCell);
