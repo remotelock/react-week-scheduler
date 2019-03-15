@@ -17,6 +17,7 @@
   ],
   "main": "index.js",
   "module": "index.mjs",
+  "types": "./generated-types/index.d.ts",
   "dependencies": {
     "@reach/visually-hidden": "^0.1.2",
     "@rehooks/component-size": "^1.0.2",
@@ -107,7 +108,7 @@
     "start": "parcel demo/index.html",
     "rollup": "NODE_ENV=production rollup -c rollup.config.js -m",
     "types": "yarn tsc -p ./tsconfig.types.json",
-    "clean": "rm -rf index.js index.mjs index.d.ts index.css ./*.map",
+    "clean": "rm -rf index.js index.mjs generated-types index.css ./*.map",
     "prebuild": "npm-run-all -s clean -p lint check-ts",
     "build/demo": "parcel build demo/index.html --public-url /react-week-scheduler",
     "build": "npm-run-all -s clean -p --aggregate-output types rollup",

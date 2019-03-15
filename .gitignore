@@ -48,3 +48,4 @@ index.mjs
 index.css
 .cache
 *.map
+generated-types/

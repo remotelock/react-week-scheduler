@@ -5,3 +5,4 @@ dist/
 *.css
 *.d.ts
 .cache
+generated-types/
