@@ -19,8 +19,8 @@ yarn add @remotelock/react-week-scheduler
 ```jsx
 import React, { useState } from 'react';
 import 'resize-observer-polyfill/dist/ResizeObserver.global';
-import { TimeGridScheduler } from '@remotelock/react-week-scheduler';
-import classNames from '@remotelock/react-week-scheduler/index.css';
+import { TimeGridScheduler, classes } from '@remotelock/react-week-scheduler';
+import '@remotelock/react-week-scheduler/index.css';
 
 const rangeStrings = [
   ['2019-03-03T22:45:00.000Z', '2019-03-04T01:15:00.000Z'],
@@ -41,7 +41,7 @@ function App() {
 
   return (
     <TimeGridScheduler
-      classes={classNames}
+      classes={classes}
       originDate={new Date('2019-03-04')}
       schedule={schedule}
       onChange={setSchedule}
@@ -54,20 +54,22 @@ function App() {
 
 `react-week-scheduler` ships with a set of default styles for convenience. The styles are compiled as [CSS Modules](https://github.com/css-modules/css-modules) class names. The components exported from the package do not import the styles by default. Instead, they expect a `classes` prop to be passed.
 
-To use the default styles you need to have your bundler configured for CSS Modules. The class names need to be available at runtime as a regular JS object.
+The class names need to be available at runtime as a regular JS object.
 
 ### Using the default styles
 
-To use the default styles, import the default classes object and pass it to the component:
+To use the default styles, import the default classes object as well as the styles file and pass it to the component:
 
 ```jsx
-import { TimeGridScheduler } from '@remotelock/react-week-scheduler';
-import classNames from '@remotelock/react-week-scheduler/index.css';
+import { TimeGridScheduler, classes } from '@remotelock/react-week-scheduler';
+import '@remotelock/react-week-scheduler/index.css';
 
 function App() {
-  return <TimeGridScheduler classes={classNames} {...otherProps} />;
+  return <TimeGridScheduler classes={classes} {...otherProps} />;
 }
 ```
+
+The stylesheet `@remotelock/react-week-scheduler/index.css` has scoped class names precompiled, and the `classes` object has a mapping of class names to scoped class names. You do not need to have your bundle configured for CSS modules.
 
 ## Browser Support
 
