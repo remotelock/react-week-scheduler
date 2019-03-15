@@ -12,6 +12,7 @@ export default {
   plugins: [
     postcss({
       modules: false,
+      autoModules: false,
       extract: true,
       sourceMap: true,
     }),
