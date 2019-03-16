@@ -1,7 +1,6 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
-    "declarationDir": "./generated-types",
     "emitDeclarationOnly": true,
     "declaration": true,
     "isolatedModules": false,

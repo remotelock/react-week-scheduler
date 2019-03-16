@@ -15,6 +15,7 @@ import { useClickAndDrag } from '../hooks/useClickAndDrag';
 import useMousetrap from '../hooks/useMousetrap';
 import {
   CellInfo,
+  ClassNames,
   DateRange,
   Grid,
   OnChangeCallback,
@@ -73,7 +74,7 @@ export const TimeGridScheduler = React.memo(function TimeGridScheduler({
    * are the corresponding class names which can be scoped
    * with CSS Modules, e.g. `'_root_7f2c6'`.
    */
-  classes: Record<string, string>;
+  classes: ClassNames;
   className?: string;
 
   /**

@@ -7,8 +7,10 @@ coverage
 .rts2_cache_*/
 build
 dist
-*.js
+index.js
+index.mjs
+index.d.ts
+**/*.d.ts
 *.css
-*.d.ts
 .cache
 generated-types/

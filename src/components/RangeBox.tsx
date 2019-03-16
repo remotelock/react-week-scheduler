@@ -20,7 +20,6 @@ import { ScheduleProps } from './Schedule';
 export const RangeBox = React.memo(function RangeBox({
   classes,
   grid,
-  isBeingEdited,
   rangeIndex,
   cellIndex,
   cellArray,
@@ -262,11 +261,10 @@ export const RangeBox = React.memo(function RangeBox({
         className={classcat([
           classes.event,
           classes['button-reset'],
-          classes['range-box'],
+          classes['range-boxes'],
           className,
           {
             [classes['is-draggable']]: moveAxis !== 'none',
-            [classes['is-being-edited']]: isBeingEdited && isBeingEdited(cell),
           },
         ])}
         ref={ref}
@@ -291,13 +289,13 @@ export const RangeBox = React.memo(function RangeBox({
           }
           handleClasses={{
             bottom: classcat([classes.handle, classes.bottom]),
-            bottomLeft: classcat([classes.handle, classes['bottom-left']]),
-            bottomRight: classcat([classes.handle, classes['bottom-right']]),
-            left: classcat([classes.handle, classes.left]),
-            right: classcat([classes.handle, classes.right]),
+            bottomLeft: classes.handle,
+            bottomRight: classes.handle,
+            left: classes.handle,
+            right: classes.handle,
             top: classcat([classes.handle, classes.top]),
-            topLeft: classcat([classes.handle, classes['top-left']]),
-            topRight: classcat([classes.handle, classes['top-right']]),
+            topLeft: classes.handle,
+            topRight: classes.handle,
           }}
         >
           <div

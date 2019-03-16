@@ -17,7 +17,7 @@
   ],
   "main": "index.js",
   "module": "index.mjs",
-  "types": "./generated-types/index.d.ts",
+  "types": "./src/index.d.ts",
   "dependencies": {
     "@reach/visually-hidden": "^0.1.2",
     "@rehooks/component-size": "^1.0.2",
@@ -34,6 +34,7 @@
     "mousetrap": "^1.6.3",
     "re-resizable": "^4.11.0",
     "react-draggable": "^3.2.1",
+    "rimraf": "^2.6.3",
     "rxjs": "^6.4.0",
     "scroll-into-view-if-needed": "^2.2.20"
   },
@@ -69,6 +70,7 @@
     "husky": "^1.3.1",
     "lint-staged": "^8.1.5",
     "node-sass": "^4.11.0",
+    "nodemon": "^1.18.10",
     "npm-run-all": "^4.1.5",
     "parcel": "^1.12.0",
     "postcss-modules": "^1.4.1",
@@ -89,6 +91,7 @@
     "stylelint-config-standard": "^18.2.0",
     "stylelint-csstree-validator": "^1.3.0",
     "stylelint-no-unsupported-browser-features": "^3.0.2",
+    "typed-scss-modules": "^0.0.9",
     "typescript": "^3.3.3333",
     "use-undo": "^1.0.0",
     "yarnhook": "^0.4.0"
@@ -99,20 +102,26 @@
     "check-prettier": "prettier '**/*.{t,j}s{,x}' '**/*.{css,scss,json,md}' --list-different",
     "common-check": "run-p -c --aggregate-output lint check-prettier check-integrity",
     "check-integrity": "yarn check --integrity",
+    "precheck-ts": "run-p types/scss",
     "check-ts": "tsc --project . --noEmit",
     "lint-ts/eslint": "eslint '**/*.ts{,x}'",
     "lint-scss": "stylelint '**/*.scss'",
     "lint-ts": "run-p -c --aggregate-output 'lint-ts/*'",
     "lint": "run-p -c --aggregate-output lint-ts lint-scss",
     "analyze": "source-map-explorer 'dist/*.js'",
-    "start": "parcel demo/index.html",
+    "prestart": "run-p types/scss",
+    "start/parcel": "parcel demo/index.html",
+    "start": "run-p types/scss/dev start/parcel",
     "rollup": "NODE_ENV=production rollup -c rollup.config.js -m",
-    "types": "yarn tsc -p ./tsconfig.types.json",
-    "clean": "rm -rf index.js index.mjs generated-types index.css ./*.map",
+    "types/scss/dev": "nodemon -w '{src,demo}/**/*.scss' --exec 'yarn types/scss'",
+    "types/scss": "yarn tsm '{src,demo}/**/*.scss' -n none -e default && yarn types/scss/fix",
+    "types/scss/fix": "for file in src/**/*.scss.d.ts; do echo export $(cat $file) > $file; done",
+    "types/ts": "yarn tsc -p ./tsconfig.types.json",
+    "types": "run-s types/scss types/ts",
+    "clean": "rimraf dist index.js index.mjs src/{!types}/*.d.ts index.css 'demo/**/*.scss.d.ts' 'src/**/*.scss.d.ts' './*.map'",
     "prebuild": "npm-run-all -s clean -p lint check-ts",
     "build/demo": "parcel build demo/index.html --public-url /react-week-scheduler",
-    "build": "npm-run-all -s clean -p --aggregate-output types rollup",
-    "predeploy/demo": "yarn build/demo",
+    "build": "npm-run-all -s clean -p --aggregate-output types build/demo rollup",
     "deploy/demo": "gh-pages -d dist",
     "run-prettier": "prettier --write '*.json' 'types/**/*.ts' 'src/**/*.ts{,x}' 'src/**/*.scss'",
     "semantic-release": "semantic-release",
@@ -123,6 +132,6 @@
     "url": "https://github.com/remotelock/react-week-scheduler.git"
   },
   "engines": {
-    "node": "^10.11.0"
+    "node": ">=10.13.0"
   }
 }

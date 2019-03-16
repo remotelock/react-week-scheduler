@@ -1,8 +1,10 @@
 /* eslint-disable import/no-extraneous-dependencies */
 
+import classcat from 'classcat';
 import { format, isSameWeek, setDay, startOfWeek } from 'date-fns';
 // @ts-ignore
 import humanizeDuration from 'humanize-duration';
+import { mapValues } from 'lodash';
 import React, { Fragment, useMemo, useState } from 'react';
 import CustomProperties from 'react-custom-properties';
 import ReactDOM from 'react-dom';
@@ -10,10 +12,16 @@ import 'resize-observer-polyfill/dist/ResizeObserver.global';
 import useUndo from 'use-undo';
 import { TimeGridScheduler } from '../src/components/TimeGridScheduler';
 import useMousetrap from '../src/hooks/useMousetrap';
-import defaultStyleClasses from '../src/styles';
+import { classes as defaultClasses } from '../src/styles';
 import { ScheduleType } from '../src/types';
 import { Key } from './components/Key/Key';
 import demoClasses from './index.module.scss';
+
+const classes = mapValues(
+  defaultClasses,
+  (value, key: keyof typeof defaultClasses) =>
+    classcat([value, demoClasses[key]]),
+);
 
 const rangeStrings: [string, string][] = [
   ['2019-03-03T22:45:00.000Z', '2019-03-04T01:15:00.000Z'],
@@ -192,8 +200,7 @@ function App() {
         <Fragment key={`${cellHeight},${cellWidth}`}>
           <TimeGridScheduler
             key={originDate.toString()}
-            className={demoClasses.root}
-            classes={defaultStyleClasses}
+            classes={classes}
             originDate={originDate}
             schedule={scheduleState.present}
             onChange={setSchedule}

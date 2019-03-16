@@ -1,6 +1,7 @@
 import React from 'react';
 import {
   CellInfo,
+  ClassNames,
   DateRange,
   Grid,
   OnChangeCallback,
@@ -9,13 +10,12 @@ import {
 import { RangeBox } from './RangeBox';
 
 export type ScheduleProps = {
-  classes: Record<string, string>;
+  classes: ClassNames;
   grid: Grid;
   onChange?: OnChangeCallback;
   isResizable?: boolean;
   isDeletable?: boolean;
   moveAxis: 'none' | 'both' | 'x' | 'y';
-  isBeingEdited?(cell: CellInfo): boolean;
   cellInfoToDateRange(cell: CellInfo): DateRange;
   onActiveChange?(index: [number, number] | [null, null]): void;
   onClick?(index: [number, number] | [null, null]): void;
@@ -32,13 +32,12 @@ export const Schedule = React.memo(function Schedule({
   moveAxis: isMovable,
   cellInfoToDateRange,
   dateRangeToCells,
-  isBeingEdited,
   onActiveChange: onActive,
 }: {
   dateRangeToCells(range: DateRange): CellInfo[];
   ranges: ScheduleType;
   className?: string;
-  classes: Record<string, string>;
+  classes: ClassNames;
 } & ScheduleProps) {
   return (
     <div className={classes['range-boxes']}>
@@ -61,7 +60,6 @@ export const Schedule = React.memo(function Schedule({
                   cellIndex={cellIndex}
                   rangeIndex={rangeIndex}
                   className={className}
-                  isBeingEdited={isBeingEdited}
                   onChange={onChange}
                   grid={grid}
                   cell={cell}

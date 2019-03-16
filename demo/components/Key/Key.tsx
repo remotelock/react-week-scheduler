@@ -6,8 +6,8 @@ export function Key({
   classes,
 }: {
   children: string;
-  classes?: Record<string, string>;
+  classes?: Partial<typeof defaultClasses>;
 }) {
-  const classNames: Record<string, string> = { ...defaultClasses, ...classes };
+  const classNames = { ...defaultClasses, ...classes };
   return <span className={classNames.key}>{children}</span>;
 }
