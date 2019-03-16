@@ -1,16 +1,16 @@
 import isEqual from 'lodash/isEqual';
 import React, { useCallback, useEffect, useState } from 'react';
-import { fromEvent } from 'rxjs/observable/fromEvent';
-import { merge } from 'rxjs/observable/merge';
-import { of } from 'rxjs/observable/of';
-import { delay } from 'rxjs/operators/delay';
-import { distinctUntilChanged } from 'rxjs/operators/distinctUntilChanged';
-import { filter } from 'rxjs/operators/filter';
-import { map } from 'rxjs/operators/map';
-import { mergeMap } from 'rxjs/operators/mergeMap';
-import { startWith } from 'rxjs/operators/startWith';
-import { takeUntil } from 'rxjs/operators/takeUntil';
-import { tap } from 'rxjs/operators/tap';
+import { fromEvent, merge, of } from 'rxjs';
+import {
+  delay,
+  distinctUntilChanged,
+  filter,
+  map,
+  mergeMap,
+  startWith,
+  takeUntil,
+  tap,
+} from 'rxjs/operators';
 import { Rect } from '../types';
 import { createPageMapCoordsToContainer } from '../utils/createPageMapCoordsToContainer';
 

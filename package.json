@@ -30,7 +30,6 @@
     "re-resizable": "^4.11.0",
     "react-draggable": "^3.2.1",
     "rxjs": "^6.4.0",
-    "rxjs-compat": "^6.4.0",
     "scroll-into-view-if-needed": "^2.2.20"
   },
   "peerDependencies": {
