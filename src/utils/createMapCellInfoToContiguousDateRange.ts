@@ -1,5 +1,5 @@
+import isBefore from 'date-fns/is_before';
 import { MapCellInfoToDateRange } from '../types';
-import { isBefore } from 'date-fns';
 import { cellToDate } from './cellToDate';
 
 export const createMapCellInfoToContiguousDateRange: MapCellInfoToDateRange = ({

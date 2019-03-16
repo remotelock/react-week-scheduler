@@ -1,4 +1,4 @@
-import { compareDesc } from 'date-fns';
+import compareDesc from 'date-fns/compare_desc';
 import { DateRange } from '../types';
 
 export function getEarliestRange(ranges: DateRange[]): DateRange | undefined {

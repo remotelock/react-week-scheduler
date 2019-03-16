@@ -1,11 +1,9 @@
-import { DateRange, CellInfo } from '../types';
-import {
-  startOfDay,
-  differenceInDays,
-  differenceInMinutes,
-  isEqual,
-} from 'date-fns';
-import { range } from 'lodash';
+import differenceInDays from 'date-fns/difference_in_days';
+import differenceInMinutes from 'date-fns/difference_in_minutes';
+import isEqual from 'date-fns/is_equal';
+import startOfDay from 'date-fns/start_of_day';
+import range from 'lodash/range';
+import { CellInfo, DateRange } from '../types';
 import { getSpan } from './getSpan';
 
 export const createMapDateRangeToCells = ({

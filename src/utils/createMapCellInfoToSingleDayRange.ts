@@ -1,6 +1,8 @@
-import { MapCellInfoToDateRange, DateRange, CellInfo } from '../types';
+import getDay from 'date-fns/get_day';
+import isSameDay from 'date-fns/is_same_day';
+import setDay from 'date-fns/set_day';
+import { CellInfo, DateRange, MapCellInfoToDateRange } from '../types';
 import { createMapCellInfoToContiguousDateRange } from './createMapCellInfoToContiguousDateRange';
-import { isSameDay, getDay, setDay } from 'date-fns';
 
 const constrainToOneDay = ([start, end]: DateRange): DateRange => {
   if (!isSameDay(end, start)) {

@@ -1,7 +1,7 @@
 // @ts-ignore
 import VisuallyHidden from '@reach/visually-hidden';
 import classcat from 'classcat';
-import { format } from 'date-fns';
+import format from 'date-fns/format';
 import invariant from 'invariant';
 import Resizable, { ResizeCallback } from 're-resizable';
 import React, {

@@ -1,4 +1,6 @@
-import { isSameDay, format, getMinutes } from 'date-fns';
+import format from 'date-fns/format';
+import getMinutes from 'date-fns/get_minutes';
+import isSameDay from 'date-fns/is_same_day';
 
 const dropSame = (
   dates: [Date, Date],

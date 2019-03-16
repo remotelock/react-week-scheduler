@@ -1,5 +1,7 @@
-import { Grid, CellInfo, Rect } from '../types';
-import { clamp, floor, round } from 'lodash';
+import clamp from 'lodash/clamp';
+import floor from 'lodash/floor';
+import round from 'lodash/round';
+import { CellInfo, Grid, Rect } from '../types';
 import { getSpan } from './getSpan';
 
 export const createGrid = ({

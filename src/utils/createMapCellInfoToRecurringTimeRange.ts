@@ -1,14 +1,12 @@
+import addMinutes from 'date-fns/add_minutes';
+import compareAsc from 'date-fns/compare_asc';
+import endOfDay from 'date-fns/end_of_day';
+import isBefore from 'date-fns/is_before';
+import isEqual from 'date-fns/is_equal';
+import startOfDay from 'date-fns/start_of_day';
+import subDays from 'date-fns/sub_days';
+import range from 'lodash/range';
 import { DateRange, MapCellInfoToDateRange } from '../types';
-import { range } from 'lodash';
-import {
-  addMinutes,
-  isBefore,
-  endOfDay,
-  isEqual,
-  subDays,
-  startOfDay,
-  compareAsc,
-} from 'date-fns';
 import { cellToDate } from './cellToDate';
 
 export type RecurringTimeRange = DateRange[];

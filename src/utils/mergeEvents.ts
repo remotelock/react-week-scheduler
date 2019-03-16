@@ -1,4 +1,4 @@
-import { compareAsc } from 'date-fns';
+import compareAsc from 'date-fns/compare_asc';
 // @ts-ignore
 import _mergeRanges from 'merge-ranges';
 import { ScheduleType } from '../types';

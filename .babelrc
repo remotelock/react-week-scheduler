@@ -10,6 +10,18 @@
     "@babel/preset-react",
     "@babel/preset-typescript"
   ],
+  "plugins": [
+    "date-fns",
+    [
+      "transform-imports",
+      {
+        "lodash": {
+          "transform": "lodash/${member}",
+          "preventFullImport": true
+        }
+      }
+    ]
+  ],
   "sourceMap": "both",
   "retainLines": true
 }

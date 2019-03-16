@@ -1,10 +1,13 @@
 /* eslint-disable import/no-extraneous-dependencies */
 
 import classcat from 'classcat';
-import { format, isSameWeek, setDay, startOfWeek } from 'date-fns';
+import format from 'date-fns/format';
+import isSameWeek from 'date-fns/is_same_week';
+import setDay from 'date-fns/set_day';
+import startOfWeek from 'date-fns/start_of_week';
 // @ts-ignore
 import humanizeDuration from 'humanize-duration';
-import { mapValues } from 'lodash';
+import mapValues from 'lodash/mapValues';
 import React, { Fragment, useMemo, useState } from 'react';
 import CustomProperties from 'react-custom-properties';
 import ReactDOM from 'react-dom';

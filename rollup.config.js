@@ -1,4 +1,3 @@
-import autoExternal from 'rollup-plugin-auto-external';
 import babel from 'rollup-plugin-babel';
 import commonjs from 'rollup-plugin-commonjs';
 import resolve from 'rollup-plugin-node-resolve';
@@ -12,17 +11,22 @@ export default {
     { file: pkg.main, format: 'cjs' },
   ],
   plugins: [
-    autoExternal(),
+    resolve({
+      jsnext: true,
+      main: true,
+      customResolveOptions: {
+        moduleDirectory: 'src',
+      },
+      extensions: ['.js', '.jsx', '.ts', '.tsx'],
+    }),
+    commonjs({
+      extensions: ['.js', '.mjs'],
+      include: 'node_modules/**',
+    }),
     postcss({
       modules: true,
       extract: true,
       sourceMap: true,
-    }),
-    commonjs({
-      extensions: ['.js', '.mjs'],
-    }),
-    resolve({
-      extensions: ['.mjs', '.js', '.jsx', '.ts', '.tsx'],
     }),
     babel({
       exclude: 'node_modules/**',

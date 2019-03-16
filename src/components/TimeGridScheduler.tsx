@@ -1,8 +1,12 @@
 import useComponentSize from '@rehooks/component-size';
 import classcat from 'classcat';
-import { addDays, addHours, format, isEqual, startOfDay } from 'date-fns';
+import addDays from 'date-fns/add_days';
+import addHours from 'date-fns/add_hours';
+import format from 'date-fns/format';
+import isEqual from 'date-fns/is_equal';
+import startOfDay from 'date-fns/start_of_day';
 import invariant from 'invariant';
-import { times } from 'lodash';
+import times from 'lodash/times';
 import React, {
   useCallback,
   useEffect,
