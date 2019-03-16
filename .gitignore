@@ -46,6 +46,7 @@ index.d.ts
 index.js
 index.mjs
 index.css
+**/*.d.ts
 .cache
 *.map
 generated-types/

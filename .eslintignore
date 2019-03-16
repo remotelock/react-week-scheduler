@@ -1,8 +1,10 @@
 node_modules/
 build/
 dist/
-*.js
+index.js
+index.mjs
+index.d.ts
 *.css
-*.d.ts
+**/*.d.ts
 .cache
 generated-types/

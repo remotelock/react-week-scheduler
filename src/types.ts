@@ -5,6 +5,8 @@ export type OnChangeCallback = (
 
 export type Coords = { x: number; y: number };
 
+export type ClassNames = typeof import('./styles/styles.module.scss').default;
+
 export type ScheduleType = DateRange[];
 
 export type CellInfo = {

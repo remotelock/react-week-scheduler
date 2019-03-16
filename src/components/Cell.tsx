@@ -1,7 +1,7 @@
 import classcat from 'classcat';
 import { getMinutes } from 'date-fns';
 import React from 'react';
-import { CellInfo, DateRange } from '../types';
+import { CellInfo, ClassNames, DateRange } from '../types';
 
 export const Cell = React.memo(function Cell({
   timeIndex,
@@ -10,7 +10,7 @@ export const Cell = React.memo(function Cell({
   getDateRangeForVisualGrid,
 }: {
   timeIndex: number;
-  classes: Record<string, string>;
+  classes: ClassNames;
   getDateRangeForVisualGrid(cell: CellInfo): DateRange[];
   children?(options: { start: Date; isHourStart: boolean }): React.ReactNode;
 }) {
