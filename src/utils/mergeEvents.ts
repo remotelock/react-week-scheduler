@@ -1,10 +1,11 @@
 import compareAsc from 'date-fns/compare_asc';
-// @ts-ignore
 import _mergeRanges from 'merge-ranges';
 import { ScheduleType } from '../types';
 
 export function mergeRanges(event: ScheduleType): ScheduleType {
-  return _mergeRanges([...event].map(d => d.map(c => new Date(c))));
+  return _mergeRanges(
+    [...event].map(d => d.map(c => new Date(c)) as [Date, Date]),
+  );
 }
 
 export function mergeEvents(
