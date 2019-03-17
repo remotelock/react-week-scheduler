@@ -252,7 +252,7 @@ export const TimeGridScheduler = React.memo(function TimeGridScheduler({
     [activeRangeIndex, handleEventChange],
   );
 
-  useMousetrap(DELETE_KEYS, handleDelete, root.current);
+  useMousetrap(DELETE_KEYS, handleDelete, root);
 
   useEffect(() => {
     cancel();
@@ -311,11 +311,20 @@ export const TimeGridScheduler = React.memo(function TimeGridScheduler({
     setWasInitialScrollPerformed(true);
   }, [wasInitialScrollPerformed, grid, schedule, defaultHours, originDate, dateRangeToCells]);
 
+  const handleBlur: React.FocusEventHandler = useCallback(
+    event => {
+      if (!event.target.contains(document.activeElement)) {
+        setActive([null, null]);
+      }
+    },
+    [setActive],
+  );
+
   return (
     <div
       ref={root}
       style={style}
-      onBlur={() => setActive([null, null])}
+      onBlur={handleBlur}
       className={classcat([
         classes.root,
         className,

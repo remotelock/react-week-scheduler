@@ -10,12 +10,15 @@ import { useEffect, useRef } from 'react';
 export default function useMousetrap(
   handlerKey: string | string[],
   handlerCallback: (e: ExtendedKeyboardEvent, combo: string) => void,
-  element: typeof document | Element | null,
+  elementOrElementRef: typeof document | React.RefObject<Element | null>,
 ) {
   const actionRef = useRef<typeof handlerCallback | null>(null);
   actionRef.current = handlerCallback;
 
   useEffect(() => {
+    const element =
+      'current' in elementOrElementRef ? elementOrElementRef.current : document;
+
     if (!element) {
       return;
     }
@@ -27,5 +30,5 @@ export default function useMousetrap(
     return () => {
       mousetrap.unbind(handlerKey);
     };
-  }, [handlerKey, element]);
+  }, [handlerKey, elementOrElementRef]);
 }

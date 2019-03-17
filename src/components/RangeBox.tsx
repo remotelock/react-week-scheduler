@@ -91,7 +91,7 @@ export const RangeBox = React.memo(function RangeBox({
 
       onChange(cellInfoToDateRange(newCell), rangeIndex);
     },
-    ref.current,
+    ref,
   );
 
   useMousetrap(
@@ -117,7 +117,7 @@ export const RangeBox = React.memo(function RangeBox({
 
       onChange(cellInfoToDateRange(newCell), rangeIndex);
     },
-    ref.current,
+    ref,
   );
 
   const handleDrag: DraggableEventHandler = useCallback(
