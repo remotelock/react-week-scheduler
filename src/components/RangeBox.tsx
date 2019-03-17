@@ -105,7 +105,7 @@ export const RangeBox = React.memo(function RangeBox({
         return;
       }
 
-      if (modifiedCell.endY === grid.numVerticalCells - 1) {
+      if (modifiedCell.endY >= grid.numVerticalCells - 2) {
         return;
       }
 
