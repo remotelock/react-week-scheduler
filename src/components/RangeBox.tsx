@@ -130,7 +130,7 @@ export const RangeBox = React.memo(function RangeBox({
         return;
       }
 
-      if (modifiedCell.endY >= grid.numVerticalCells - 2) {
+      if (Math.round(modifiedCell.endY) >= grid.numVerticalCells - 1) {
         return;
       }
 
@@ -156,7 +156,7 @@ export const RangeBox = React.memo(function RangeBox({
         return;
       }
 
-      if (modifiedCell.endY >= grid.numVerticalCells - 2) {
+      if (Math.round(modifiedCell.endY) >= grid.numVerticalCells - 1) {
         return;
       }
 

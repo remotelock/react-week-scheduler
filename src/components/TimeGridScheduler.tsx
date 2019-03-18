@@ -27,7 +27,6 @@ import {
   ScheduleType,
 } from '../types';
 import { createGrid } from '../utils/createGrid';
-import { createMapCellInfoToContiguousDateRange } from '../utils/createMapCellInfoToContiguousDateRange';
 import {
   createMapCellInfoToRecurringTimeRange,
   RecurringTimeRange,
@@ -271,7 +270,7 @@ export const TimeGridScheduler = React.memo(function TimeGridScheduler({
 
   const getDateRangeForVisualGrid = useMemo(
     () =>
-      createMapCellInfoToContiguousDateRange({
+      createMapCellInfoToRecurringTimeRange({
         originDate,
         fromX: toDay,
         fromY: y => y * visualGridVerticalPrecision,
