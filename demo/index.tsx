@@ -18,7 +18,7 @@ import { TimeGridScheduler } from '../src/components/TimeGridScheduler';
 import useMousetrap from '../src/hooks/useMousetrap';
 import { classes as defaultClasses } from '../src/styles';
 import { EventRootProps, ScheduleType } from '../src/types';
-import deleteIconUrl from './assets/outline-delete-24px.svg';
+import DeleteIcon from './assets/outline-delete-24px.svg';
 import { Key } from './components/Key/Key';
 import demoClasses from './index.module.scss';
 
@@ -53,7 +53,8 @@ const EventRoot = React.forwardRef<any, EventRootProps>(function EventRoot(
       className={demoClasses.tooltip}
       content={
         <button onClick={handleDelete}>
-          <img alt={undefined} role="presentation" src={deleteIconUrl} /> Delete
+          <DeleteIcon className={demoClasses.icon} />
+          Delete
         </button>
       }
     >
