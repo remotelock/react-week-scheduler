@@ -3,9 +3,10 @@ import classcat from 'classcat';
 import addDays from 'date-fns/add_days';
 import addHours from 'date-fns/add_hours';
 import format from 'date-fns/format';
-import isEqual from 'date-fns/is_equal';
+import isDateEqual from 'date-fns/is_equal';
 import startOfDay from 'date-fns/start_of_day';
 import invariant from 'invariant';
+import isEqual from 'lodash/isEqual';
 import times from 'lodash/times';
 import React, {
   useCallback,
@@ -35,7 +36,7 @@ import { createMapDateRangeToCells } from '../utils/createMapDateRangeToCells';
 import { getEarliestRange } from '../utils/getEarliestRange';
 import { mergeEvents, mergeRanges } from '../utils/mergeEvents';
 import { Cell } from './Cell';
-import { Schedule } from './Schedule';
+import { Schedule, ScheduleProps } from './Schedule';
 
 const MINS_IN_DAY = 24 * 60;
 const horizontalPrecision = 1;
@@ -53,6 +54,8 @@ export const TimeGridScheduler = React.memo(function TimeGridScheduler({
   classes,
   className,
   onChange,
+  eventContentComponent,
+  eventRootComponent,
 }: {
   originDate?: Date;
 
@@ -88,6 +91,8 @@ export const TimeGridScheduler = React.memo(function TimeGridScheduler({
    */
   defaultHours?: [number, number];
   onChange(newSchedule: ScheduleType): void;
+  eventContentComponent?: ScheduleProps['eventContentComponent'];
+  eventRootComponent?: ScheduleProps['eventRootComponent'];
 }) {
   const originDate = useMemo(() => startOfDay(_originDate), [_originDate]);
   const numVerticalCells = MINS_IN_DAY / verticalPrecision;
@@ -210,8 +215,8 @@ export const TimeGridScheduler = React.memo(function TimeGridScheduler({
         newSchedule.splice(rangeIndex, 1);
       } else {
         if (
-          isEqual(newDateRange[0], newSchedule[rangeIndex][0]) &&
-          isEqual(newDateRange[1], newSchedule[rangeIndex][1])
+          isDateEqual(newDateRange[0], newSchedule[rangeIndex][0]) &&
+          isDateEqual(newDateRange[1], newSchedule[rangeIndex][1])
         ) {
           return;
         }
@@ -235,9 +240,15 @@ export const TimeGridScheduler = React.memo(function TimeGridScheduler({
     document,
   );
 
-  const [[activeRangeIndex], setActive] = useState<
+  const [[activeRangeIndex, activeCellIndex], setActive] = useState<
     [number, number] | [null, null]
   >([null, null]);
+
+  const getIsActive = useCallback(
+    ({ rangeIndex, cellIndex }) =>
+      rangeIndex === activeRangeIndex && cellIndex === activeCellIndex,
+    [activeCellIndex, activeRangeIndex],
+  );
 
   const handleDelete = useCallback(
     (e: ExtendedKeyboardEvent) => {
@@ -408,6 +419,9 @@ export const TimeGridScheduler = React.memo(function TimeGridScheduler({
               ranges={mergeEvents(schedule, pendingCreation)}
               grid={grid}
               moveAxis="none"
+              eventContentComponent={eventContentComponent}
+              eventRootComponent={eventRootComponent}
+              getIsActive={getIsActive}
             />
           )}
           {grid && !pendingCreation && (
@@ -422,6 +436,9 @@ export const TimeGridScheduler = React.memo(function TimeGridScheduler({
               onChange={handleEventChange}
               ranges={schedule}
               grid={grid}
+              eventContentComponent={eventContentComponent}
+              eventRootComponent={eventRootComponent}
+              getIsActive={getIsActive}
             />
           )}
 
@@ -453,4 +470,4 @@ export const TimeGridScheduler = React.memo(function TimeGridScheduler({
       </div>
     </div>
   );
-});
+}, isEqual);

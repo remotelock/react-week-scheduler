@@ -1,4 +1,4 @@
-import mousetrap from 'mousetrap';
+import Mousetrap from 'mousetrap';
 import { useEffect, useRef } from 'react';
 
 /**
@@ -14,21 +14,18 @@ export default function useMousetrap(
 ) {
   const actionRef = useRef<typeof handlerCallback | null>(null);
   actionRef.current = handlerCallback;
+  const element =
+    'current' in elementOrElementRef ? elementOrElementRef.current : document;
 
   useEffect(() => {
-    const element =
-      'current' in elementOrElementRef ? elementOrElementRef.current : document;
+    const instance = new Mousetrap(element as Element);
 
-    if (!element) {
-      return;
-    }
-
-    Mousetrap(element as Element).bind(handlerKey, (e, combo) => {
+    instance.bind(handlerKey, (e, combo) => {
       typeof actionRef.current === 'function' && actionRef.current(e, combo);
     });
 
     return () => {
-      mousetrap.unbind(handlerKey);
+      instance.unbind(handlerKey);
     };
-  }, [handlerKey, elementOrElementRef]);
+  }, [handlerKey, element]);
 }

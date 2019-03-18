@@ -7,6 +7,15 @@ export type Coords = { x: number; y: number };
 
 export type ClassNames = typeof import('./styles/styles.module.scss').default;
 
+export type EventRootProps = {
+  className?: string;
+  style?: React.CSSProperties;
+  cellIndex: number;
+  rangeIndex: number;
+  isActive: boolean;
+  handleDelete(): void;
+};
+
 export type ScheduleType = DateRange[];
 
 export type CellInfo = {

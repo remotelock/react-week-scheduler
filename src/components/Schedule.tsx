@@ -3,10 +3,12 @@ import {
   CellInfo,
   ClassNames,
   DateRange,
+  EventRootProps,
   Grid,
   OnChangeCallback,
   ScheduleType,
 } from '../types';
+import { EventContent } from './EventContent';
 import { RangeBox } from './RangeBox';
 
 export type ScheduleProps = {
@@ -19,6 +21,11 @@ export type ScheduleProps = {
   cellInfoToDateRange(cell: CellInfo): DateRange;
   onActiveChange?(index: [number, number] | [null, null]): void;
   onClick?(index: [number, number] | [null, null]): void;
+  getIsActive(indexes: { cellIndex: number; rangeIndex: number }): boolean;
+  eventContentComponent?: React.ElementType<
+    React.ComponentProps<typeof EventContent>
+  >;
+  eventRootComponent?: React.ElementType<EventRootProps>;
 };
 
 export const Schedule = React.memo(function Schedule({
@@ -29,10 +36,13 @@ export const Schedule = React.memo(function Schedule({
   onChange,
   isResizable,
   isDeletable,
-  moveAxis: isMovable,
+  moveAxis,
   cellInfoToDateRange,
   dateRangeToCells,
-  onActiveChange: onActive,
+  onActiveChange,
+  eventContentComponent,
+  eventRootComponent,
+  getIsActive,
 }: {
   dateRangeToCells(range: DateRange): CellInfo[];
   ranges: ScheduleType;
@@ -48,12 +58,12 @@ export const Schedule = React.memo(function Schedule({
               return (
                 <RangeBox
                   classes={classes}
-                  onActiveChange={onActive}
+                  onActiveChange={onActiveChange}
                   key={`${rangeIndex}.${ranges.length}.${cellIndex}.${
                     cellArray.length
                   }`}
                   isResizable={isResizable}
-                  moveAxis={isMovable}
+                  moveAxis={moveAxis}
                   isDeletable={isDeletable}
                   cellInfoToDateRange={cellInfoToDateRange}
                   cellArray={cellArray}
@@ -63,6 +73,9 @@ export const Schedule = React.memo(function Schedule({
                   onChange={onChange}
                   grid={grid}
                   cell={cell}
+                  getIsActive={getIsActive}
+                  eventContentComponent={eventContentComponent}
+                  eventRootComponent={eventRootComponent}
                 />
               );
             })}

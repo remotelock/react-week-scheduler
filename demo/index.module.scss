@@ -11,6 +11,28 @@ html {
   box-sizing: border-box;
 }
 
+.tooltip {
+  padding: 0;
+  button {
+    padding: 0.3125rem 0.5625rem;
+    appearance: none;
+    background: transparent;
+    border: 0;
+    font-family: inherit;
+    font-size: inherit;
+    color: inherit;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    cursor: pointer;
+
+    img {
+      filter: invert(100%);
+    }
+  }
+}
+
 .buttons-wrapper {
   display: flex;
   align-items: center;

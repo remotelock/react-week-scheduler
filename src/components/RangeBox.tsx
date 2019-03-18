@@ -1,7 +1,4 @@
-// @ts-ignore
-import VisuallyHidden from '@reach/visually-hidden';
 import classcat from 'classcat';
-import format from 'date-fns/format';
 import invariant from 'invariant';
 import Resizable, { ResizeCallback } from 're-resizable';
 import React, {
@@ -14,7 +11,7 @@ import React, {
 import Draggable, { DraggableEventHandler } from 'react-draggable';
 import useMousetrap from '../hooks/useMousetrap';
 import { CellInfo } from '../types';
-import { getTextForDateRange } from '../utils/getTextForDateRange';
+import { EventContent } from './EventContent';
 import { ScheduleProps } from './Schedule';
 
 export const RangeBox = React.memo(function RangeBox({
@@ -31,6 +28,9 @@ export const RangeBox = React.memo(function RangeBox({
   moveAxis,
   onActiveChange,
   onClick,
+  getIsActive,
+  eventContentComponent: EventContentComponent = EventContent,
+  eventRootComponent: EventRootComponent = 'div',
 }: ScheduleProps & {
   cellIndex: number;
   cellArray: CellInfo[];
@@ -213,6 +213,10 @@ export const RangeBox = React.memo(function RangeBox({
     [grid, rect, isResizable, setModifiedCell, cell, originalRect],
   );
 
+  const handleDelete = useCallback(() => {
+    onChange(undefined, rangeIndex);
+  }, [onChange, rangeIndex]);
+
   const handleOnFocus = useCallback(() => {
     if (!onActiveChange) {
       return;
@@ -240,6 +244,12 @@ export const RangeBox = React.memo(function RangeBox({
     [classes.handle],
   );
 
+  const isActive = useMemo(() => getIsActive({ cellIndex, rangeIndex }), [
+    cellIndex,
+    rangeIndex,
+    getIsActive,
+  ]);
+
   return (
     <Draggable
       axis={moveAxis}
@@ -254,13 +264,17 @@ export const RangeBox = React.memo(function RangeBox({
       onStop={handleStop}
       cancel={cancelClasses}
     >
-      <div
+      <EventRootComponent
         role="button"
         onFocus={handleOnFocus}
         onClick={handleOnClick}
+        handleDelete={handleDelete}
+        cellIndex={cellIndex}
+        rangeIndex={rangeIndex}
+        isActive={isActive}
+        classes={classes}
         className={classcat([
           classes.event,
-          classes['button-reset'],
           classes['range-boxes'],
           className,
           {
@@ -298,22 +312,16 @@ export const RangeBox = React.memo(function RangeBox({
             topRight: classes.handle,
           }}
         >
-          <div
-            style={{ width: width - 20, height }}
-            className={classes['event-content']}
-          >
-            <VisuallyHidden>
-              {getTextForDateRange(modifiedDateRange)}
-            </VisuallyHidden>
-            <span aria-hidden className={classes.start}>
-              {isStart && format(modifiedDateRange[0], 'h:mma')}
-            </span>
-            <span aria-hidden className={classes.end}>
-              {isEnd && format(modifiedDateRange[1], 'h:mma')}
-            </span>
-          </div>
+          <EventContentComponent
+            width={width}
+            height={height}
+            classes={classes}
+            dateRange={modifiedDateRange}
+            isStart={isStart}
+            isEnd={isEnd}
+          />
         </Resizable>
-      </div>
+      </EventRootComponent>
     </Draggable>
   );
 });

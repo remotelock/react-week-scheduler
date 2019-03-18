@@ -1,5 +1,6 @@
 /* eslint-disable import/no-extraneous-dependencies */
 
+import Tippy from '@tippy.js/react';
 import classcat from 'classcat';
 import format from 'date-fns/format';
 import isSameWeek from 'date-fns/is_same_week';
@@ -16,7 +17,8 @@ import useUndo from 'use-undo';
 import { TimeGridScheduler } from '../src/components/TimeGridScheduler';
 import useMousetrap from '../src/hooks/useMousetrap';
 import { classes as defaultClasses } from '../src/styles';
-import { ScheduleType } from '../src/types';
+import { EventRootProps, ScheduleType } from '../src/types';
+import deleteIconUrl from './assets/outline-delete-24px.svg';
 import { Key } from './components/Key/Key';
 import demoClasses from './index.module.scss';
 
@@ -39,6 +41,26 @@ const rangeStrings: [string, string][] = [
 const defaultSchedule: ScheduleType = rangeStrings.map(
   range => range.map(dateString => new Date(dateString)) as [Date, Date],
 );
+
+const EventRoot = React.forwardRef<any, EventRootProps>(function EventRoot(
+  { handleDelete, rangeIndex, cellIndex, isActive, ...props },
+  ref,
+) {
+  return (
+    <Tippy
+      arrow
+      interactive
+      className={demoClasses.tooltip}
+      content={
+        <button onClick={handleDelete}>
+          <img alt={undefined} role="presentation" src={deleteIconUrl} /> Delete
+        </button>
+      }
+    >
+      <div {...props} ref={ref} />
+    </Tippy>
+  );
+});
 
 function App() {
   const [weekStart, setWeekStart] = useState(1);
@@ -88,7 +110,7 @@ function App() {
     document,
   );
 
-  const [verticalPrecision, setVerticalPrecision] = useState(30);
+  const [verticalPrecision, setVerticalPrecision] = useState(15);
   const [
     visualGridVerticalPrecision,
     setVisualGridVerticalPrecision,
@@ -209,6 +231,7 @@ function App() {
             onChange={setSchedule}
             verticalPrecision={verticalPrecision}
             visualGridVerticalPrecision={visualGridVerticalPrecision}
+            eventRootComponent={EventRoot}
           />
         </Fragment>
       </CustomProperties>
