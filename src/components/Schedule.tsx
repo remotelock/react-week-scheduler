@@ -3,12 +3,10 @@ import {
   CellInfo,
   ClassNames,
   DateRange,
-  EventRootProps,
   Grid,
   OnChangeCallback,
   ScheduleType,
 } from '../types';
-import { EventContent } from './EventContent';
 import { RangeBox } from './RangeBox';
 
 export type ScheduleProps = {
@@ -22,10 +20,8 @@ export type ScheduleProps = {
   onActiveChange?(index: [number, number] | [null, null]): void;
   onClick?(index: [number, number] | [null, null]): void;
   getIsActive(indexes: { cellIndex: number; rangeIndex: number }): boolean;
-  eventContentComponent?: React.ElementType<
-    React.ComponentProps<typeof EventContent>
-  >;
-  eventRootComponent?: React.ElementType<EventRootProps>;
+  eventContentComponent?: any;
+  eventRootComponent?: any;
 };
 
 export const Schedule = React.memo(function Schedule({

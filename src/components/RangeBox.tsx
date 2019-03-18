@@ -214,6 +214,10 @@ export const RangeBox = React.memo(function RangeBox({
   );
 
   const handleDelete = useCallback(() => {
+    if (!onChange) {
+      return;
+    }
+
     onChange(undefined, rangeIndex);
   }, [onChange, rangeIndex]);
 
