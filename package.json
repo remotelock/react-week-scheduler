@@ -126,7 +126,7 @@
     "types": "run-s types/scss types/ts",
     "clean": "rimraf dist index.js index.mjs src/{!types}/*.d.ts index.css 'demo/**/*.d.ts' 'src/**/*.d.ts' 'src/**/*.map' './*.map'",
     "prebuild": "npm-run-all -s clean -p lint check-ts",
-    "build/demo": "parcel build demo/index.html --public-url /react-week-scheduler",
+    "build/demo": "parcel build demo/index.html --public-url /react-week-scheduler/",
     "build": "npm-run-all -s clean -p --aggregate-output types build/demo rollup",
     "deploy/demo": "gh-pages -d dist",
     "run-prettier": "prettier --write '*.json' 'types/**/*.ts' 'src/**/*.ts{,x}' 'src/**/*.scss'",
