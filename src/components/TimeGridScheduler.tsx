@@ -420,7 +420,6 @@ export const TimeGridScheduler = React.memo(function TimeGridScheduler({
               grid={grid}
               moveAxis="none"
               eventContentComponent={eventContentComponent}
-              eventRootComponent={eventRootComponent}
               getIsActive={getIsActive}
             />
           )}
