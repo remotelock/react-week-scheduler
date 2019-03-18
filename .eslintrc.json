@@ -21,6 +21,7 @@
   "plugins": ["react", "compat", "css-modules", "react-hooks"],
   "rules": {
     "no-console": "error",
+    "react/prop-types": ["off"],
     "@typescript-eslint/no-var-requires": ["off"],
     "react-hooks/rules-of-hooks": "error",
     "react-hooks/exhaustive-deps": "warn",
