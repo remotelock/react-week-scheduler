@@ -50,6 +50,7 @@ const EventRoot = React.forwardRef<any, EventRootProps>(function EventRoot(
     <Tippy
       arrow
       interactive
+      hideOnClick={false}
       className={demoClasses.tooltip}
       content={
         <button onClick={handleDelete}>

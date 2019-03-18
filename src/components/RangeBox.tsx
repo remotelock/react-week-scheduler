@@ -95,6 +95,31 @@ export const RangeBox = React.memo(function RangeBox({
   );
 
   useMousetrap(
+    'shift+up',
+    () => {
+      if (!onChange || !isResizable) {
+        return;
+      }
+
+      if (
+        modifiedCell.endY === modifiedCell.startY ||
+        modifiedCell.spanY === 0
+      ) {
+        return;
+      }
+
+      const newCell = {
+        ...modifiedCell,
+        endY: modifiedCell.endY - 1,
+        spanY: modifiedCell.spanY - 1,
+      };
+
+      onChange(cellInfoToDateRange(newCell), rangeIndex);
+    },
+    ref,
+  );
+
+  useMousetrap(
     'down',
     () => {
       if (!onChange) {
@@ -112,6 +137,32 @@ export const RangeBox = React.memo(function RangeBox({
       const newCell = {
         ...modifiedCell,
         startY: modifiedCell.startY + 1,
+        endY: modifiedCell.endY + 1,
+      };
+
+      onChange(cellInfoToDateRange(newCell), rangeIndex);
+    },
+    ref,
+  );
+
+  useMousetrap(
+    'shift+down',
+    () => {
+      if (!onChange || !isResizable) {
+        return;
+      }
+
+      if (moveAxis === 'none' || moveAxis === 'x') {
+        return;
+      }
+
+      if (modifiedCell.endY >= grid.numVerticalCells - 2) {
+        return;
+      }
+
+      const newCell = {
+        ...modifiedCell,
+        spanY: modifiedCell.spanY + 1,
         endY: modifiedCell.endY + 1,
       };
 
