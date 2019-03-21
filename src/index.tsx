@@ -1,5 +1,5 @@
 import { TimeGridScheduler } from './components/TimeGridScheduler';
-import { useMouseTrap } from './hooks/useMousetrap';
+import { useMousetrap } from './hooks/useMousetrap';
 import { classes } from './styles';
 
-export { TimeGridScheduler, classes, useMouseTrap };
+export { TimeGridScheduler, classes, useMousetrap };
