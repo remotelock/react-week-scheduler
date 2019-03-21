@@ -15,7 +15,7 @@ import ReactDOM from 'react-dom';
 import 'resize-observer-polyfill/dist/ResizeObserver.global';
 import useUndo from 'use-undo';
 import { TimeGridScheduler } from '../src/components/TimeGridScheduler';
-import useMousetrap from '../src/hooks/useMousetrap';
+import { useMousetrap } from '../src/hooks/useMousetrap';
 import { classes as defaultClasses } from '../src/styles';
 import { EventRootProps, ScheduleType } from '../src/types';
 import DeleteIcon from './assets/outline-delete-24px.svg';

@@ -7,7 +7,7 @@ import { useEffect, useRef } from 'react';
  * @param handlerKey - A key, key combo or array of combos according to Mousetrap documentation.
  * @param  handlerCallback - A function that is triggered on key combo catch.
  */
-export default function useMousetrap(
+export function useMousetrap(
   handlerKey: string | string[],
   handlerCallback: (e: ExtendedKeyboardEvent, combo: string) => void,
   elementOrElementRef: typeof document | React.RefObject<Element | null>,

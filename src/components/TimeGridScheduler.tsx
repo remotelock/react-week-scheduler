@@ -17,7 +17,7 @@ import React, {
 } from 'react';
 import scrollIntoView from 'scroll-into-view-if-needed';
 import { useClickAndDrag } from '../hooks/useClickAndDrag';
-import useMousetrap from '../hooks/useMousetrap';
+import { useMousetrap } from '../hooks/useMousetrap';
 import {
   CellInfo,
   ClassNames,
@@ -313,6 +313,11 @@ export const TimeGridScheduler = React.memo(function TimeGridScheduler({
     const { top, bottom } = rect;
 
     if (top === 0 && bottom === 0) {
+      return;
+    }
+
+    // IE, Edge do not support it
+    if (!('scrollBy' in root.current)) {
       return;
     }
 

@@ -9,7 +9,7 @@ import React, {
   useState,
 } from 'react';
 import Draggable, { DraggableEventHandler } from 'react-draggable';
-import useMousetrap from '../hooks/useMousetrap';
+import { useMousetrap } from '../hooks/useMousetrap';
 import { CellInfo } from '../types';
 import { EventContent } from './EventContent';
 import { ScheduleProps } from './Schedule';
