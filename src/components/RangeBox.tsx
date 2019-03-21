@@ -288,6 +288,8 @@ export const RangeBox = React.memo(function RangeBox({
     onClick([rangeIndex, cellIndex]);
   }, [onClick, rangeIndex, cellIndex]);
 
+  useMousetrap('enter', handleOnClick, ref);
+
   const cancelClasses = useMemo(
     () =>
       classes.handle

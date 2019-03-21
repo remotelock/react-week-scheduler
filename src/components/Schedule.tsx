@@ -38,6 +38,7 @@ export const Schedule = React.memo(function Schedule({
   onActiveChange,
   eventContentComponent,
   eventRootComponent,
+  onClick,
   getIsActive,
 }: {
   dateRangeToCells(range: DateRange): CellInfo[];
@@ -67,6 +68,7 @@ export const Schedule = React.memo(function Schedule({
                   rangeIndex={rangeIndex}
                   className={className}
                   onChange={onChange}
+                  onClick={onClick}
                   grid={grid}
                   cell={cell}
                   getIsActive={getIsActive}

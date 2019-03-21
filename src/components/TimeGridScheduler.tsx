@@ -53,6 +53,7 @@ export const TimeGridScheduler = React.memo(function TimeGridScheduler({
   classes,
   className,
   onChange,
+  onEventClick,
   eventContentComponent,
   eventRootComponent,
 }: {
@@ -90,6 +91,7 @@ export const TimeGridScheduler = React.memo(function TimeGridScheduler({
    */
   defaultHours?: [number, number];
   onChange(newSchedule: ScheduleType): void;
+  onEventClick?: ScheduleProps['onClick'];
   eventContentComponent?: ScheduleProps['eventContentComponent'];
   eventRootComponent?: ScheduleProps['eventRootComponent'];
 }) {
@@ -437,6 +439,7 @@ export const TimeGridScheduler = React.memo(function TimeGridScheduler({
               moveAxis="y"
               isDeletable
               onChange={handleEventChange}
+              onClick={onEventClick}
               ranges={schedule}
               grid={grid}
               eventContentComponent={eventContentComponent}
