@@ -155,7 +155,6 @@
   z-index: var(--z-index-event);
   margin: 0;
   position: absolute;
-  font-weight: bold;
   font-size: 1rem;
   --text: hsl(207, 65%, 93%);
   --background: hsl(202, 100%, 20%);
@@ -226,9 +225,7 @@
       text-transform: uppercase;
     }
 
-    transition-duration: 0.5s;
-    transition-timing-function: ease-in-out;
-    flex: 1 1 var(--cell-height, 50px);
+    flex: 1 1 var(--cell-height, 40px);
     display: flex;
     justify-content: flex-start;
     align-items: flex-start;
@@ -297,14 +294,13 @@
 
 .range-boxes {
   .event-content {
-    padding: 10px 0;
-    display: inline-flex;
-    flex-direction: column;
-    justify-content: space-between;
-    align-items: center;
-    text-align: center;
+    padding: 5px 10px;
+    font-weight: bold;
+
+    font-size: 13px;
     width: 100%;
     height: 100%;
+    white-space: pre;
 
     & > * {
       width: 100%;
@@ -312,11 +308,10 @@
   }
 
   .start {
-    align-self: start;
-  }
-
-  .end {
-    align-self: end;
+    &:after {
+      content: ' – ';
+      display: inline-block;
+    }
   }
 }
 
