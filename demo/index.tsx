@@ -116,8 +116,8 @@ function App() {
   const [
     visualGridVerticalPrecision,
     setVisualGridVerticalPrecision,
-  ] = useState(30);
-  const [cellHeight, setCellHeight] = useState(50);
+  ] = useState(60);
+  const [cellHeight, setCellHeight] = useState(45);
   const [cellWidth, setCellWidth] = useState(250);
   const [disabled, setDisabled] = useState(false);
 
@@ -205,7 +205,7 @@ function App() {
             type="range"
             max={100}
             step={10}
-            min={40}
+            min={30}
             value={cellHeight}
             onChange={({ target: { value } }) => setCellHeight(Number(value))}
           />
