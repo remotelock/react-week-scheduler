@@ -10,12 +10,14 @@ import isEqual from 'lodash/isEqual';
 import times from 'lodash/times';
 import React, {
   useCallback,
+  useContext,
   useEffect,
   useMemo,
   useRef,
   useState,
 } from 'react';
 import scrollIntoView from 'scroll-into-view-if-needed';
+import { SchedulerContext } from '../context';
 import { useClickAndDrag } from '../hooks/useClickAndDrag';
 import { useMousetrap } from '../hooks/useMousetrap';
 import {
@@ -97,6 +99,7 @@ export const TimeGridScheduler = React.memo(function TimeGridScheduler({
   eventRootComponent?: ScheduleProps['eventRootComponent'];
   disabled?: boolean;
 }) {
+  const { locale } = useContext(SchedulerContext);
   const originDate = useMemo(() => startOfDay(_originDate), [_originDate]);
   const numVerticalCells = MINS_IN_DAY / verticalPrecision;
   const numHorizontalCells = 7 / horizontalPrecision;
@@ -385,7 +388,7 @@ export const TimeGridScheduler = React.memo(function TimeGridScheduler({
                         if (isHourStart) {
                           return (
                             <div className={classes.time}>
-                              {format(start, 'h a')}
+                              {format(start, 'h a', { locale })}
                             </div>
                           );
                         }
@@ -416,7 +419,7 @@ export const TimeGridScheduler = React.memo(function TimeGridScheduler({
                 className={classes['day-column']}
               >
                 <div className={classcat([classes.cell, classes.title])}>
-                  {format(addDays(originDate, i), 'ddd')}
+                  {format(addDays(originDate, i), 'ddd', { locale })}
                 </div>
               </div>
             ))}

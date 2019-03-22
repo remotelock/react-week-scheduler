@@ -188,7 +188,9 @@ function App() {
           >
             {[0, 1, 2, 3, 4, 5, 6].map(value => (
               <option key={value} value={value}>
-                {format(setDay(new Date(), value), 'ddd')}
+                {format(setDay(new Date(), value), 'ddd', {
+                  locale: locales[locale],
+                })}
               </option>
             ))}
           </select>

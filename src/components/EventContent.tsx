@@ -30,7 +30,9 @@ export const EventContent = React.memo(function EventContent({
       style={{ width: width - 20, height }}
       className={classes['event-content']}
     >
-      <VisuallyHidden>{getTextForDateRange(dateRange)}</VisuallyHidden>
+      <VisuallyHidden>
+        {getTextForDateRange(dateRange, { locale })}
+      </VisuallyHidden>
       <span aria-hidden className={classes.start}>
         {isStart && format(dateRange[0], 'h:mma', { locale })}
       </span>
