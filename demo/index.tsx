@@ -4,6 +4,10 @@ import Tippy from '@tippy.js/react';
 import classcat from 'classcat';
 import format from 'date-fns/format';
 import isSameWeek from 'date-fns/is_same_week';
+import ar from 'date-fns/locale/ar';
+import de from 'date-fns/locale/de';
+import en from 'date-fns/locale/en';
+import ja from 'date-fns/locale/ja';
 import setDay from 'date-fns/set_day';
 import startOfWeek from 'date-fns/start_of_week';
 // @ts-ignore
@@ -15,12 +19,20 @@ import ReactDOM from 'react-dom';
 import 'resize-observer-polyfill/dist/ResizeObserver.global';
 import useUndo from 'use-undo';
 import { TimeGridScheduler } from '../src/components/TimeGridScheduler';
+import { dateFnsContext } from '../src/context';
 import { useMousetrap } from '../src/hooks/useMousetrap';
 import { classes as defaultClasses } from '../src/styles';
 import { EventRootProps, ScheduleType } from '../src/types';
 import DeleteIcon from './assets/outline-delete-24px.svg';
 import { Key } from './components/Key/Key';
 import demoClasses from './index.module.scss';
+
+const locales = {
+  ja,
+  en,
+  de,
+  ar,
+};
 
 const classes = mapValues(
   defaultClasses,
@@ -120,6 +132,7 @@ function App() {
   const [cellHeight, setCellHeight] = useState(45);
   const [cellWidth, setCellWidth] = useState(250);
   const [disabled, setDisabled] = useState(false);
+  const [locale, setLocale] = useState('en');
 
   return (
     <>
@@ -197,6 +210,23 @@ function App() {
             ))}
           </select>
         </label>
+        <label htmlFor="locale">
+          Locale:
+          <select
+            name="locale"
+            id="locale"
+            value={locale}
+            onChange={({ target: { value } }) => {
+              setLocale(value);
+            }}
+          >
+            {['en', 'ar', 'ja', 'de'].map(value => (
+              <option key={value} value={value}>
+                {value}
+              </option>
+            ))}
+          </select>
+        </label>
         <label htmlFor="cell_height">
           Cell height:
           <input
@@ -236,17 +266,19 @@ function App() {
         }}
       >
         <Fragment key={`${cellHeight},${cellWidth}`}>
-          <TimeGridScheduler
-            key={originDate.toString()}
-            classes={classes}
-            originDate={originDate}
-            schedule={scheduleState.present}
-            onChange={setSchedule}
-            verticalPrecision={verticalPrecision}
-            visualGridVerticalPrecision={visualGridVerticalPrecision}
-            eventRootComponent={EventRoot}
-            disabled={disabled}
-          />
+          <dateFnsContext.Provider value={{ locale: locales[locale] }}>
+            <TimeGridScheduler
+              key={originDate.toString()}
+              classes={classes}
+              originDate={originDate}
+              schedule={scheduleState.present}
+              onChange={setSchedule}
+              verticalPrecision={verticalPrecision}
+              visualGridVerticalPrecision={visualGridVerticalPrecision}
+              eventRootComponent={EventRoot}
+              disabled={disabled}
+            />
+          </dateFnsContext.Provider>
         </Fragment>
       </CustomProperties>
     </>
