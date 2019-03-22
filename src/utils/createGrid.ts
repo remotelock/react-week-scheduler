@@ -15,8 +15,8 @@ export const createGrid = ({
   numVerticalCells: number;
   numHorizontalCells: number;
 }): Grid => {
-  const cellHeight = floor(totalHeight / numVerticalCells);
-  const cellWidth = floor(totalWidth / numHorizontalCells);
+  const cellHeight = totalHeight / numVerticalCells;
+  const cellWidth = totalWidth / numHorizontalCells;
 
   return {
     totalHeight,
