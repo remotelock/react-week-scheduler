@@ -308,10 +308,15 @@
   }
 
   .start {
+    display: inline;
     &:after {
       content: ' – ';
-      display: inline-block;
+      display: inline;
     }
+  }
+
+  .end {
+    display: inline;
   }
 }
 
