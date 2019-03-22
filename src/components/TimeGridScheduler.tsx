@@ -35,6 +35,7 @@ import {
 } from '../utils/createMapCellInfoToRecurringTimeRange';
 import { createMapDateRangeToCells } from '../utils/createMapDateRangeToCells';
 import { getEarliestRange } from '../utils/getEarliestRange';
+import { getSpan } from '../utils/getSpan';
 import { mergeEvents, mergeRanges } from '../utils/mergeEvents';
 import { Cell } from './Cell';
 import { Schedule, ScheduleProps } from './Schedule';
@@ -195,9 +196,7 @@ export const TimeGridScheduler = React.memo(function TimeGridScheduler({
     }
 
     const cell = grid.getCellFromRect(box);
-    const spanY = Math.max(cell.spanY, toY(60));
-    const endY = spanY + cell.startY;
-    const dateRanges = cellInfoToDateRanges({ ...cell, spanY, endY });
+    const dateRanges = cellInfoToDateRanges(cell);
     const event = dateRanges;
     setPendingCreation(event);
   }, [box, grid, cellInfoToDateRanges, toY, setPendingCreation]);
@@ -352,6 +351,32 @@ export const TimeGridScheduler = React.memo(function TimeGridScheduler({
     [setActive],
   );
 
+  const handleCellClick = useCallback(
+    (dayIndex: number, timeIndex: number) => (event: React.MouseEvent) => {
+      if (!grid) {
+        return;
+      }
+
+      const spanY = toY(60);
+      const cell = {
+        startX: dayIndex,
+        startY: timeIndex,
+        endX: dayIndex,
+        endY: spanY + timeIndex,
+        spanY,
+        spanX: getSpan(dayIndex, dayIndex),
+      };
+
+      const dateRanges = cellInfoToDateRanges(cell);
+
+      setPendingCreation(dateRanges);
+
+      event.stopPropagation();
+      event.preventDefault();
+    },
+    [grid, toY, cellInfoToDateRanges],
+  );
+
   return (
     <div
       ref={root}
@@ -477,6 +502,11 @@ export const TimeGridScheduler = React.memo(function TimeGridScheduler({
                       return (
                         <Cell
                           classes={classes}
+                          onClick={handleCellClick(
+                            dayIndex,
+                            timeIndex *
+                              (numVerticalCells / numVisualVerticalCells),
+                          )}
                           getDateRangeForVisualGrid={getDateRangeForVisualGrid}
                           key={timeIndex}
                           timeIndex={timeIndex}

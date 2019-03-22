@@ -121,6 +121,7 @@ export function useClickAndDrag(
               };
             },
           ),
+          filter(({ width }) => width >= 5),
           takeUntil(dragEnd$),
         );
       }),

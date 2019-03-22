@@ -8,11 +8,13 @@ export const Cell = React.memo(function Cell({
   children,
   classes,
   getDateRangeForVisualGrid,
+  onClick,
 }: {
   timeIndex: number;
   classes: ClassNames;
   getDateRangeForVisualGrid(cell: CellInfo): DateRange[];
   children?(options: { start: Date; isHourStart: boolean }): React.ReactNode;
+  onClick?: React.MouseEventHandler;
 }) {
   const [[start]] = getDateRangeForVisualGrid({
     startX: 0,
@@ -27,6 +29,8 @@ export const Cell = React.memo(function Cell({
 
   return (
     <div
+      role="button"
+      onClick={onClick}
       className={classcat([
         classes.cell,
         { [classes['is-hour-start']]: isHourStart },
