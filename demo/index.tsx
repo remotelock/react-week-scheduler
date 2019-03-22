@@ -2,18 +2,23 @@
 
 import Tippy from '@tippy.js/react';
 import classcat from 'classcat';
+import compareAsc from 'date-fns/compare_asc';
 import format from 'date-fns/format';
-import isSameWeek from 'date-fns/is_same_week';
+import getDay from 'date-fns/get_day';
+import getHours from 'date-fns/get_hours';
+import getMinutes from 'date-fns/get_minutes';
 import ar from 'date-fns/locale/ar';
 import de from 'date-fns/locale/de';
 import en from 'date-fns/locale/en';
 import ja from 'date-fns/locale/ja';
 import setDay from 'date-fns/set_day';
+import setHours from 'date-fns/set_hours';
+import setMinutes from 'date-fns/set_minutes';
 import startOfWeek from 'date-fns/start_of_week';
 // @ts-ignore
 import humanizeDuration from 'humanize-duration';
 import mapValues from 'lodash/mapValues';
-import React, { Fragment, useMemo, useState } from 'react';
+import React, { Fragment, useEffect, useMemo, useState } from 'react';
 import CustomProperties from 'react-custom-properties';
 import ReactDOM from 'react-dom';
 import 'resize-observer-polyfill/dist/ResizeObserver.global';
@@ -85,20 +90,46 @@ function App() {
       }),
     [weekStart],
   );
+  const defaultAdjustedSchedule = useMemo(
+    () =>
+      defaultSchedule
+        .map(
+          range =>
+            [
+              setMinutes(
+                setHours(
+                  setDay(originDate, getDay(range[0]), {
+                    weekStartsOn: weekStart,
+                  }),
+                  getHours(range[0]),
+                ),
+                getMinutes(range[0]),
+              ),
+              setMinutes(
+                setHours(
+                  setDay(originDate, getDay(range[1]), {
+                    weekStartsOn: weekStart,
+                  }),
+                  getHours(range[1]),
+                ),
+                getMinutes(range[1]),
+              ),
+            ] as [Date, Date],
+        )
+        .sort(([start], [end]) => compareAsc(start, end)),
+    [weekStart, originDate],
+  );
   const [
     scheduleState,
     {
       set: setSchedule,
+      reset: resetSchedule,
       undo: undoSchedule,
       redo: redoSchedule,
       canUndo: canUndoSchedule,
       canRedo: canRedoSchedule,
     },
-  ] = useUndo<ScheduleType>(
-    defaultSchedule.filter(range =>
-      isSameWeek(originDate, range[0], { weekStartsOn: weekStart }),
-    ),
-  );
+  ] = useUndo<ScheduleType>(defaultAdjustedSchedule);
 
   useMousetrap(
     'ctrl+z',
@@ -136,6 +167,11 @@ function App() {
   const [cellWidth, setCellWidth] = useState(250);
   const [disabled, setDisabled] = useState(false);
   const [locale, setLocale] = useState('en');
+
+  useEffect(() => {
+    setSchedule(defaultAdjustedSchedule);
+    resetSchedule(defaultAdjustedSchedule);
+  }, [defaultAdjustedSchedule, setSchedule, resetSchedule]);
 
   return (
     <>
