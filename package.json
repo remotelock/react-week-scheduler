@@ -5,7 +5,7 @@
   "description": "",
   "homepage": "https://remotelock.github.io/react-week-scheduler/",
   "private": false,
-  "sideEffects": false,
+  "sideEffects": [ "*.css" ],
   "keywords": [
     "calendar",
     "time grid",
