@@ -2,7 +2,7 @@
 import VisuallyHidden from '@reach/visually-hidden';
 import format from 'date-fns/format';
 import React, { useContext } from 'react';
-import { dateFnsContext } from '../context';
+import { SchedulerContext } from '../context';
 import { ClassNames } from '../types';
 import { getTextForDateRange } from '../utils/getTextForDateRange';
 
@@ -23,7 +23,7 @@ export const EventContent = React.memo(function EventContent({
   isStart,
   isEnd,
 }: EventContentProps) {
-  const { locale } = useContext(dateFnsContext);
+  const { locale } = useContext(SchedulerContext);
 
   return (
     <div

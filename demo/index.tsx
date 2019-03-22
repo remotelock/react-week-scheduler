@@ -19,7 +19,7 @@ import ReactDOM from 'react-dom';
 import 'resize-observer-polyfill/dist/ResizeObserver.global';
 import useUndo from 'use-undo';
 import { TimeGridScheduler } from '../src/components/TimeGridScheduler';
-import { dateFnsContext } from '../src/context';
+import { SchedulerContext } from '../src/context';
 import { useMousetrap } from '../src/hooks/useMousetrap';
 import { classes as defaultClasses } from '../src/styles';
 import { EventRootProps, ScheduleType } from '../src/types';
@@ -266,7 +266,7 @@ function App() {
         }}
       >
         <Fragment key={`${cellHeight},${cellWidth}`}>
-          <dateFnsContext.Provider value={{ locale: locales[locale] }}>
+          <SchedulerContext.Provider value={{ locale: locales[locale] }}>
             <TimeGridScheduler
               key={originDate.toString()}
               classes={classes}
@@ -278,7 +278,7 @@ function App() {
               eventRootComponent={EventRoot}
               disabled={disabled}
             />
-          </dateFnsContext.Provider>
+          </SchedulerContext.Provider>
         </Fragment>
       </CustomProperties>
     </>
