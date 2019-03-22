@@ -192,10 +192,12 @@ export const TimeGridScheduler = React.memo(function TimeGridScheduler({
     }
 
     const cell = grid.getCellFromRect(box);
-    const dateRanges = cellInfoToDateRanges(cell);
+    const spanY = Math.max(cell.spanY, toY(60));
+    const endY = spanY + cell.startY;
+    const dateRanges = cellInfoToDateRanges({ ...cell, spanY, endY });
     const event = dateRanges;
     setPendingCreation(event);
-  }, [box, grid, cellInfoToDateRanges, setPendingCreation]);
+  }, [box, grid, cellInfoToDateRanges, toY, setPendingCreation]);
 
   useEffect(() => {
     if (disabled) {
