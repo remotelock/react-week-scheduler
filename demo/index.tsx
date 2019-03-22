@@ -129,6 +129,9 @@ function App() {
     visualGridVerticalPrecision,
     setVisualGridVerticalPrecision,
   ] = useState(60);
+  const [cellClickPrecision, setCellClickPrecision] = useState(
+    visualGridVerticalPrecision,
+  );
   const [cellHeight, setCellHeight] = useState(45);
   const [cellWidth, setCellWidth] = useState(250);
   const [disabled, setDisabled] = useState(false);
@@ -212,6 +215,23 @@ function App() {
             ))}
           </select>
         </label>
+        <label htmlFor="min_cell_click_precision">
+          Min click precision:
+          <select
+            name="min_cell_click_precision"
+            id="min_cell_click_precision"
+            value={cellClickPrecision}
+            onChange={({ target: { value } }) =>
+              setCellClickPrecision(Number(value))
+            }
+          >
+            {[15, 30, 60].map(value => (
+              <option key={value} value={value}>
+                {humanizeDuration(value * 60 * 1000)}
+              </option>
+            ))}
+          </select>
+        </label>
         <label htmlFor="locale">
           Locale:
           <select
@@ -277,6 +297,7 @@ function App() {
               onChange={setSchedule}
               verticalPrecision={verticalPrecision}
               visualGridVerticalPrecision={visualGridVerticalPrecision}
+              cellClickPrecision={cellClickPrecision}
               eventRootComponent={EventRoot}
               disabled={disabled}
             />

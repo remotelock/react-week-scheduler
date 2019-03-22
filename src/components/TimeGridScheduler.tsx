@@ -49,6 +49,7 @@ const DELETE_KEYS = ['del', 'backspace'];
 export const TimeGridScheduler = React.memo(function TimeGridScheduler({
   verticalPrecision = 30,
   visualGridVerticalPrecision = 30,
+  cellClickPrecision = visualGridVerticalPrecision,
   style,
   schedule,
   originDate: _originDate = new Date(),
@@ -74,6 +75,13 @@ export const TimeGridScheduler = React.memo(function TimeGridScheduler({
    * @default 30
    */
   visualGridVerticalPrecision?: number;
+
+  /**
+   * The minimum number of minutes for an time block
+   * created with a single click.
+   * @default visualGridVerticalPrecision
+   */
+  cellClickPrecision?: number;
 
   /** Custom styles applied to the root of the view */
   style?: React.CSSProperties;
@@ -357,7 +365,7 @@ export const TimeGridScheduler = React.memo(function TimeGridScheduler({
         return;
       }
 
-      const spanY = toY(60);
+      const spanY = toY(cellClickPrecision);
       const cell = {
         startX: dayIndex,
         startY: timeIndex,
@@ -374,7 +382,7 @@ export const TimeGridScheduler = React.memo(function TimeGridScheduler({
       event.stopPropagation();
       event.preventDefault();
     },
-    [grid, disabled, toY, cellInfoToDateRanges],
+    [grid, disabled, toY, cellClickPrecision, cellInfoToDateRanges],
   );
 
   return (
