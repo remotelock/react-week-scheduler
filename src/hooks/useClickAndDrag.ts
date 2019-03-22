@@ -19,7 +19,10 @@ const prevent = tap((e: TouchEvent) => {
   e.stopPropagation();
 });
 
-export function useClickAndDrag(ref: React.RefObject<HTMLElement>) {
+export function useClickAndDrag(
+  ref: React.RefObject<HTMLElement>,
+  isDisabled?: boolean,
+) {
   const [style, setStyle] = useState({
     transform: 'translate(0, 0)',
     width: 0,
@@ -31,7 +34,7 @@ export function useClickAndDrag(ref: React.RefObject<HTMLElement>) {
   const container = ref.current;
 
   useEffect(() => {
-    if (!container) {
+    if (!container || isDisabled) {
       return;
     }
 
@@ -139,7 +142,7 @@ export function useClickAndDrag(ref: React.RefObject<HTMLElement>) {
       boxSubscriber.unsubscribe();
       styleSubscriber.unsubscribe();
     };
-  }, [container]);
+  }, [container, isDisabled]);
 
   const cancel = useCallback(() => {
     setIsDragging(false);

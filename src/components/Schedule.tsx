@@ -22,6 +22,7 @@ export type ScheduleProps = {
   getIsActive(indexes: { cellIndex: number; rangeIndex: number }): boolean;
   eventContentComponent?: any;
   eventRootComponent?: any;
+  disabled?: boolean;
 };
 
 export const Schedule = React.memo(function Schedule({
@@ -40,6 +41,7 @@ export const Schedule = React.memo(function Schedule({
   eventRootComponent,
   onClick,
   getIsActive,
+  disabled,
 }: {
   dateRangeToCells(range: DateRange): CellInfo[];
   ranges: ScheduleType;
@@ -74,6 +76,7 @@ export const Schedule = React.memo(function Schedule({
                   getIsActive={getIsActive}
                   eventContentComponent={eventContentComponent}
                   eventRootComponent={eventRootComponent}
+                  disabled={disabled}
                 />
               );
             })}

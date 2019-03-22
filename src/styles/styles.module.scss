@@ -160,7 +160,7 @@
   --text: hsl(207, 65%, 93%);
   --background: hsl(202, 100%, 20%);
 
-  &:not(.is-pending-creation) {
+  &:not(.is-pending-creation):not([disabled]):not(.is-disabled) {
     &:focus,
     &:hover {
       --background: hsl(202, 100%, 30%);

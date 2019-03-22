@@ -31,6 +31,7 @@ export const RangeBox = React.memo(function RangeBox({
   getIsActive,
   eventContentComponent: EventContentComponent = EventContent,
   eventRootComponent: EventRootComponent = 'div',
+  disabled,
 }: ScheduleProps & {
   cellIndex: number;
   cellArray: CellInfo[];
@@ -61,17 +62,17 @@ export const RangeBox = React.memo(function RangeBox({
   const isEnd = cellIndex === cellArray.length - 1;
 
   const handleStop = useCallback(() => {
-    if (!onChange) {
+    if (!onChange || disabled) {
       return;
     }
 
     onChange(cellInfoToDateRange(modifiedCell), rangeIndex);
-  }, [modifiedCell, rangeIndex, cellInfoToDateRange, onChange]);
+  }, [modifiedCell, rangeIndex, disabled, cellInfoToDateRange, onChange]);
 
   useMousetrap(
     'up',
     () => {
-      if (!onChange) {
+      if (!onChange || disabled) {
         return;
       }
 
@@ -97,7 +98,7 @@ export const RangeBox = React.memo(function RangeBox({
   useMousetrap(
     'shift+up',
     () => {
-      if (!onChange || !isResizable) {
+      if (!onChange || !isResizable || disabled) {
         return;
       }
 
@@ -122,7 +123,7 @@ export const RangeBox = React.memo(function RangeBox({
   useMousetrap(
     'down',
     () => {
-      if (!onChange) {
+      if (!onChange || disabled) {
         return;
       }
 
@@ -148,7 +149,7 @@ export const RangeBox = React.memo(function RangeBox({
   useMousetrap(
     'shift+down',
     () => {
-      if (!onChange || !isResizable) {
+      if (!onChange || !isResizable || disabled) {
         return;
       }
 
@@ -173,7 +174,7 @@ export const RangeBox = React.memo(function RangeBox({
 
   const handleDrag: DraggableEventHandler = useCallback(
     (event, { y, x }) => {
-      if (moveAxis === 'none') {
+      if (moveAxis === 'none' || disabled) {
         return;
       }
 
@@ -219,12 +220,12 @@ export const RangeBox = React.memo(function RangeBox({
 
       setModifiedCell(newCell);
     },
-    [grid, rect, moveAxis, cell, setModifiedCell],
+    [grid, rect, moveAxis, disabled, cell, setModifiedCell],
   );
 
   const handleResize: ResizeCallback = useCallback(
     (event, direction, _ref, delta) => {
-      if (!isResizable) {
+      if (!isResizable || disabled) {
         return;
       }
 
@@ -261,32 +262,32 @@ export const RangeBox = React.memo(function RangeBox({
 
       setModifiedCell(newCell);
     },
-    [grid, rect, isResizable, setModifiedCell, cell, originalRect],
+    [grid, rect, disabled, isResizable, setModifiedCell, cell, originalRect],
   );
 
   const handleDelete = useCallback(() => {
-    if (!onChange) {
+    if (!onChange || disabled) {
       return;
     }
 
     onChange(undefined, rangeIndex);
-  }, [onChange, rangeIndex]);
+  }, [onChange, disabled, rangeIndex]);
 
   const handleOnFocus = useCallback(() => {
-    if (!onActiveChange) {
+    if (!onActiveChange || disabled) {
       return;
     }
 
     onActiveChange([rangeIndex, cellIndex]);
-  }, [onActiveChange, rangeIndex, cellIndex]);
+  }, [onActiveChange, disabled, rangeIndex, cellIndex]);
 
   const handleOnClick = useCallback(() => {
-    if (!onClick) {
+    if (!onClick || disabled) {
       return;
     }
 
     onClick([rangeIndex, cellIndex]);
-  }, [onClick, rangeIndex, cellIndex]);
+  }, [onClick, rangeIndex, disabled, cellIndex]);
 
   useMousetrap('enter', handleOnClick, ref);
 
@@ -320,9 +321,11 @@ export const RangeBox = React.memo(function RangeBox({
       onDrag={handleDrag}
       onStop={handleStop}
       cancel={cancelClasses}
+      disabled={disabled}
     >
       <EventRootComponent
         role="button"
+        disabled={disabled}
         onFocus={handleOnFocus}
         onClick={handleOnClick}
         handleDelete={handleDelete}
@@ -335,11 +338,11 @@ export const RangeBox = React.memo(function RangeBox({
           classes['range-boxes'],
           className,
           {
-            [classes['is-draggable']]: moveAxis !== 'none',
+            [classes['is-draggable']]: !disabled && moveAxis !== 'none',
+            [classes['is-disabled']]: disabled,
           },
         ])}
         ref={ref}
-        tabIndex={0}
         style={{ width: width - 20, height }}
       >
         <Resizable
@@ -351,7 +354,7 @@ export const RangeBox = React.memo(function RangeBox({
           onResizeStop={handleStop}
           handleWrapperClass={classes['handle-wrapper']}
           enable={
-            isResizable
+            isResizable && !disabled
               ? {
                   top: true,
                   bottom: true,

@@ -56,6 +56,7 @@ export const TimeGridScheduler = React.memo(function TimeGridScheduler({
   onEventClick,
   eventContentComponent,
   eventRootComponent,
+  disabled,
 }: {
   originDate?: Date;
 
@@ -94,6 +95,7 @@ export const TimeGridScheduler = React.memo(function TimeGridScheduler({
   onEventClick?: ScheduleProps['onClick'];
   eventContentComponent?: ScheduleProps['eventContentComponent'];
   eventRootComponent?: ScheduleProps['eventRootComponent'];
+  disabled?: boolean;
 }) {
   const originDate = useMemo(() => startOfDay(_originDate), [_originDate]);
   const numVerticalCells = MINS_IN_DAY / verticalPrecision;
@@ -152,7 +154,7 @@ export const TimeGridScheduler = React.memo(function TimeGridScheduler({
     isDragging,
     hasFinishedDragging,
     cancel,
-  } = useClickAndDrag(parent);
+  } = useClickAndDrag(parent, disabled);
   const [
     pendingCreation,
     setPendingCreation,
@@ -196,14 +198,22 @@ export const TimeGridScheduler = React.memo(function TimeGridScheduler({
   }, [box, grid, cellInfoToDateRanges, setPendingCreation]);
 
   useEffect(() => {
+    if (disabled) {
+      return;
+    }
+
     if (hasFinishedDragging) {
       onChange(mergeEvents(schedule, pendingCreation));
       setPendingCreation(null);
     }
-  }, [hasFinishedDragging, onChange, setPendingCreation, pendingCreation, schedule]);
+  }, [hasFinishedDragging, disabled, onChange, setPendingCreation, pendingCreation, schedule]);
 
   const handleEventChange = useCallback<OnChangeCallback>(
     (newDateRange, rangeIndex) => {
+      if (disabled) {
+        return;
+      }
+
       if (!schedule && newDateRange) {
         onChange([newDateRange]);
 
@@ -228,7 +238,7 @@ export const TimeGridScheduler = React.memo(function TimeGridScheduler({
 
       onChange(newSchedule);
     },
-    [schedule, onChange],
+    [schedule, onChange, disabled],
   );
 
   useMousetrap(
@@ -253,7 +263,7 @@ export const TimeGridScheduler = React.memo(function TimeGridScheduler({
 
   const handleDelete = useCallback(
     (e: ExtendedKeyboardEvent) => {
-      if (activeRangeIndex === null) {
+      if (activeRangeIndex === null || disabled) {
         return;
       }
 
@@ -261,7 +271,7 @@ export const TimeGridScheduler = React.memo(function TimeGridScheduler({
       e.stopPropagation();
       handleEventChange(undefined, activeRangeIndex);
     },
-    [activeRangeIndex, handleEventChange],
+    [activeRangeIndex, disabled, handleEventChange],
   );
 
   useMousetrap(DELETE_KEYS, handleDelete, root);
@@ -445,6 +455,7 @@ export const TimeGridScheduler = React.memo(function TimeGridScheduler({
               eventContentComponent={eventContentComponent}
               eventRootComponent={eventRootComponent}
               getIsActive={getIsActive}
+              disabled={disabled}
             />
           )}
 

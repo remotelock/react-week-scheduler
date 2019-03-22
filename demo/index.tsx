@@ -119,6 +119,7 @@ function App() {
   ] = useState(30);
   const [cellHeight, setCellHeight] = useState(50);
   const [cellWidth, setCellWidth] = useState(250);
+  const [disabled, setDisabled] = useState(false);
 
   return (
     <>
@@ -153,6 +154,16 @@ function App() {
               </option>
             ))}
           </select>
+        </label>
+        <label htmlFor="disabled">
+          <input
+            id="disabled"
+            type="checkbox"
+            name="disabled"
+            checked={disabled}
+            onChange={e => setDisabled(Boolean(e.target.checked))}
+          />
+          Disabled
         </label>
         <label style={{ display: 'none' }} htmlFor="start_of_week">
           Start of week:
@@ -234,6 +245,7 @@ function App() {
             verticalPrecision={verticalPrecision}
             visualGridVerticalPrecision={visualGridVerticalPrecision}
             eventRootComponent={EventRoot}
+            disabled={disabled}
           />
         </Fragment>
       </CustomProperties>
