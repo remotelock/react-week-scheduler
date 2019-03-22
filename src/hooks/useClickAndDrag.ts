@@ -1,9 +1,7 @@
-import isEqual from 'lodash/isEqual';
 import React, { useCallback, useEffect, useState } from 'react';
-import { fromEvent, merge, of } from 'rxjs';
+import { fromEvent, merge, Observable, of } from 'rxjs';
 import {
   delay,
-  distinctUntilChanged,
   filter,
   map,
   mergeMap,
@@ -23,7 +21,7 @@ export function useClickAndDrag(
   ref: React.RefObject<HTMLElement>,
   isDisabled?: boolean,
 ) {
-  const [style, setStyle] = useState({
+  const [style, setStyle] = useState<React.CSSProperties>({
     transform: 'translate(0, 0)',
     width: 0,
     height: 0,
@@ -88,7 +86,7 @@ export function useClickAndDrag(
 
     const move$ = merge(mouseMove$, touchMove$).pipe(map(mapCoordsToContainer));
 
-    const box$ = dragStart$.pipe(
+    const box$: Observable<Rect | null> = dragStart$.pipe(
       tap(() => {
         setIsDragging(true);
         setHasFinishedDragging(false);
@@ -121,19 +119,27 @@ export function useClickAndDrag(
               };
             },
           ),
-          filter(({ width }) => width >= 5),
           takeUntil(dragEnd$),
         );
       }),
-      distinctUntilChanged(isEqual),
+      map(rect => {
+        return rect.width < 5 ? null : rect;
+      }),
     );
 
     const style$ = box$.pipe(
-      map(({ top, left, width, height }) => ({
-        transform: `translate(${left}px, ${top}px)`,
-        width,
-        height,
-      })),
+      map(rect => {
+        if (rect !== null) {
+          const { width, height, left, top } = rect;
+          return {
+            transform: `translate(${left}px, ${top}px)`,
+            width,
+            height,
+          };
+        }
+
+        return { display: 'none' };
+      }),
     );
 
     const boxSubscriber = box$.subscribe(setBox);
@@ -149,7 +155,7 @@ export function useClickAndDrag(
     setIsDragging(false);
     setHasFinishedDragging(false);
     setBox(null);
-  }, [setBox]);
+  }, []);
 
   return { style, box, isDragging, cancel, hasFinishedDragging };
 }

@@ -207,7 +207,7 @@ export const TimeGridScheduler = React.memo(function TimeGridScheduler({
     const dateRanges = cellInfoToDateRanges(cell);
     const event = dateRanges;
     setPendingCreation(event);
-  }, [box, grid, cellInfoToDateRanges, toY, setPendingCreation]);
+  }, [box, grid, cellInfoToDateRanges, toY]);
 
   useEffect(() => {
     if (disabled) {
