@@ -353,7 +353,7 @@ export const TimeGridScheduler = React.memo(function TimeGridScheduler({
 
   const handleCellClick = useCallback(
     (dayIndex: number, timeIndex: number) => (event: React.MouseEvent) => {
-      if (!grid) {
+      if (!grid || disabled) {
         return;
       }
 
@@ -374,7 +374,7 @@ export const TimeGridScheduler = React.memo(function TimeGridScheduler({
       event.stopPropagation();
       event.preventDefault();
     },
-    [grid, toY, cellInfoToDateRanges],
+    [grid, disabled, toY, cellInfoToDateRanges],
   );
 
   return (
