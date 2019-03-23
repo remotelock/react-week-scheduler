@@ -34,7 +34,7 @@ import {
   RecurringTimeRange,
 } from '../utils/createMapCellInfoToRecurringTimeRange';
 import { createMapDateRangeToCells } from '../utils/createMapDateRangeToCells';
-import { getEarliestRange } from '../utils/getEarliestRange';
+import { getEarliestTimeRange } from '../utils/getEarliestTimeRange';
 import { getSpan } from '../utils/getSpan';
 import { mergeEvents, mergeRanges } from '../utils/mergeEvents';
 import { Cell } from './Cell';
@@ -328,7 +328,7 @@ export const TimeGridScheduler = React.memo(function TimeGridScheduler({
     }
 
     const range = dateRangeToCells(
-      getEarliestRange(schedule) || [
+      getEarliestTimeRange(schedule) || [
         addHours(originDate, defaultHours[0]),
         addHours(originDate, defaultHours[1]),
       ],
