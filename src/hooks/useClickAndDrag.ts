@@ -123,7 +123,7 @@ export function useClickAndDrag(
         );
       }),
       map(rect => {
-        return rect.width < 5 ? null : rect;
+        return rect.width === 0 && rect.height === 0 ? null : rect;
       }),
     );
 
