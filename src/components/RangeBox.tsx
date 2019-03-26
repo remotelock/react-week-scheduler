@@ -11,6 +11,7 @@ import React, {
 import Draggable, { DraggableEventHandler } from 'react-draggable';
 import { useMousetrap } from '../hooks/useMousetrap';
 import { CellInfo } from '../types';
+import { DefaultEventRootComponent } from './DefaultEventRootComponent';
 import { EventContent } from './EventContent';
 import { ScheduleProps } from './Schedule';
 
@@ -30,7 +31,7 @@ export const RangeBox = React.memo(function RangeBox({
   onClick,
   getIsActive,
   eventContentComponent: EventContentComponent = EventContent,
-  eventRootComponent: EventRootComponent = 'div',
+  eventRootComponent: EventRootComponent = DefaultEventRootComponent,
   disabled,
 }: ScheduleProps & {
   cellIndex: number;

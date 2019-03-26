@@ -1,5 +1,3 @@
-/* eslint-disable import/no-extraneous-dependencies */
-
 import Tippy from '@tippy.js/react';
 import classcat from 'classcat';
 import compareAsc from 'date-fns/compare_asc';
@@ -23,6 +21,7 @@ import CustomProperties from 'react-custom-properties';
 import ReactDOM from 'react-dom';
 import 'resize-observer-polyfill/dist/ResizeObserver.global';
 import useUndo from 'use-undo';
+import { DefaultEventRootComponent } from '../src/components/DefaultEventRootComponent';
 import { TimeGridScheduler } from '../src/components/TimeGridScheduler';
 import { SchedulerContext } from '../src/context';
 import { useMousetrap } from '../src/hooks/useMousetrap';
@@ -60,7 +59,7 @@ const defaultSchedule: ScheduleType = rangeStrings.map(
 );
 
 const EventRoot = React.forwardRef<any, EventRootProps>(function EventRoot(
-  { handleDelete, rangeIndex, cellIndex, isActive, ...props },
+  { handleDelete, ...props },
   ref,
 ) {
   return (
@@ -76,7 +75,11 @@ const EventRoot = React.forwardRef<any, EventRootProps>(function EventRoot(
         </button>
       }
     >
-      <div {...props} ref={ref} />
+      <DefaultEventRootComponent
+        handleDelete={handleDelete}
+        {...props}
+        ref={ref}
+      />
     </Tippy>
   );
 });
