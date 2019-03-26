@@ -69,10 +69,16 @@ export const RangeBox = React.memo(function RangeBox({
     onChange(cellInfoToDateRange(modifiedCell), rangeIndex);
   }, [modifiedCell, rangeIndex, disabled, cellInfoToDateRange, onChange]);
 
+  const isActive = useMemo(() => getIsActive({ cellIndex, rangeIndex }), [
+    cellIndex,
+    rangeIndex,
+    getIsActive,
+  ]);
+
   useMousetrap(
     'up',
     () => {
-      if (!onChange || disabled) {
+      if (!onChange || disabled || !isActive) {
         return;
       }
 
@@ -98,7 +104,7 @@ export const RangeBox = React.memo(function RangeBox({
   useMousetrap(
     'shift+up',
     () => {
-      if (!onChange || !isResizable || disabled) {
+      if (!onChange || !isResizable || disabled || !isActive) {
         return;
       }
 
@@ -123,7 +129,7 @@ export const RangeBox = React.memo(function RangeBox({
   useMousetrap(
     'down',
     () => {
-      if (!onChange || disabled) {
+      if (!onChange || disabled || !isActive) {
         return;
       }
 
@@ -149,7 +155,7 @@ export const RangeBox = React.memo(function RangeBox({
   useMousetrap(
     'shift+down',
     () => {
-      if (!onChange || !isResizable || disabled) {
+      if (!onChange || !isResizable || disabled || !isActive) {
         return;
       }
 
@@ -301,12 +307,6 @@ export const RangeBox = React.memo(function RangeBox({
         : undefined,
     [classes.handle],
   );
-
-  const isActive = useMemo(() => getIsActive({ cellIndex, rangeIndex }), [
-    cellIndex,
-    rangeIndex,
-    getIsActive,
-  ]);
 
   return (
     <Draggable
