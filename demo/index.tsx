@@ -59,7 +59,7 @@ const defaultSchedule: ScheduleType = rangeStrings.map(
 );
 
 const EventRoot = React.forwardRef<any, EventRootProps>(function EventRoot(
-  { handleDelete, ...props },
+  { handleDelete, disabled, ...props },
   ref,
 ) {
   return (
@@ -69,7 +69,7 @@ const EventRoot = React.forwardRef<any, EventRootProps>(function EventRoot(
       hideOnClick={false}
       className={demoClasses.tooltip}
       content={
-        <button onClick={handleDelete}>
+        <button disabled={disabled} onClick={handleDelete}>
           <DeleteIcon className={demoClasses.icon} />
           Delete
         </button>
@@ -77,6 +77,7 @@ const EventRoot = React.forwardRef<any, EventRootProps>(function EventRoot(
     >
       <DefaultEventRootComponent
         handleDelete={handleDelete}
+        disabled={disabled}
         {...props}
         ref={ref}
       />
