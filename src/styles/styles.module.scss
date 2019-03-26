@@ -161,8 +161,7 @@
 
   &:not(.is-pending-creation):not([disabled]):not(.is-disabled) {
     &:focus,
-    &:hover,
-    &.is-active {
+    &:hover {
       --background: hsl(202, 100%, 30%);
       box-shadow: 0 1px 5px 1px hsla(202, 100%, 16%, 0.5),
         0 5px 10px 1px rgba(217, 217, 217, 0.5);
@@ -176,8 +175,7 @@
       z-index: var(--z-index-event);
     }
 
-    &:focus,
-    &.is-active {
+    &:focus {
       --background: hsl(202, 100%, 40%);
     }
 
