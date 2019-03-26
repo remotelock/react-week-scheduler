@@ -209,6 +209,10 @@ export const TimeGridScheduler = React.memo(function TimeGridScheduler({
     setPendingCreation(event);
   }, [box, grid, cellInfoToDateRanges, toY]);
 
+  const [[activeRangeIndex, activeCellIndex], setActive] = useState<
+    [number, number] | [null, null]
+  >([null, null]);
+
   useEffect(() => {
     if (disabled) {
       return;
@@ -219,6 +223,12 @@ export const TimeGridScheduler = React.memo(function TimeGridScheduler({
       setPendingCreation(null);
     }
   }, [hasFinishedDragging, disabled, onChange, setPendingCreation, pendingCreation, schedule]);
+
+  useEffect(() => {
+    if (pendingCreation === null) {
+      setActive([null, null]);
+    }
+  }, [pendingCreation]);
 
   const handleEventChange = useCallback<OnChangeCallback>(
     (newDateRange, rangeIndex) => {
@@ -262,10 +272,6 @@ export const TimeGridScheduler = React.memo(function TimeGridScheduler({
     },
     document,
   );
-
-  const [[activeRangeIndex, activeCellIndex], setActive] = useState<
-    [number, number] | [null, null]
-  >([null, null]);
 
   const getIsActive = useCallback(
     ({ rangeIndex, cellIndex }) =>
