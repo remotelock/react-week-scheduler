@@ -288,12 +288,12 @@ export const RangeBox = React.memo(function RangeBox({
   }, [onActiveChange, disabled, rangeIndex, cellIndex]);
 
   const handleOnClick = useCallback(() => {
-    if (!onClick || disabled) {
+    if (!onClick || disabled || !isActive) {
       return;
     }
 
     onClick([rangeIndex, cellIndex]);
-  }, [onClick, rangeIndex, disabled, cellIndex]);
+  }, [onClick, rangeIndex, disabled, isActive, cellIndex]);
 
   useMousetrap('enter', handleOnClick, ref);
 
