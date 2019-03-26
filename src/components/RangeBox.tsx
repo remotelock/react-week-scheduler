@@ -340,6 +340,7 @@ export const RangeBox = React.memo(function RangeBox({
           {
             [classes['is-draggable']]: !disabled && moveAxis !== 'none',
             [classes['is-disabled']]: disabled,
+            [classes['is-active']]: isActive,
           },
         ])}
         ref={ref}
