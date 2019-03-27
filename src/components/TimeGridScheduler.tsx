@@ -398,6 +398,7 @@ export const TimeGridScheduler = React.memo(function TimeGridScheduler({
       onBlur={handleBlur}
       className={classcat([
         classes.root,
+        classes.theme,
         className,
         { [classes['no-scroll']]: isDragging },
       ])}

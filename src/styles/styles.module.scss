@@ -2,18 +2,26 @@
   touch-action: none;
 }
 
+.theme {
+  --color-cell-border: hsl(204, 11%, 83%);
+  --color-drag-box-border: hsla(209, 97%, 50%, 0.5);
+  --color-drag-box-background: hsla(209, 97%, 65%, 0.5);
+  --color-handle-wrapper-text: hsla(209, 100%, 80%, 0.5);
+  --color-timeline-text: hsl(0, 0%, 48%);
+  --color-header-background: hsla(0, 0%, 97%, 1);
+  --color-event-text: hsl(207, 65%, 93%);
+  --color-event-background: hsl(202, 100%, 20%);
+  --color-event-active-background: hsl(202, 100%, 40%);
+  --color-event-hover-background: hsl(202, 100%, 30%);
+  --color-event-shadow-1: hsla(202, 100%, 16%, 0.5);
+  --color-event-shadow-2: rgba(217, 217, 217, 0.5);
+  --color-header-shadow-1: hsla(0, 0%, 50%, 0.2);
+  --color-header-shadow-2: hsla(0, 0%, 85%, 0.239);
+  --color-timeline-background: white;
+  --color-grid-background: white;
+}
+
 .root {
-  contain: strict;
-  overflow: auto;
-  background: white;
-  border: 1px solid hsla(0, 0%, 83%, 1);
-  --border: hsl(207, 60%, 85%);
-
-  &,
-  * {
-    box-sizing: border-box;
-  }
-
   --z-index-handle-wrapper: 1;
   --z-index-layer-container: 1;
   --z-index-event: 2;
@@ -25,6 +33,16 @@
   --z-index-header: 1;
   --z-index-timeline: 2;
   --z-index-timeline-header: 1;
+
+  contain: strict;
+  overflow: auto;
+  background: var(--color-grid-background, white);
+  border: 1px solid var(--color-cell-border);
+
+  &,
+  * {
+    box-sizing: border-box;
+  }
 }
 
 .grid-root {
@@ -64,7 +82,7 @@
   background-repeat: no-repeat;
   background-size: auto 100%;
   box-sizing: border-box;
-  color: hsla(209, 100%, 80%, 0.5);
+  color: var(--color-handle-wrapper-text);
   vertical-align: middle;
 
   .handle.top {
@@ -116,8 +134,8 @@
     left: 0;
     top: 0;
     z-index: var(--z-index-drag-box);
-    border: 3px dashed hsla(209, 97%, 50%, 0.5);
-    background: hsla(209, 97%, 65%, 0.5);
+    border: 3px dashed var(--color-drag-box-border);
+    background: var(--color-drag-box-background);
     width: 100px;
     height: 100px;
   }
@@ -157,40 +175,36 @@
   margin: 0;
   position: absolute;
   font-size: 1rem;
-  --text: hsl(207, 65%, 93%);
-  --background: hsl(202, 100%, 20%);
 
   &:not(.is-pending-creation):not([disabled]):not(.is-disabled) {
     &:focus,
     &:hover {
-      --background: hsl(202, 100%, 30%);
-      box-shadow: 0 1px 5px 1px hsla(202, 100%, 16%, 0.5),
-        0 5px 10px 1px rgba(217, 217, 217, 0.5);
-      z-index: var(--z-index-event);
+      box-shadow: 0 1px 5px 1px var(--color-event-shadow-1),
+        0 5px 10px 1px var(--color-event-shadow-2);
     }
 
     &:focus-within {
-      --background: hsl(202, 100%, 30%);
-      box-shadow: 0 1px 5px 1px hsla(202, 100%, 16%, 0.5),
-        0 5px 10px 1px rgba(217, 217, 217, 0.5);
-      z-index: var(--z-index-event);
+      box-shadow: 0 1px 5px 1px var(--color-event-shadow-1),
+        0 5px 10px 1px var(--color-event-shadow-2);
+    }
+
+    &:hover {
+      --background: var(--color-event-hover-background);
     }
 
     &:focus {
-      --background: hsl(202, 100%, 40%);
+      --background: var(--color-event-active-background);
       z-index: var(--z-index-event-active);
     }
 
     &:focus-within {
-      --background: hsl(202, 100%, 40%);
+      --background: var(--color-event-active-background);
       z-index: var(--z-index-event-active);
     }
   }
 
-  border: 0.5px solid var(--border);
-
-  background: var(--background);
-  color: var(--text);
+  background: var(--background, var(--color-event-background));
+  color: var(--color-event-text);
   left: 0;
   right: 0;
   width: 100px;
@@ -223,7 +237,7 @@
 
   .cell {
     .time {
-      color: hsl(0, 0%, 48%);
+      color: var(--color-timeline-text);
       font-size: 0.75em;
       text-transform: uppercase;
     }
@@ -245,7 +259,7 @@
 
 .cell:first-child,
 .cell + .cell {
-  border: 1px solid hsla(0, 0%, 83%, 1);
+  border: 1px solid var(--color-cell-border);
   border-bottom: 0;
   border-left: 0;
 }
@@ -276,9 +290,9 @@
 .header {
   will-change: transform;
   z-index: var(--z-index-header);
-  background: hsla(0, 0%, 97%, 1);
-  box-shadow: 0 1px 5px hsla(0, 0%, 50%, 0.2),
-    0 1px 10px hsla(0, 0%, 85%, 0.239);
+  background: var(--color-header-background);
+  box-shadow: 0 1px 5px var(--color-header-shadow-1),
+    0 1px 10px var(--color-header-shadow-2);
 }
 
 .day-column.first {
@@ -329,7 +343,7 @@
   z-index: var(--z-index-timeline);
 
   .day-column {
-    background: white;
+    background: var(--color-timeline-background);
     min-width: auto;
     flex: 0 0 auto;
   }
@@ -338,7 +352,7 @@
 .timeline .header {
   z-index: var(--z-index-timeline-header);
   box-shadow: none;
-  background: white;
+  background: var(--color-timeline-background);
   .cell {
     visibility: hidden;
   }
@@ -352,7 +366,7 @@
   }
 
   .time {
-    background: white;
+    background: inherit;
     padding-right: 1rem;
   }
 
