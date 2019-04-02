@@ -215,9 +215,9 @@ export const RangeBox = React.memo(function RangeBox({
       const newCell = {
         ...cell,
         startX: moveAxis === 'y' ? cell.startX : startX,
-        endX: startX + cell.spanX - 1,
+        endX: moveAxis === 'x' ? startX + cell.spanX - 1 : cell.endX,
         startY: moveAxis === 'x' ? cell.startY : startY,
-        endY: startY + cell.spanY - 1,
+        endY: moveAxis === 'y' ? startY + cell.spanY - 1 : cell.endY,
       };
 
       invariant(
