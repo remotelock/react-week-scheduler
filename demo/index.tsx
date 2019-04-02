@@ -66,6 +66,7 @@ const EventRoot = React.forwardRef<any, EventRootProps>(function EventRoot(
     <Tippy
       arrow
       interactive
+      isEnabled={!disabled}
       hideOnClick={false}
       className={demoClasses.tooltip}
       content={

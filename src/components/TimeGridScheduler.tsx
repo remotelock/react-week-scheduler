@@ -119,15 +119,13 @@ export const TimeGridScheduler = React.memo(function TimeGridScheduler({
     verticalPrecision,
   ]);
 
-  const cellInfoToDateRanges = useMemo(
-    () =>
-      createMapCellInfoToRecurringTimeRange({
-        originDate,
-        fromY: toMin,
-        fromX: toDay,
-      }),
-    [toMin, originDate],
-  );
+  const cellInfoToDateRanges = useMemo(() => {
+    return createMapCellInfoToRecurringTimeRange({
+      originDate,
+      fromY: toMin,
+      fromX: toDay,
+    });
+  }, [toMin, originDate]);
 
   const cellInfoToSingleDateRange = useCallback(
     (cell: CellInfo): DateRange => {
@@ -144,17 +142,15 @@ export const TimeGridScheduler = React.memo(function TimeGridScheduler({
     [cellInfoToDateRanges],
   );
 
-  const dateRangeToCells = useMemo(
-    () =>
-      createMapDateRangeToCells({
-        originDate,
-        numVerticalCells,
-        numHorizontalCells,
-        toX,
-        toY,
-      }),
-    [toY, numVerticalCells, numHorizontalCells, originDate],
-  );
+  const dateRangeToCells = useMemo(() => {
+    return createMapDateRangeToCells({
+      originDate,
+      numVerticalCells,
+      numHorizontalCells,
+      toX,
+      toY,
+    });
+  }, [toY, numVerticalCells, numHorizontalCells, originDate]);
 
   const root = useRef<HTMLDivElement | null>(null);
   const parent = useRef<HTMLDivElement | null>(null);
@@ -175,14 +171,18 @@ export const TimeGridScheduler = React.memo(function TimeGridScheduler({
   const [[totalHeight, totalWidth], setDimensions] = useState([0, 0]);
 
   const numVisualVerticalCells = (24 * 60) / visualGridVerticalPrecision;
-  useEffect(() => {
-    if (!parent.current) {
-      setDimensions([0, 0]);
-      return;
-    }
 
-    setDimensions([parent.current.scrollHeight, parent.current.scrollWidth]);
-  }, [size, numVisualVerticalCells]);
+  useEffect(
+    function updateGridDimensionsOnSizeOrCellCountChange() {
+      if (!parent.current) {
+        setDimensions([0, 0]);
+        return;
+      }
+
+      setDimensions([parent.current.scrollHeight, parent.current.scrollWidth]);
+    },
+    [size, numVisualVerticalCells],
+  );
 
   const grid = useMemo<Grid | null>(() => {
     if (totalHeight === null || totalWidth === null) {
@@ -197,38 +197,54 @@ export const TimeGridScheduler = React.memo(function TimeGridScheduler({
     });
   }, [totalHeight, totalWidth, numHorizontalCells, numVerticalCells]);
 
-  useEffect(() => {
-    if (grid === null || box === null) {
-      setPendingCreation(null);
-      return;
-    }
+  useEffect(
+    function updatePendingCreationOnDragBoxUpdate() {
+      if (grid === null || box === null) {
+        setPendingCreation(null);
+        return;
+      }
 
-    const cell = grid.getCellFromRect(box);
-    const dateRanges = cellInfoToDateRanges(cell);
-    const event = dateRanges;
-    setPendingCreation(event);
-  }, [box, grid, cellInfoToDateRanges, toY]);
+      const cell = grid.getCellFromRect(box);
+      const dateRanges = cellInfoToDateRanges(cell);
+      const event = dateRanges;
+      setPendingCreation(event);
+    },
+    [box, grid, cellInfoToDateRanges, toY],
+  );
 
   const [[activeRangeIndex, activeCellIndex], setActive] = useState<
     [number, number] | [null, null]
   >([null, null]);
 
-  useEffect(() => {
-    if (disabled) {
-      return;
-    }
+  useEffect(
+    function updateScheduleAfterDraggingFinished() {
+      if (disabled) {
+        return;
+      }
 
-    if (hasFinishedDragging) {
-      onChange(mergeEvents(schedule, pendingCreation));
-      setPendingCreation(null);
-    }
-  }, [hasFinishedDragging, disabled, onChange, setPendingCreation, pendingCreation, schedule]);
+      if (hasFinishedDragging) {
+        onChange(mergeEvents(schedule, pendingCreation));
+        setPendingCreation(null);
+      }
+    },
+    [
+      hasFinishedDragging,
+      disabled,
+      onChange,
+      setPendingCreation,
+      pendingCreation,
+      schedule,
+    ],
+  );
 
-  useEffect(() => {
-    if (pendingCreation === null) {
-      setActive([null, null]);
-    }
-  }, [pendingCreation]);
+  useEffect(
+    function clearActiveBlockAfterCreation() {
+      if (pendingCreation === null) {
+        setActive([null, null]);
+      }
+    },
+    [pendingCreation],
+  );
 
   const handleEventChange = useCallback<OnChangeCallback>(
     (newDateRange, rangeIndex) => {
@@ -265,7 +281,7 @@ export const TimeGridScheduler = React.memo(function TimeGridScheduler({
 
   useMousetrap(
     'esc',
-    () => {
+    function cancelOnEsc() {
       if (pendingCreation) {
         cancel();
       }
@@ -274,8 +290,9 @@ export const TimeGridScheduler = React.memo(function TimeGridScheduler({
   );
 
   const getIsActive = useCallback(
-    ({ rangeIndex, cellIndex }) =>
-      rangeIndex === activeRangeIndex && cellIndex === activeCellIndex,
+    ({ rangeIndex, cellIndex }) => {
+      return rangeIndex === activeRangeIndex && cellIndex === activeCellIndex;
+    },
     [activeCellIndex, activeRangeIndex],
   );
 
@@ -294,67 +311,81 @@ export const TimeGridScheduler = React.memo(function TimeGridScheduler({
 
   useMousetrap(DELETE_KEYS, handleDelete, root);
 
-  useEffect(() => {
-    cancel();
-  }, [size, cancel]);
-
-  const getDateRangeForVisualGrid = useMemo(
-    () =>
-      createMapCellInfoToRecurringTimeRange({
-        originDate,
-        fromX: toDay,
-        fromY: y => y * visualGridVerticalPrecision,
-      }),
-    [visualGridVerticalPrecision, originDate],
+  useEffect(
+    function cancelPendingCreationOnSizeChange() {
+      cancel();
+    },
+    [size, cancel],
   );
 
-  useEffect(() => {
-    if (!document.activeElement) {
-      return;
-    }
-
-    if (!root.current || !root.current.contains(document.activeElement)) {
-      return;
-    }
-
-    scrollIntoView(document.activeElement, {
-      scrollMode: 'if-needed',
-      block: 'nearest',
-      inline: 'nearest',
+  const getDateRangeForVisualGrid = useMemo(() => {
+    return createMapCellInfoToRecurringTimeRange({
+      originDate,
+      fromX: toDay,
+      fromY: y => y * visualGridVerticalPrecision,
     });
-  }, [schedule]);
+  }, [visualGridVerticalPrecision, originDate]);
+
+  useEffect(
+    function scrollToActiveTimeBlock() {
+      if (!document.activeElement) {
+        return;
+      }
+
+      if (!root.current || !root.current.contains(document.activeElement)) {
+        return;
+      }
+
+      scrollIntoView(document.activeElement, {
+        scrollMode: 'if-needed',
+        block: 'nearest',
+        inline: 'nearest',
+      });
+    },
+    [schedule],
+  );
 
   const [wasInitialScrollPerformed, setWasInitialScrollPerformed] = useState(
     false,
   );
 
-  useEffect(() => {
-    if (wasInitialScrollPerformed || !root.current || !grid) {
-      return;
-    }
+  useEffect(
+    function performInitialScroll() {
+      if (wasInitialScrollPerformed || !root.current || !grid) {
+        return;
+      }
 
-    const range = dateRangeToCells(
-      getEarliestTimeRange(schedule) || [
-        addHours(originDate, defaultHours[0]),
-        addHours(originDate, defaultHours[1]),
-      ],
-    );
-    const rect = grid.getRectFromCell(range[0]);
-    const { top, bottom } = rect;
+      const range = dateRangeToCells(
+        getEarliestTimeRange(schedule) || [
+          addHours(originDate, defaultHours[0]),
+          addHours(originDate, defaultHours[1]),
+        ],
+      );
+      const rect = grid.getRectFromCell(range[0]);
+      const { top, bottom } = rect;
 
-    if (top === 0 && bottom === 0) {
-      return;
-    }
+      if (top === 0 && bottom === 0) {
+        return;
+      }
 
-    // IE, Edge do not support it
-    if (!('scrollBy' in root.current)) {
-      return;
-    }
+      // IE, Edge do not support it
+      if (!('scrollBy' in root.current)) {
+        return;
+      }
 
-    root.current.scrollBy(0, top);
+      root.current.scrollBy(0, top);
 
-    setWasInitialScrollPerformed(true);
-  }, [wasInitialScrollPerformed, grid, schedule, defaultHours, originDate, dateRangeToCells]);
+      setWasInitialScrollPerformed(true);
+    },
+    [
+      wasInitialScrollPerformed,
+      grid,
+      schedule,
+      defaultHours,
+      originDate,
+      dateRangeToCells,
+    ],
+  );
 
   const handleBlur: React.FocusEventHandler = useCallback(
     event => {
