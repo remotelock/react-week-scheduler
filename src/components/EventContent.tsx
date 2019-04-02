@@ -4,7 +4,7 @@ import React, { useContext } from 'react';
 import { SchedulerContext } from '../context';
 import { ClassNames } from '../types';
 import {
-  getFormattedTimeRangeComponents,
+  getFormattedComponentsForDateRange,
   getTextForDateRange,
 } from '../utils/getTextForDateRange';
 
@@ -26,13 +26,11 @@ export const EventContent = React.memo(function EventContent({
   isEnd,
 }: EventContentProps) {
   const { locale } = useContext(SchedulerContext);
-  const [start, end] = getFormattedTimeRangeComponents(
+  const [start, end] = getFormattedComponentsForDateRange({
     dateRange,
-    { locale },
-    undefined,
-    undefined,
-    false,
-  );
+    locale,
+    includeDayIfSame: false,
+  });
 
   return (
     <div
@@ -40,7 +38,7 @@ export const EventContent = React.memo(function EventContent({
       className={classes['event-content']}
     >
       <VisuallyHidden>
-        {getTextForDateRange(dateRange, { locale })}
+        {getTextForDateRange({ dateRange, locale })}
       </VisuallyHidden>
       <span aria-hidden className={classes.start}>
         {isStart && start}

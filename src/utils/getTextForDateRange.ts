@@ -33,19 +33,27 @@ const formatHour = (
   return format(date, 'h:m', { locale });
 };
 
-export const getFormattedTimeRangeComponents = (
-  dates: [Date, Date],
-  locale: typeof import('date-fns/locale/en'),
-  template?: string,
-  template2?: string,
-  includeDay: boolean = true,
-) => {
-  const start = dates[0];
-  const end = dates[dates.length - 1];
+type Options = {
+  dateRange: [Date, Date];
+  locale: typeof import('date-fns/locale/en');
+  template?: string;
+  template2?: string;
+  includeDayIfSame?: boolean;
+};
+
+export const getFormattedComponentsForDateRange = ({
+  dateRange,
+  locale,
+  template,
+  template2,
+  includeDayIfSame = true,
+}: Options) => {
+  const start = dateRange[0];
+  const end = dateRange[dateRange.length - 1];
 
   if (isSameDay(start, end) && !template) {
-    const [firstM, secondM] = dropSame(dates, 'a', true, locale);
-    const day = includeDay ? `${format(start, 'ddd', { locale })} ` : '';
+    const [firstM, secondM] = dropSame(dateRange, 'a', true, locale);
+    const day = includeDayIfSame ? `${format(start, 'ddd', { locale })} ` : '';
     return [
       `${day}${formatHour(start, {
         locale,
@@ -60,18 +68,6 @@ export const getFormattedTimeRangeComponents = (
   return [startDateStr, endDateStr];
 };
 
-export const getTextForDateRange = (
-  dates: [Date, Date],
-  locale: typeof import('date-fns/locale/en'),
-  template?: string,
-  template2?: string,
-  includeDay?: boolean,
-) => {
-  return getFormattedTimeRangeComponents(
-    dates,
-    locale,
-    template,
-    template2,
-    includeDay,
-  ).join(' – ');
+export const getTextForDateRange = (options: Options) => {
+  return getFormattedComponentsForDateRange(options).join(' – ');
 };

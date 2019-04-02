@@ -4,7 +4,7 @@ import { SchedulerContext } from './context';
 import { useMousetrap } from './hooks/useMousetrap';
 import { classes } from './styles';
 import {
-  getFormattedTimeRangeComponents,
+  getFormattedComponentsForDateRange,
   getTextForDateRange,
 } from './utils/getTextForDateRange';
 
@@ -14,6 +14,6 @@ export {
   DefaultEventRootComponent,
   useMousetrap,
   SchedulerContext,
-  getFormattedTimeRangeComponents,
+  getFormattedComponentsForDateRange as getFormattedTimeRangeComponents,
   getTextForDateRange,
 };
