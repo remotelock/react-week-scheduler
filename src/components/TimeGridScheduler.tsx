@@ -136,7 +136,7 @@ export const TimeGridScheduler = React.memo(function TimeGridScheduler({
         rest.length === 0,
         `Expected "cellInfoToSingleDateRange" to return a single date range, found ${
           rest.length
-        } additional ranges instead. This is a bug in @remotelock/weekly-scheduler`,
+        } additional ranges instead. This is a bug in @remotelock/react-week-scheduler`,
       );
 
       return first;
