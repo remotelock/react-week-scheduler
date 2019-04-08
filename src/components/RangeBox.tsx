@@ -47,6 +47,7 @@ export const RangeBox = React.memo(function RangeBox({
     modifiedCell,
     grid,
   ]);
+  const [isInteracting, setIsInteracting] = useState(false);
 
   useEffect(() => {
     setModifiedCell(cell);
@@ -63,6 +64,8 @@ export const RangeBox = React.memo(function RangeBox({
   const isEnd = cellIndex === cellArray.length - 1;
 
   const handleStop = useCallback(() => {
+    setIsInteracting(false);
+
     if (!onChange || disabled) {
       return;
     }
@@ -185,6 +188,7 @@ export const RangeBox = React.memo(function RangeBox({
         return;
       }
 
+      setIsInteracting(true);
       event.preventDefault();
       event.stopPropagation();
 
@@ -236,6 +240,7 @@ export const RangeBox = React.memo(function RangeBox({
         return;
       }
 
+      setIsInteracting(true);
       event.preventDefault();
       event.stopPropagation();
 
@@ -309,6 +314,36 @@ export const RangeBox = React.memo(function RangeBox({
     [classes.handle],
   );
 
+  const preventDefaultIfInteracting = useCallback(
+    e => {
+      if (isInteracting) {
+        e.preventDefault();
+      }
+    },
+    [isInteracting],
+  );
+
+  useEffect(() => {
+    document.body.addEventListener('touchmove', preventDefaultIfInteracting, {
+      passive: false,
+    });
+    document.body.addEventListener('scroll', preventDefaultIfInteracting, {
+      passive: false,
+    });
+
+    return () => {
+      document.body.removeEventListener(
+        'touchmove',
+        preventDefaultIfInteracting,
+      );
+      document.body.removeEventListener('scroll', preventDefaultIfInteracting);
+    };
+  }, [preventDefaultIfInteracting]);
+
+  const touchAction = useMemo(() => {
+    return isInteracting ? 'none' : undefined;
+  }, [isInteracting]);
+
   return (
     <Draggable
       axis={moveAxis}
@@ -318,6 +353,7 @@ export const RangeBox = React.memo(function RangeBox({
         left: 0,
         right: grid.totalWidth,
       }}
+      touch-action={touchAction}
       position={{ x: left, y: top }}
       onDrag={handleDrag}
       onStop={handleStop}
@@ -326,6 +362,7 @@ export const RangeBox = React.memo(function RangeBox({
     >
       <EventRootComponent
         role="button"
+        touch-action={touchAction}
         disabled={disabled}
         onFocus={handleOnFocus}
         onClick={handleOnClick}
