@@ -16,6 +16,7 @@ import startOfWeek from 'date-fns/start_of_week';
 // @ts-ignore
 import humanizeDuration from 'humanize-duration';
 import mapValues from 'lodash/mapValues';
+import 'pepjs';
 import React, { Fragment, useEffect, useMemo, useState } from 'react';
 import CustomProperties from 'react-custom-properties';
 import ReactDOM from 'react-dom';

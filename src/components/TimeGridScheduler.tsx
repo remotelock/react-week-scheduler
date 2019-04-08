@@ -427,6 +427,7 @@ export const TimeGridScheduler = React.memo(function TimeGridScheduler({
       ref={root}
       style={style}
       onBlur={handleBlur}
+      touch-action={isDragging ? 'none' : undefined}
       className={classcat([
         classes.root,
         classes.theme,
