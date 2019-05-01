@@ -60,6 +60,7 @@
     "@types/stylelint": "^9.4.2",
     "@typescript-eslint/eslint-plugin": "^1.4.2",
     "@typescript-eslint/parser": "^1.4.2",
+    "babel-plugin-annotate-pure-calls": "^0.4.0",
     "babel-plugin-date-fns": "^0.2.1",
     "babel-plugin-transform-imports": "^1.5.1",
     "eslint": "^5.15.1",
