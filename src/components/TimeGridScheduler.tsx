@@ -8,7 +8,7 @@ import startOfDay from 'date-fns/start_of_day';
 import invariant from 'invariant';
 import isEqual from 'lodash/isEqual';
 import times from 'lodash/times';
-import React from 'react';
+import * as React from 'react';
 import scrollIntoView from 'scroll-into-view-if-needed';
 import { SchedulerContext } from '../context';
 import { useClickAndDrag } from '../hooks/useClickAndDrag';

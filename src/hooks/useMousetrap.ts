@@ -1,5 +1,5 @@
 import Mousetrap from 'mousetrap';
-import React from 'react';
+import * as React from 'react';
 
 const { useEffect, useRef } = React;
 

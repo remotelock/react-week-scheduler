@@ -1,6 +1,6 @@
-import React from 'react';
-import rxjs, { Observable } from 'rxjs';
-import operators from 'rxjs/operators';
+import * as React from 'react';
+import * as rxjs from 'rxjs';
+import * as operators from 'rxjs/operators';
 import { Rect } from '../types';
 import { createPageMapCoordsToContainer } from '../utils/createPageMapCoordsToContainer';
 

@@ -1,7 +1,7 @@
 import classcat from 'classcat';
 import invariant from 'invariant';
 import Resizable, { ResizeCallback } from 're-resizable';
-import React from 'react';
+import * as React from 'react';
 import Draggable, { DraggableEventHandler } from 'react-draggable';
 import { useMousetrap } from '../hooks/useMousetrap';
 import { CellInfo } from '../types';

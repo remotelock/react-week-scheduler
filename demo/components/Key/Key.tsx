@@ -1,4 +1,4 @@
-import React from 'react';
+import * as React from 'react';
 import defaultClasses from './Key.module.scss';
 
 export function Key({

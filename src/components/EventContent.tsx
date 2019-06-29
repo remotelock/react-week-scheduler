@@ -1,6 +1,6 @@
 // @ts-ignore
 import VisuallyHidden from '@reach/visually-hidden';
-import React from 'react';
+import * as React from 'react';
 import { SchedulerContext } from '../context';
 import { ClassNames } from '../types';
 import {
