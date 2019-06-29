@@ -13,6 +13,13 @@ jobs:
         - provider: script
           skip_cleanup: true
           script: npx semantic-release
+          on:
+            branch: master
+        - provider: script
+          skip_cleanup: true
+          script: npx semantic-release
+          on:
+            branch: develop
         - provider: pages
           github-token: $GH_TOKEN
           skip-cleanup: true
