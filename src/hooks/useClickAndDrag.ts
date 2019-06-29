@@ -82,7 +82,7 @@ export function useClickAndDrag(
 
     const move$ = merge(mouseMove$, touchMove$).pipe(map(mapCoordsToContainer));
 
-    const box$: Observable<Rect | null> = dragStart$.pipe(
+    const box$: rxjs.Observable<Rect | null> = dragStart$.pipe(
       tap(() => {
         setIsDragging(true);
         setHasFinishedDragging(false);
