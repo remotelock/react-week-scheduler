@@ -1,4 +1,17 @@
 {
+  "branches": [
+    "+([1-9])?(.{+([1-9]),x}).x",
+    "master",
+    "develop",
+    {
+      "name": "alpha",
+      "prerelease": true
+    },
+    {
+      "name": "beta",
+      "prerelease": true
+    }
+  ],
   "analyzeCommits": {
     "preset": "angular",
     "releaseRules": [
