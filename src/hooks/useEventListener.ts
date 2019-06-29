@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import React from 'react';
 
 export function useEventListener<
   K extends keyof HTMLElementEventMap,
@@ -12,7 +12,7 @@ export function useEventListener<
 ) {
   const { current } = ref;
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (current === null) {
       return;
     }

@@ -8,14 +8,7 @@ import startOfDay from 'date-fns/start_of_day';
 import invariant from 'invariant';
 import isEqual from 'lodash/isEqual';
 import times from 'lodash/times';
-import React, {
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import React from 'react';
 import scrollIntoView from 'scroll-into-view-if-needed';
 import { SchedulerContext } from '../context';
 import { useClickAndDrag } from '../hooks/useClickAndDrag';
@@ -39,6 +32,8 @@ import { getSpan } from '../utils/getSpan';
 import { mergeEvents, mergeRanges } from '../utils/mergeEvents';
 import { Cell } from './Cell';
 import { Schedule, ScheduleProps } from './Schedule';
+
+const { useCallback, useContext, useEffect, useMemo, useRef, useState } = React;
 
 const MINS_IN_DAY = 24 * 60;
 const horizontalPrecision = 1;

@@ -1,19 +1,15 @@
 import classcat from 'classcat';
 import invariant from 'invariant';
 import Resizable, { ResizeCallback } from 're-resizable';
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import React from 'react';
 import Draggable, { DraggableEventHandler } from 'react-draggable';
 import { useMousetrap } from '../hooks/useMousetrap';
 import { CellInfo } from '../types';
 import { DefaultEventRootComponent } from './DefaultEventRootComponent';
 import { EventContent } from './EventContent';
 import { ScheduleProps } from './Schedule';
+
+const { useCallback, useEffect, useMemo, useRef, useState } = React;
 
 export const RangeBox = React.memo(function RangeBox({
   classes,
