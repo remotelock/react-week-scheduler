@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { fromEvent, merge, of } from 'rxjs';
+import { fromEvent, merge, Observable, of } from 'rxjs';
 import {
   delay,
   filter,
@@ -86,7 +86,7 @@ export function useClickAndDrag(
 
     const move$ = merge(mouseMove$, touchMove$).pipe(map(mapCoordsToContainer));
 
-    const box$: rxjs.Observable<Rect | null> = dragStart$.pipe(
+    const box$: Observable<Rect | null> = dragStart$.pipe(
       tap(() => {
         setIsDragging(true);
         setHasFinishedDragging(false);
