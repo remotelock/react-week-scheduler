@@ -1,7 +1,5 @@
 import Mousetrap from 'mousetrap';
-import * as React from 'react';
-
-const { useEffect, useRef } = React;
+import { useEffect, useRef } from 'react';
 
 /**
  * Use mousetrap hook

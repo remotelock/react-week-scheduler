@@ -17,7 +17,7 @@ import startOfWeek from 'date-fns/start_of_week';
 import humanizeDuration from 'humanize-duration';
 import mapValues from 'lodash/mapValues';
 import 'pepjs';
-import * as React from 'react';
+import React, { Fragment, useEffect, useMemo, useState } from 'react';
 import CustomProperties from 'react-custom-properties';
 import ReactDOM from 'react-dom';
 import 'resize-observer-polyfill/dist/ResizeObserver.global';
@@ -31,8 +31,6 @@ import { EventRootProps, ScheduleType } from '../src/types';
 import DeleteIcon from './assets/outline-delete-24px.svg';
 import { Key } from './components/Key/Key';
 import demoClasses from './index.module.scss';
-
-const { Fragment, useEffect, useMemo, useState } = React;
 
 const locales = {
   ja,

@@ -1,12 +1,16 @@
-import * as React from 'react';
-import * as rxjs from 'rxjs';
-import * as operators from 'rxjs/operators';
+import React, { useCallback, useEffect, useState } from 'react';
+import { fromEvent, merge, of } from 'rxjs';
+import {
+  delay,
+  filter,
+  map,
+  mergeMap,
+  startWith,
+  takeUntil,
+  tap,
+} from 'rxjs/operators';
 import { Rect } from '../types';
 import { createPageMapCoordsToContainer } from '../utils/createPageMapCoordsToContainer';
-
-const { useCallback, useEffect, useState } = React;
-const { fromEvent, merge, of } = rxjs;
-const { delay, filter, map, mergeMap, startWith, takeUntil, tap } = operators;
 
 const prevent = tap((e: TouchEvent) => {
   e.preventDefault();

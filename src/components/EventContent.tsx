@@ -1,6 +1,6 @@
 // @ts-ignore
 import VisuallyHidden from '@reach/visually-hidden';
-import * as React from 'react';
+import React, { useContext } from 'react';
 import { SchedulerContext } from '../context';
 import { ClassNames } from '../types';
 import {
@@ -25,7 +25,7 @@ export const EventContent = React.memo(function EventContent({
   isStart,
   isEnd,
 }: EventContentProps) {
-  const { locale } = React.useContext(SchedulerContext);
+  const { locale } = useContext(SchedulerContext);
   const [start, end] = getFormattedComponentsForDateRange({
     dateRange,
     locale,
