@@ -1,6 +1,6 @@
 import classcat from 'classcat';
 import getMinutes from 'date-fns/get_minutes';
-import * as React from 'react';
+import React from 'react';
 import { CellInfo, ClassNames, DateRange } from '../types';
 
 export const Cell = React.memo(function Cell({
