@@ -30,7 +30,7 @@ const formatHour = (
     return format(date, 'h', { locale });
   }
 
-  return format(date, 'h:m', { locale });
+  return format(date, 'h:mm', { locale });
 };
 
 type Options = {
