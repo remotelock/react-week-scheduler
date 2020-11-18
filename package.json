@@ -97,7 +97,7 @@
     "rollup-plugin-postcss": "^2.0.3",
     "sass": "^1.17.2",
     "scroll-into-view-if-needed": "^2.2.20",
-    "semantic-release": "^16.0.0-beta.22",
+    "semantic-release": "^17.2.3",
     "source-map-explorer": "^1.7.0",
     "stylelint": "^9.10.1",
     "stylelint-config-standard": "^18.2.0",
