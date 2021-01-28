@@ -131,10 +131,8 @@ export const TimeGridScheduler = React.memo(function TimeGridScheduler({
     (cell: CellInfo): DateRange => {
       const [first, ...rest] = cellInfoToDateRanges(cell);
       invariant(
-        rest.length === 0,
-        `Expected "cellInfoToSingleDateRange" to return a single date range, found ${
-          rest.length
-        } additional ranges instead. This is a bug in @remotelock/react-week-scheduler`,
+        rest.length === 0, // eslint-disable-next-line
+        `Expected "cellInfoToSingleDateRange" to return a single date range, found ${rest.length} additional ranges instead. This is a bug in @remotelock/react-week-scheduler`,
       );
 
       return first;
@@ -460,7 +458,7 @@ export const TimeGridScheduler = React.memo(function TimeGridScheduler({
                         if (isHourStart) {
                           return (
                             <div className={classes.time}>
-                              {format(start, 'h a', { locale })}
+                              {format(start, 'HH', { locale })}
                             </div>
                           );
                         }

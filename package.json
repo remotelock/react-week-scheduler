@@ -1,9 +1,9 @@
 {
-  "name": "@remotelock/react-week-scheduler",
-  "version": "0.0.0-development",
+  "name": "@gfd/react-week-scheduler",
+  "version": "0.0.1",
   "license": "MIT",
   "description": "",
-  "homepage": "https://remotelock.github.io/react-week-scheduler/",
+  "homepage": "https://github.com/greyforce/react-week-scheduler/",
   "private": false,
   "sideEffects": [
     "*.css"
@@ -141,7 +141,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/remotelock/react-week-scheduler.git"
+    "url": "https://github.com/greyforce/react-week-scheduler.git"
   },
   "engines": {
     "node": ">=10.13.0"
