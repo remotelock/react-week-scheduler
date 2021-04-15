@@ -141,7 +141,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/remotelock/react-week-scheduler.git"
+    "url": "git+https://github.com/Yonoton/react-week-scheduler.git"
   },
   "engines": {
     "node": ">=10.13.0"
