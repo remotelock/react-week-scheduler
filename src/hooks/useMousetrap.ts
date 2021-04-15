@@ -1,4 +1,4 @@
-import Mousetrap from 'mousetrap';
+import Mousetrap, { ExtendedKeyboardEvent } from 'mousetrap';
 import { useEffect, useRef } from 'react';
 
 /**

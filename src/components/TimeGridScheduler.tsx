@@ -8,6 +8,7 @@ import startOfDay from 'date-fns/start_of_day';
 import invariant from 'invariant';
 import isEqual from 'lodash/isEqual';
 import times from 'lodash/times';
+import { ExtendedKeyboardEvent } from 'mousetrap';
 import React, {
   useCallback,
   useContext,
