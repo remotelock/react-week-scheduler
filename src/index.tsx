@@ -7,7 +7,7 @@ import {
   getFormattedComponentsForDateRange,
   getTextForDateRange,
 } from './utils/getTextForDateRange';
-
+require('../types/merge-ranges');
 export {
   TimeGridScheduler,
   classes,
