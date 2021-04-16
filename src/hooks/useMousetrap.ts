@@ -20,7 +20,8 @@ export function useMousetrap(
   useEffect(() => {
     const instance = new Mousetrap(element as Element);
 
-    instance.bind(handlerKey, (e, combo) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    instance.bind(handlerKey, (e: any, combo: any) => {
       typeof actionRef.current === 'function' && actionRef.current(e, combo);
     });
 

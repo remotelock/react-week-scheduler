@@ -219,8 +219,7 @@ function _nonIterableRest() {
   throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
 }
 
-var DefaultEventRootComponent = /*#__PURE__*/React__default.memo( /*#__PURE__*/
-React__default.forwardRef(function DefaultEventRootComponent(_ref,
+var DefaultEventRootComponent = /*#__PURE__*/React__default.forwardRef(function DefaultEventRootComponent(_ref,
 
 
 
@@ -233,7 +232,7 @@ React__default.forwardRef(function DefaultEventRootComponent(_ref,
 ref)
 {var isActive = _ref.isActive,handleDelete = _ref.handleDelete,cellIndex = _ref.cellIndex,rangeIndex = _ref.rangeIndex,classes = _ref.classes,disabled = _ref.disabled,props = _objectWithoutProperties(_ref, ["isActive", "handleDelete", "cellIndex", "rangeIndex", "classes", "disabled"]);
   return /*#__PURE__*/React__default.createElement("div", _extends({ ref: ref, "aria-disabled": disabled }, props));
-}));
+});
 
 var SchedulerContext = /*#__PURE__*/React.createContext({ locale: en });
 
@@ -431,6 +430,7 @@ elementOrElementRef)
   React.useEffect(function () {
     var instance = new Mousetrap(element);
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     instance.bind(handlerKey, function (e, combo) {
       typeof actionRef.current === 'function' && actionRef.current(e, combo);
     });

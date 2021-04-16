@@ -48,5 +48,5 @@ dist
 # index.css
 # **/*.d.ts
 .cache
-*.map
+# *.map
 generated-types/
