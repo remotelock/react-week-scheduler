@@ -58,7 +58,3 @@ export type Rect = ClientRect & {
   startY: number;
   endY: number;
 };
-
-declare module 'merge-ranges' {
-  export default function mergeRanges(ranges: [Date, Date][]): [Date, Date][];
-}
