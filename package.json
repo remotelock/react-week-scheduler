@@ -137,7 +137,8 @@
     "deploy/demo": "gh-pages -d dist",
     "run-prettier": "prettier --write '*.json' 'types/**/*.ts' 'src/**/*.ts{,x}' 'src/**/*.scss'",
     "semantic-release": "semantic-release",
-    "commitlint": "commitlint -e $GIT_PARAMS"
+    "commitlint": "commitlint -e $GIT_PARAMS",
+    "update/build": "run-s types/scss types/ts rollup"
   },
   "repository": {
     "type": "git",
