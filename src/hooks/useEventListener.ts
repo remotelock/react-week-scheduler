@@ -6,7 +6,8 @@ export function useEventListener<
 >(
   ref: React.RefObject<Element>,
   event: K,
-  listener: (this: Element, event: HTMLElementEventMap[K]) => void,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  listener: (this: any, event: any) => void,
   options?: boolean | AddEventListenerOptions,
   { enabled = true } = {},
 ) {

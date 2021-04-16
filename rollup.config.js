@@ -7,20 +7,18 @@ import pkg from './package.json';
 export default {
   input: 'src/index.tsx',
   output: [
-    { file: pkg.module, format: 'es' },
     { file: pkg.main, format: 'cjs' },
   ],
   plugins: [
     resolve({
-      jsnext: true,
-      main: true,
+      mainFields: ['module', 'main'],
       customResolveOptions: {
         moduleDirectory: 'src',
       },
       extensions: ['.js', '.jsx', '.ts', '.tsx'],
     }),
     commonjs({
-      extensions: ['.js', '.mjs'],
+      extensions: ['.js'],
       include: 'node_modules/**',
     }),
     postcss({
@@ -30,7 +28,7 @@ export default {
     }),
     babel({
       exclude: 'node_modules/**',
-      extensions: ['.mjs', '.js', '.jsx', '.ts', '.tsx'],
+      extensions: ['.js', '.jsx', '.ts', '.tsx'],
     }),
   ],
 };

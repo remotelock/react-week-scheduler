@@ -1,5 +1,5 @@
 {
-  "name": "@remotelock/react-week-scheduler",
+  "name": "@yonoton/react-week-scheduler",
   "version": "0.0.0-development",
   "license": "MIT",
   "description": "",
@@ -18,7 +18,7 @@
     "fullcalendar"
   ],
   "main": "index.js",
-  "module": "index.mjs",
+  "module": "index.js",
   "types": "./src/index.d.ts",
   "dependencies": {
     "@reach/visually-hidden": "^0.1.2",
@@ -32,7 +32,8 @@
     "re-resizable": "^4.11.0",
     "react-draggable": "^3.2.1",
     "rxjs": "^6.4.0",
-    "scroll-into-view-if-needed": "^2.2.20"
+    "scroll-into-view-if-needed": "^2.2.20",
+    "@types/mousetrap": "^1.6.6"
   },
   "peerDependencies": {
     "pepjs": "^0.5.0",
@@ -53,7 +54,6 @@
     "@types/invariant": "^2.2.29",
     "@types/jest": "^24.0.9",
     "@types/lodash": "4.14.120",
-    "@types/mousetrap": "^1.6.1",
     "@types/node": "^11.10.4",
     "@types/react": "^16.8.8",
     "@types/react-dom": "^16.8.2",
@@ -137,11 +137,12 @@
     "deploy/demo": "gh-pages -d dist",
     "run-prettier": "prettier --write '*.json' 'types/**/*.ts' 'src/**/*.ts{,x}' 'src/**/*.scss'",
     "semantic-release": "semantic-release",
-    "commitlint": "commitlint -e $GIT_PARAMS"
+    "commitlint": "commitlint -e $GIT_PARAMS",
+    "update/build": "run-s types/scss types/ts rollup"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/remotelock/react-week-scheduler.git"
+    "url": "git+https://github.com/Yonoton/react-week-scheduler.git"
   },
   "engines": {
     "node": ">=10.13.0"
