@@ -42,11 +42,11 @@ node_modules/
 
 build
 dist
-index.d.ts
+# index.d.ts
 # index.js
 # index.mjs
 # index.css
-**/*.d.ts
+# **/*.d.ts
 .cache
 *.map
 generated-types/
