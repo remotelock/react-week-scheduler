@@ -47,4 +47,7 @@ export declare type Rect = ClientRect & {
     startY: number;
     endY: number;
 };
+declare module 'merge-ranges' {
+    export default function mergeRanges(ranges: [Date, Date][]): [Date, Date][];
+}
 //# sourceMappingURL=types.d.ts.map
