@@ -8,30 +8,31 @@ var React = require('react');
 var React__default = _interopDefault(React);
 var useComponentSize = _interopDefault(require('@rehooks/component-size'));
 var classcat = _interopDefault(require('classcat'));
-var addDays = _interopDefault(require('date-fns/add_days'));
-var addHours = _interopDefault(require('date-fns/add_hours'));
-var format = _interopDefault(require('date-fns/format'));
-var isDateEqual = _interopDefault(require('date-fns/is_equal'));
 var startOfDay = _interopDefault(require('date-fns/start_of_day'));
+var format = _interopDefault(require('date-fns/format'));
+var addHours = _interopDefault(require('date-fns/add_hours'));
+var addDays = _interopDefault(require('date-fns/add_days'));
+var isDateEqual = _interopDefault(require('date-fns/isEqual'));
 var invariant = _interopDefault(require('invariant'));
 var isEqual = _interopDefault(require('lodash/isEqual'));
 var times = _interopDefault(require('lodash/times'));
 var scrollIntoView = _interopDefault(require('scroll-into-view-if-needed'));
-var en = _interopDefault(require('date-fns/locale/en'));
+var locale = require('date-fns/locale');
 var rxjs = require('rxjs');
 var operators = require('rxjs/operators');
 var Mousetrap = _interopDefault(require('mousetrap'));
 var clamp = _interopDefault(require('lodash/clamp'));
 var floor = _interopDefault(require('lodash/floor'));
 var round = _interopDefault(require('lodash/round'));
-var addMinutes = _interopDefault(require('date-fns/add_minutes'));
-var compareAsc = _interopDefault(require('date-fns/compare_asc'));
-var endOfDay = _interopDefault(require('date-fns/end_of_day'));
-var isBefore = _interopDefault(require('date-fns/is_before'));
 var min = _interopDefault(require('date-fns/min'));
+var isBefore = _interopDefault(require('date-fns/is_before'));
+var endOfDay = _interopDefault(require('date-fns/end_of_day'));
+var compareAsc = _interopDefault(require('date-fns/compare_asc'));
+var addMinutes = _interopDefault(require('date-fns/add_minutes'));
 var range = _interopDefault(require('lodash/range'));
 var differenceInDays = _interopDefault(require('date-fns/difference_in_days'));
 var differenceInMinutes = _interopDefault(require('date-fns/difference_in_minutes'));
+var isEqual$1 = _interopDefault(require('date-fns/is_equal'));
 var setDay = _interopDefault(require('date-fns/set_day'));
 var _mergeRanges = _interopDefault(require('merge-ranges'));
 var getMinutes = _interopDefault(require('date-fns/get_minutes'));
@@ -219,7 +220,8 @@ function _nonIterableRest() {
   throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
 }
 
-var DefaultEventRootComponent = /*#__PURE__*/React__default.forwardRef(function DefaultEventRootComponent(_ref,
+var DefaultEventRootComponent = /*#__PURE__*/React__default.forwardRef(
+function DefaultEventRootComponent(_ref,
 
 
 
@@ -234,7 +236,7 @@ ref)
   return /*#__PURE__*/React__default.createElement("div", _extends({ ref: ref, "aria-disabled": disabled }, props));
 });
 
-var SchedulerContext = /*#__PURE__*/React.createContext({ locale: en });
+var SchedulerContext = /*#__PURE__*/React.createContext({ locale: locale.enUS });
 
 var createPageMapCoordsToContainer = function createPageMapCoordsToContainer(container) {
   return function (event) {
@@ -303,11 +305,7 @@ isDisabled)
 
     var touchStartWithDelay$ = touchStart$.pipe(
     operators.mergeMap(function (start) {return (
-        rxjs.of(start).pipe(
-        operators.delay(300),
-        operators.takeUntil(touchMove$),
-        prevent));}));
-
+        rxjs.of(start).pipe(operators.delay(300), operators.takeUntil(touchMove$), prevent));}));
 
 
 
@@ -553,10 +551,7 @@ var createMapCellInfoToRecurringTimeRange = function createMapCellInfoToRecurrin
           toDay: toDay,
           originDate: originDate });
 
-        var endDate = min(
-        addMinutes(startDate, toMin(spanY)),
-        endOfDay(startDate));
-
+        var endDate = min([addMinutes(startDate, toMin(spanY)), endOfDay(startDate)]);
 
         var range = isBefore(startDate, endDate) ?
         [startDate, endDate] :
@@ -607,7 +602,7 @@ var createMapDateRangeToCells = function createMapDateRangeToCells(_ref) {var _r
 
       });
 
-      if (isDateEqual(end, startOfDay(end))) {
+      if (isEqual$1(end, startOfDay(end))) {
         cells.pop();
       }
 
@@ -701,6 +696,7 @@ template)
 
 var formatHour = function formatHour(
 date,
+
 locale)
 {
   if (getMinutes(date) === 0) {
@@ -1115,9 +1111,7 @@ var RangeBox = /*#__PURE__*/React__default.memo(function RangeBox(_ref2)
 
     React__default.createElement(Resizable, {
       size: _objectSpread2(_objectSpread2({}, originalRect), {}, { width: originalRect.width - 20 }),
-      key: "".concat(rangeIndex, ".").concat(cellIndex, ".").concat(cellArray.length, ".").concat(
-      originalRect.top, ".").concat(
-      originalRect.left),
+      key: "".concat(rangeIndex, ".").concat(cellIndex, ".").concat(cellArray.length, ".").concat(originalRect.top, ".").concat(originalRect.left),
       onResize: handleResize,
       onResizeStop: handleStop,
       handleWrapperClass: classes['handle-wrapper'],
@@ -1187,9 +1181,7 @@ var Schedule = /*#__PURE__*/React__default.memo(function Schedule(_ref)
             React__default.createElement(RangeBox, {
               classes: classes,
               onActiveChange: onActiveChange,
-              key: "".concat(rangeIndex, ".").concat(ranges.length, ".").concat(cellIndex, ".").concat(
-              cellArray.length),
-
+              key: "".concat(rangeIndex, ".").concat(ranges.length, ".").concat(cellIndex, ".").concat(cellArray.length),
               isResizable: isResizable,
               moveAxis: moveAxis,
               isDeletable: isDeletable,
@@ -1283,12 +1275,8 @@ var TimeGridScheduler = /*#__PURE__*/React__default.memo(function TimeGridSchedu
 
 
 
-
-
-
-{var _ref$verticalPrecisio = _ref.verticalPrecision,verticalPrecision = _ref$verticalPrecisio === void 0 ? 30 : _ref$verticalPrecisio,_ref$visualGridVertic = _ref.visualGridVerticalPrecision,visualGridVerticalPrecision = _ref$visualGridVertic === void 0 ? 30 : _ref$visualGridVertic,_ref$cellClickPrecisi = _ref.cellClickPrecision,cellClickPrecision = _ref$cellClickPrecisi === void 0 ? visualGridVerticalPrecision : _ref$cellClickPrecisi,style = _ref.style,schedule = _ref.schedule,_ref$originDate = _ref.originDate,_originDate = _ref$originDate === void 0 ? new Date() : _ref$originDate,_ref$defaultHours = _ref.defaultHours,defaultHours = _ref$defaultHours === void 0 ? [9, 15] : _ref$defaultHours,classes = _ref.classes,className = _ref.className,onChange = _ref.onChange,onEventClick = _ref.onEventClick,eventContentComponent = _ref.eventContentComponent,eventRootComponent = _ref.eventRootComponent,disabled = _ref.disabled,localize = _ref.localize;var _useContext =
+{var _ref$verticalPrecisio = _ref.verticalPrecision,verticalPrecision = _ref$verticalPrecisio === void 0 ? 30 : _ref$verticalPrecisio,_ref$visualGridVertic = _ref.visualGridVerticalPrecision,visualGridVerticalPrecision = _ref$visualGridVertic === void 0 ? 30 : _ref$visualGridVertic,_ref$cellClickPrecisi = _ref.cellClickPrecision,cellClickPrecision = _ref$cellClickPrecisi === void 0 ? visualGridVerticalPrecision : _ref$cellClickPrecisi,style = _ref.style,schedule = _ref.schedule,_ref$originDate = _ref.originDate,_originDate = _ref$originDate === void 0 ? new Date() : _ref$originDate,_ref$defaultHours = _ref.defaultHours,defaultHours = _ref$defaultHours === void 0 ? [9, 15] : _ref$defaultHours,classes = _ref.classes,className = _ref.className,onChange = _ref.onChange,onEventClick = _ref.onEventClick,eventContentComponent = _ref.eventContentComponent,eventRootComponent = _ref.eventRootComponent,disabled = _ref.disabled;var _useContext =
   React.useContext(SchedulerContext),locale = _useContext.locale;
-  console.log('locale', locale, 'localize', localize);
   var originDate = React.useMemo(function () {return startOfDay(_originDate);}, [_originDate]);
   var numVerticalCells = MINS_IN_DAY / verticalPrecision;
   var numHorizontalCells = 7 / horizontalPrecision;

@@ -1,5 +1,5 @@
 import classcat from 'classcat';
-import getMinutes from 'date-fns/get_minutes';
+import { getMinutes } from 'date-fns';
 import React from 'react';
 import { CellInfo, ClassNames, DateRange } from '../types';
 

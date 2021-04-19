@@ -58,9 +58,7 @@ export const Schedule = React.memo(function Schedule({
                 <RangeBox
                   classes={classes}
                   onActiveChange={onActiveChange}
-                  key={`${rangeIndex}.${ranges.length}.${cellIndex}.${
-                    cellArray.length
-                  }`}
+                  key={`${rangeIndex}.${ranges.length}.${cellIndex}.${cellArray.length}`}
                   isResizable={isResizable}
                   moveAxis={moveAxis}
                   isDeletable={isDeletable}

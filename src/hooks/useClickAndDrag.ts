@@ -52,11 +52,7 @@ export function useClickAndDrag(
 
     const touchStartWithDelay$ = touchStart$.pipe(
       mergeMap(start =>
-        of(start).pipe(
-          delay(300),
-          takeUntil(touchMove$),
-          prevent,
-        ),
+        of(start).pipe(delay(300), takeUntil(touchMove$), prevent),
       ),
     );
 

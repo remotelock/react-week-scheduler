@@ -1,6 +1,7 @@
+import { Locale } from 'date-fns';
 declare type Options = {
     dateRange: [Date, Date];
-    locale: typeof import('date-fns/locale/en');
+    locale: Locale;
     template?: string;
     template2?: string;
     includeDayIfSame?: boolean;

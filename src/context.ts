@@ -1,4 +1,4 @@
-import en from 'date-fns/locale/en';
+import { enUS } from 'date-fns/locale';
 import { createContext } from 'react';
 
-export const SchedulerContext = createContext({ locale: en });
+export const SchedulerContext = createContext({ locale: enUS });

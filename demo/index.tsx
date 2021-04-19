@@ -1,18 +1,8 @@
 import Tippy from '@tippy.js/react';
 import classcat from 'classcat';
-import compareAsc from 'date-fns/compare_asc';
-import format from 'date-fns/format';
-import getDay from 'date-fns/get_day';
-import getHours from 'date-fns/get_hours';
-import getMinutes from 'date-fns/get_minutes';
-import ar from 'date-fns/locale/ar';
-import de from 'date-fns/locale/de';
-import en from 'date-fns/locale/en';
-import ja from 'date-fns/locale/ja';
-import setDay from 'date-fns/set_day';
-import setHours from 'date-fns/set_hours';
-import setMinutes from 'date-fns/set_minutes';
-import startOfWeek from 'date-fns/start_of_week';
+import {compareAsc, format, getDay, getHours, getMinutes, setDay, setHours,
+   setMinutes, startOfWeek} from 'date-fns';
+   import { ar, de, ja, enUS } from 'date-fns/locale';
 // @ts-ignore
 import humanizeDuration from 'humanize-duration';
 import mapValues from 'lodash/mapValues';
@@ -34,7 +24,7 @@ import demoClasses from './index.module.scss';
 
 const locales = {
   ja,
-  en,
+  enUS,
   de,
   ar,
 };
@@ -88,7 +78,7 @@ const EventRoot = React.forwardRef<any, EventRootProps>(function EventRoot(
 });
 
 function App() {
-  const [weekStart, setWeekStart] = useState(1);
+  const [weekStart, setWeekStart] = useState<any>(1);
   const originDate = useMemo(
     () =>
       startOfWeek(new Date('2019-03-04'), {

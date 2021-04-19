@@ -1,10 +1,7 @@
 import useComponentSize from '@rehooks/component-size';
 import classcat from 'classcat';
-import addDays from 'date-fns/add_days';
-import addHours from 'date-fns/add_hours';
-import format from 'date-fns/format';
-import isDateEqual from 'date-fns/is_equal';
-import startOfDay from 'date-fns/start_of_day';
+import { addDays, addHours, format, startOfDay } from 'date-fns';
+import isDateEqual from 'date-fns/isEqual';
 import invariant from 'invariant';
 import isEqual from 'lodash/isEqual';
 import times from 'lodash/times';
@@ -62,7 +59,6 @@ export const TimeGridScheduler = React.memo(function TimeGridScheduler({
   eventContentComponent,
   eventRootComponent,
   disabled,
-  localize,
 }: {
   originDate?: Date;
 
@@ -109,11 +105,8 @@ export const TimeGridScheduler = React.memo(function TimeGridScheduler({
   eventContentComponent?: ScheduleProps['eventContentComponent'];
   eventRootComponent?: ScheduleProps['eventRootComponent'];
   disabled?: boolean;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  localize?: any;
 }) {
   const { locale } = useContext(SchedulerContext);
-  console.log('locale', locale, 'localize', localize);
   const originDate = useMemo(() => startOfDay(_originDate), [_originDate]);
   const numVerticalCells = MINS_IN_DAY / verticalPrecision;
   const numHorizontalCells = 7 / horizontalPrecision;

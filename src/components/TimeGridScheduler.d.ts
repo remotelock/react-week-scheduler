@@ -41,6 +41,5 @@ export declare const TimeGridScheduler: React.NamedExoticComponent<{
     eventContentComponent?: ScheduleProps['eventContentComponent'];
     eventRootComponent?: ScheduleProps['eventRootComponent'];
     disabled?: boolean | undefined;
-    localize?: any;
 }>;
 //# sourceMappingURL=TimeGridScheduler.d.ts.map

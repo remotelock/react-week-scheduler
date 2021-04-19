@@ -24,7 +24,7 @@
     "@reach/visually-hidden": "^0.1.2",
     "@rehooks/component-size": "^1.0.2",
     "classcat": "^3.2.5",
-    "date-fns": "^1.30.1",
+    "date-fns": "2.21.1",
     "invariant": "^2.2.4",
     "lodash": "^4.17.11",
     "merge-ranges": "^1.0.2",
