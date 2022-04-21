@@ -1,0 +1,83 @@
+.logout-button {
+  position: absolute;
+  top: 0;
+  right: 0;
+  margin: 20px;
+}
+
+.new-upload-button {
+  position: absolute;
+  top: 80px;
+  left: 50px;
+}
+
+.main {
+  display: flex;
+  flex-direction: column;
+  margin-top: 150px;
+  margin-left: 50px;
+  margin-right: 50px;
+}
+
+.file-input {
+  display: inline-block;
+  text-align: left;
+  background: #cfcfcf;
+  padding: 16px;
+  width: 450px;
+  position: relative;
+  border-radius: 3px;
+  font-size: 14px;
+}
+
+.file-input > [type="file"] {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  z-index: 10;
+  cursor: pointer;
+}
+
+.file-input > .button {
+  display: inline-block;
+  cursor: pointer;
+  background: #eee;
+  padding: 8px 16px;
+  border-radius: 2px;
+  margin-right: 8px;
+}
+
+.file-input:hover > .button {
+  background: dodgerblue;
+  color: white;
+}
+
+.file-input > .label {
+  color: rgb(12, 12, 12);
+  white-space: nowrap;
+  opacity: 0.3;
+}
+
+.file-input.-chosen > .label {
+  opacity: 1;
+}
+
+.file-info {
+  width: 450px;
+  display: flex;
+  margin-top: 20px;
+  flex-direction: column;
+}
+
+.file-info-input {
+  width: 450px;
+  margin-top: 20px;
+}
+
+.upload-btn {
+  width: 200px;
+  margin-top: 50px;
+}
